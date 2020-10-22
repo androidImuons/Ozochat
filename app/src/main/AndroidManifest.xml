@@ -24,6 +24,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>        <activity android:name=".view.activity.OTPActivity">
+        </activity>
+        <activity android:name=".view.activity.EnterPhoneNumberActivity">
+
+        </activity>
+        <activity android:name=".view.activity.WelcomeScreen" >
+
+        </activity>
+        <activity android:name=".view.activity.SplashActivity">
+
         </activity>
 
         <receiver

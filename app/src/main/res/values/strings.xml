@@ -5,4 +5,10 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="coming_soon">Coming soon!</string>
+    <string name="welcome">Welcome to Ozochat</string>
+    <string name="agree">"Agree and Continue "</string>
+    <string name="verifyYourNumber">Verify your phone number</string>
+    <string name="ozochatSend">Ozochat will send an SMS message to verify your phone number. enter your Country code and phone number.</string>
+    <string name="waitingSend">Waiting to automatically detect an SMS sent to 9999999999. wroung Number  </string>
+    <string name="policy">Read Privacy Policy Tap Agree and Continue to accept the Terms of service.</string>
 </resources>
