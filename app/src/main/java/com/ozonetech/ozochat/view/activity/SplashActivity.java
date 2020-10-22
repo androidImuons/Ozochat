@@ -1,8 +1,10 @@
-package com.ozonetech.ozochat;
+package com.ozonetech.ozochat.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.ozonetech.ozochat.R;
 
 public class SplashActivity extends AppCompatActivity {
 
