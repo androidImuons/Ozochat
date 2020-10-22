@@ -62,6 +62,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         snackbar.setBackgroundTint(getResources().getColor(R.color.colorPrimaryDark));
         snackbar.show();
     }
+
+
     protected void hideProgressDialog() {
         try {
             if (progressDialog != null && progressDialog.isShowing()) {

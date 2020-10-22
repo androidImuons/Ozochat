@@ -27,6 +27,14 @@ public class ProfileInfoActivity extends BaseActivity implements ConnectivityRec
         checkConnection();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
     private void checkConnection() {
         boolean isConnected = ConnectivityReceiver.isConnected();
         showSnack(isConnected);
@@ -37,18 +45,9 @@ public class ProfileInfoActivity extends BaseActivity implements ConnectivityRec
         showSnack(isConnected);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        // register connection status listener
-        MyApplication.getInstance().setConnectivityListener(this);
-    }
-
-    // Showing the status in Snackbar
-    private void showSnack(boolean isConnected) {
+    public void showSnack(boolean isConnected) {
         String message;
-        int color;
         if (isConnected) {
             message = "Good! Connected to Internet";
             showSnackbar(databinding.clProfileInfo, message, Snackbar.LENGTH_SHORT);
@@ -59,12 +58,6 @@ public class ProfileInfoActivity extends BaseActivity implements ConnectivityRec
 
         }
 
-    }
-    public void showSnackbar(View view, String message, int duration) {
-        Snackbar snackbar = Snackbar.make(view, message, duration);
-        snackbar.setActionTextColor(Color.WHITE);
-        snackbar.setBackgroundTint(getResources().getColor(R.color.colorPrimaryDark));
-        snackbar.show();
     }
 
 }

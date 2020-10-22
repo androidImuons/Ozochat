@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="contacts"
+            type="com.ozonetech.ozochat.model.Contacts" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite"
+        android:orientation="horizontal">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="@dimen/dp50"
+            android:layout_height="@dimen/dp50"
+            android:layout_margin="@dimen/dp10"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_icon"
+            app:civ_border_color="#7e3c62"
+            app:civ_border_width="0dp"
+            bind:profilePicture="@{contacts.profilePicture}" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/dp5"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvContactName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp2"
+                android:fontFamily="@font/urfa_medium"
+                android:text="@{contacts.name+` (`+contacts.phone +`)`,default= ContactName}"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sp12" />
+
+
+            <TextView
+                android:id="@+id/tvContactStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp2"
+                android:fontFamily="@font/urfa_regular"
+                android:text="@{contacts.status,default= ContactStatus}"
+                android:textColor="@color/colorHint"
+                android:textSize="@dimen/sp12" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</layout>
