@@ -56,8 +56,8 @@ public class SelectContactActivity extends BaseActivity {
     }
 
     private void init() {
-        dataBinding.toolbar.setTitle(R.string.select_contact);
-        setSupportActionBar(dataBinding.toolbar);
+        //dataBinding.toolbar.setTitle(R.string.select_contact);
+        //setSupportActionBar(dataBinding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         selectUsers = new ArrayList<Contacts>();
         requestContactPermission();
@@ -71,8 +71,8 @@ public class SelectContactActivity extends BaseActivity {
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
             phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-            LoadContact loadContact = new LoadContact();
-            loadContact.execute();
+            /*LoadContact loadContact = new LoadContact();
+            loadContact.execute();*/
         }
     }
 
@@ -117,12 +117,12 @@ public class SelectContactActivity extends BaseActivity {
                 // Permission is granted
                 showContacts();
             } else {
-                showSnackbar(dataBinding.clSelectContacts, "Until you grant the permission, we canot display the names", Snackbar.LENGTH_SHORT);
+               // showSnackbar(dataBinding.clSelectContacts, "Until you grant the permission, we canot display the names", Snackbar.LENGTH_SHORT);
             }
         }
     }
 
-    class LoadContact extends AsyncTask<Void, Void, Void> {
+  /*  class LoadContact extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -190,7 +190,7 @@ public class SelectContactActivity extends BaseActivity {
             dataBinding.rvContactsList.setAdapter(contactsAdapter);
 
         }
-    }
+    }*/
 
     public ArrayList<Contacts>  removeDuplicates(ArrayList<Contacts> list){
         Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {

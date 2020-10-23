@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".view.activity.SettingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp">
+
+        <ImageView
+            android:id="@+id/backBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/dp10"
+            android:src="@drawable/ic_backspace" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/urfa_medium"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:text="Setting"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="50dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="20dp">
+
+              <RelativeLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginRight="30dp"
+                  android:layout_marginTop="30dp"
+                  android:layout_marginLeft="30dp">
+
+                  <com.facebook.drawee.view.SimpleDraweeView
+                      android:id="@+id/image"
+                      android:layout_width="80dp"
+                      android:layout_height="80dp"
+                      fresco:placeholderImage="@drawable/user_placeholder" />
+
+                  <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:gravity="center_vertical"
+                        android:orientation="vertical"
+                      android:layout_toRightOf="@id/image"
+                      android:layout_centerVertical="true"
+                      android:layout_marginLeft="20dp"
+                      >
+                  <TextView
+                      android:id="@+id/name"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Name"
+                      android:textColor="@color/black"
+                      android:textSize="18sp"
+                      android:fontFamily="@font/urfa_regular"/>
+                  <TextView
+                      android:id="@+id/about"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="About"
+                      android:textSize="@dimen/sp16"
+                      android:textColor="@color/black"
+                      android:layout_toRightOf="@id/image"
+                      android:layout_below="@+id/name"
+                      android:fontFamily="@font/urfa_regular"/>
+                  </LinearLayout>
+
+
+
+              </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="30dp">
+                    <ImageView
+                        android:id="@+id/call"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="10dp"
+                        android:src="@drawable/phone_icon"
+                         />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:layout_toRightOf="@id/call"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="20dp"
+                        >
+                        <TextView
+                            android:id="@+id/contect"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Contact"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:fontFamily="@font/urfa_regular"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="FAQ, Help, Privacy policy"
+                            android:textSize="@dimen/sp16"
+                            android:layout_toRightOf="@id/image"
+                            android:layout_below="@+id/name"
+                            android:fontFamily="@font/urfa_regular"/>
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</RelativeLayout>
