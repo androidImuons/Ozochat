@@ -11,4 +11,12 @@
     <string name="ozochatSend">Ozochat will send an SMS message to verify your phone number. enter your Country code and phone number.</string>
     <string name="waitingSend">Waiting to automatically detect an SMS sent to 9999999999. wroung Number  </string>
     <string name="policy">Read Privacy Policy Tap Agree and Continue to accept the Terms of service.</string>
+    <string name="action_settings">Settings</string>
+    <string name="toolbar_title">Contacts</string>
+    <string name="action_search">Search</string>
+    <string name="search_hint">Type name…</string>
+    <string name="start_a_chat">Start a Chat</string>
+    <string name="new_contact">New Contact</string>
+    <string name="new_group">New Group</string>
+    <string name="type_a_message">Type a message</string>
 </resources>

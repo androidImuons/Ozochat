@@ -7,10 +7,20 @@
     <dimen name="tab_label">14sp</dimen>
     <dimen name="custom_tab_layout_height">72dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="row_padding">10dp</dimen>
     <dimen name="sp16">16sp</dimen>
     <dimen name="dp50">50dp</dimen>
     <dimen name="dp5">5dp</dimen>
     <dimen name="dp2">2dp</dimen>
     <dimen name="sp12">12sp</dimen>
     <dimen name="dp10">10dp</dimen>
+    <dimen name="sp20">20sp</dimen>
+    <dimen name="dp20">20dp</dimen>
+    <dimen name="dp40">40dp</dimen>
+    <dimen name="dp60">60dp</dimen>
+    <dimen name="dp55">55dp</dimen>
+    <dimen name="dp100">100dp</dimen>
+    <dimen name="dp80">80dp</dimen>
+    <dimen name="dp30">30dp</dimen>
+    <dimen name="sp14">14sp</dimen>
 </resources>
