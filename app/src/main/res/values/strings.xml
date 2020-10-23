@@ -19,4 +19,6 @@
     <string name="new_contact">New Contact</string>
     <string name="new_group">New Group</string>
     <string name="type_a_message">Type a message</string>
+    <string name="profileinfo">Profile Info</string>
+    <string name="file_limit_size_upload_format">Files must be less than %sMB</string>
 </resources>

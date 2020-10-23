@@ -70,4 +70,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
     implementation 'com.hbb20:ccp:2.4.0'
     implementation 'com.github.aabhasr1:OtpView:v1.1.2'
+    implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
 }

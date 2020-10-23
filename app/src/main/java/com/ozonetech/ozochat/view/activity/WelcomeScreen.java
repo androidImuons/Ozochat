@@ -15,7 +15,7 @@ import com.ozonetech.ozochat.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class WelcomeScreen extends AppCompatActivity {
+public class WelcomeScreen extends BaseActivity {
 
     @BindView(R.id.text)
     TextView text;

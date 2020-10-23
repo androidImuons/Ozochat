@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener {
+public class SelectContactActivity extends BaseActivity {
 
     ActivitySelectContactBinding dataBinding;
     ArrayList<Contacts> selectUsers;

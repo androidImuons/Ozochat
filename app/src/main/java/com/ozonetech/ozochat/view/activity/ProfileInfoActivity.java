@@ -18,6 +18,7 @@ public class ProfileInfoActivity extends BaseActivity implements ConnectivityRec
 
     ActivityProfileInfoBinding databinding;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
