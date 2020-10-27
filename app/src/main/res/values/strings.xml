@@ -21,4 +21,5 @@
     <string name="type_a_message">Type a message</string>
     <string name="profileinfo">Profile Info</string>
     <string name="file_limit_size_upload_format">Files must be less than %sMB</string>
+    <string name="recent_updates">Recent updates</string>
 </resources>

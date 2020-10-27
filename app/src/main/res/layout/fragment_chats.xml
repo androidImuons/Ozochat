@@ -1,45 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorWhite"
-    tools:context=".view.fragment.ChatsFragment">
-
-    <RelativeLayout
+<layout>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/dp55">
+        android:background="@color/colorWhite"
+        tools:context=".view.fragment.ChatsFragment">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp80"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/grey_bg"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/dp55">
 
-            <TextView
-                android:id="@+id/tvContactName"
-                android:layout_width="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="@dimen/dp20"
-                android:layout_marginRight="@dimen/dp10"
-                android:fontFamily="@font/urfa_medium"
-                android:gravity="start|center"
-                android:text="@string/start_a_chat"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="@dimen/sp20" />
+                tools:listitem="@layout/chat_rooms_list_row"/>
 
-            <ImageView
-                android:layout_width="@dimen/dp40"
-                android:layout_height="@dimen/dp40"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_arrow" />
+            <LinearLayout
+                android:id="@+id/ll_startChat"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp80"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/grey_bg"
+                android:orientation="horizontal">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/dp20"
+                    android:layout_marginRight="@dimen/dp10"
+                    android:fontFamily="@font/urfa_medium"
+                    android:gravity="start|center"
+                    android:text="@string/start_a_chat"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/sp20" />
+
+                <ImageView
+                    android:layout_width="@dimen/dp40"
+                    android:layout_height="@dimen/dp40"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_arrow" />
+
+            </LinearLayout>
 
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-</FrameLayout>
+    </FrameLayout>
+</layout>

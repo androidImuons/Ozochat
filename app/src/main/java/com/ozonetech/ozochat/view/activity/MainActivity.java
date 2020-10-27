@@ -14,8 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityMainBinding;
+import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.view.fragment.CallsFragment;
 import com.ozonetech.ozochat.view.fragment.CameraFragment;
 import com.ozonetech.ozochat.view.fragment.ChatsFragment;
@@ -53,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
                 gotoSelectContactActivity();
             }
         });
+
+        User user = new User(String.valueOf(1),
+                "MAYURI",
+                "mayuri@123");
+
+        // storing user in shared preferences
+        MyApplication.getInstance().getPrefManager().storeUser(user);
+
     }
 
     private void gotoSelectContactActivity() {
