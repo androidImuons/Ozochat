@@ -111,9 +111,11 @@ public class OTPActivity extends AppCompatActivity {
                                 startActivity(new Intent(OTPActivity.this, MainActivity.class)
                                         .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
                             }
+                            finishAffinity();
                            /* startActivity(new Intent(OTPActivity.this, ProfileInfoNew.class)
                                     .putExtra("userData" , new Gson().toJson(authResponse.getUser())));*/
                             AppCommon.getInstance(OTPActivity.this).setUserObject(new Gson().toJson(authResponse.getUser()));
+                            AppCommon.getInstance(OTPActivity.this).setUserLogin(String.valueOf(authResponse.getUser().getUid()),true);
 
 
                         } else {

@@ -2,12 +2,14 @@ package com.ozonetech.ozochat.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
 import android.widget.TextView;
 
 import com.ozonetech.ozochat.R;
@@ -39,5 +41,9 @@ text.setText(getString(R.string.policy), TextView.BufferType.SPANNABLE);
         //text.setText();
 
         //text.setText(Html.fromHtml(a + b))
+    }
+
+    public void next(View view) {
+        startActivity(new Intent(this , EnterPhoneNumberActivity.class));
     }
 }

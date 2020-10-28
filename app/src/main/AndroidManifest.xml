@@ -53,7 +53,13 @@
 
         </activity>
         <activity android:name=".view.activity.ProfileInfoActivity" />
-        <activity android:name=".view.activity.SplashActivity"/>
+        <activity android:name=".view.activity.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".view.activity.PhotoVideoRedirectActivity"/>
         <activity android:name=".view.activity.ProfileInfoNew">
 
@@ -63,11 +69,7 @@
         </activity>
         <activity android:name=".view.activity.OTPActivity" />
         <activity android:name=".view.activity.EnterPhoneNumberActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".view.activity.WelcomeScreen"/>
         <activity android:name=".view.activity.SettingActivity"/>
