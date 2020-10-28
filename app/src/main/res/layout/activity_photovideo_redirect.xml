@@ -19,4 +19,20 @@
         android:visibility="gone" />
 
 
+    <TextView
+        android:id="@+id/tvContactName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp2"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:fontFamily="@font/urfa_medium"
+        android:text="@string/coming_soon"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/sp12" />
+
+
+
+
 </RelativeLayout>

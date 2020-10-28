@@ -60,20 +60,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.PhotoVideoRedirectActivity"/>
-        <activity android:name=".view.activity.ProfileInfoNew">
-
-        </activity>
-        <activity android:name=".view.activity.UploadStatus">
-
-        </activity>
         <activity android:name=".view.activity.OTPActivity" />
-        <activity android:name=".view.activity.EnterPhoneNumberActivity">
+        <activity android:name=".view.activity.EnterPhoneNumberActivity"></activity>
+        <activity android:name=".view.activity.WelcomeScreen"></activity>
+        <activity android:name=".view.activity.SettingActivity" >
 
         </activity>
-        <activity android:name=".view.activity.WelcomeScreen"/>
-        <activity android:name=".view.activity.SettingActivity"/>
-        <activity android:name=".view.activity.ProfileActivity"/>
+        <activity android:name=".view.activity.ProfileActivity" >
+
+        </activity>
 
 
         <receiver

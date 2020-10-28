@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorWhite"
-    tools:context=".view.fragment.CallsFragment">
-
-    <TextView
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textSize="@dimen/sp16"
-        android:fontFamily="@font/urfa_medium"
-        android:text="@string/coming_soon" />
+        android:background="@color/colorWhite"
+        tools:context=".view.fragment.CallsFragment">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_contacts_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            tools:listitem="@layout/contactcall_row_layout" />
 
 
-</FrameLayout>
+    </FrameLayout>
+</layout>

@@ -21,6 +21,7 @@
     <string name="type_a_message">Type a message</string>
     <string name="profileinfo">Profile Info</string>
     <string name="file_limit_size_upload_format">Files must be less than %sMB</string>
+    <string name="recent_updates">Recent updates</string>
     <string name="ServerError">Server not responding, please try later</string>
     <string name="NoInternet">Please check your internet connection.</string>
     <string name="camera">Camera</string>
