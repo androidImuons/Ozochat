@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/ll_login"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    tools:context=".view.activity.profileInfoNew">
+    tools:context=".view.activity.ProfileInfoNew">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,6 +45,8 @@
                 android:textSize="18sp" />
 
             <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/sdvImage"
+                android:onClick="uploadImg"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
@@ -72,6 +75,7 @@
                 <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
+                    android:id="@+id/Name"
                     android:layout_marginRight="@dimen/dp5"
                     android:layout_toLeftOf="@id/emojIcon"
                     android:background="@null"
@@ -101,6 +105,7 @@
                 android:background="@drawable/next_btn"
                 android:fontFamily="@font/urfa_medium"
                 android:text="Next"
+                android:onClick="next"
                 android:textColor="@color/colorWhite" />
 
 

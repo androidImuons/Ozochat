@@ -83,16 +83,6 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
             });
         }
 
-
-
-
-
-
-
-
-
-
-
     }
 
     @Override

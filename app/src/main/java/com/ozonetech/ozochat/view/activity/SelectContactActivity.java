@@ -131,7 +131,7 @@ public class SelectContactActivity extends BaseActivity {
         }
     }
 
-    @Override
+   /* @Override
     public void onContactSelected(Contacts contact) {
         Intent intent = new Intent(SelectContactActivity.this,UserChatActivity.class);
         intent.putExtra("name",contact.getName());
@@ -140,7 +140,7 @@ public class SelectContactActivity extends BaseActivity {
         intent.putExtra("profilePic",contact.getProfilePicture());
         startActivity(intent);
         Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
-    }
+    }*/
 
     class LoadContact extends AsyncTask<Void, Void, Void> {
         @Override
@@ -211,7 +211,7 @@ public class SelectContactActivity extends BaseActivity {
 
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
         dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
-        contactsAdapter = new ContactsAdapter(inflater, selectUsers, this);
+        //contactsAdapter = new ContactsAdapter(inflater, selectUsers, this);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         dataBinding.rvContactsList.setAdapter(contactsAdapter);
         // white background notification bar
