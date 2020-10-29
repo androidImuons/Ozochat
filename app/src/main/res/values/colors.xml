@@ -12,6 +12,7 @@
     <color name="text_color_gray">#CBA6A5A5</color>
     <color name="transparent_color">#00ffffff</color>
     <color name="selected_option">#009688</color>
+    <color name="dark_graw">#212121</color>
     <color name="colorchat">#BFADDF</color>
 
 </resources>

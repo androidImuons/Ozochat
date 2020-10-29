@@ -51,19 +51,19 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
+        </activity>
+        <activity android:name=".view.activity.ProfileInfoActivity" />
+        <activity android:name=".view.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".view.activity.ProfileInfoActivity" />
-        <activity android:name=".view.activity.SplashActivity"/>
         <activity android:name=".view.activity.PhotoVideoRedirectActivity"/>
-        <activity android:name=".view.activity.profileInfoNew">
+        <activity android:name=".view.activity.profileInfoNew"/>
 
-        </activity>
         <activity android:name=".view.activity.UploadStatus">
         </activity>
         <activity android:name=".view.activity.OTPActivity" />

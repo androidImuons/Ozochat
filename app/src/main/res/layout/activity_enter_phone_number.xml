@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg"
+    android:id="@+id/ll_login"
     tools:context=".view.activity.EnterPhoneNumberActivity">
 
     <LinearLayout
@@ -87,6 +88,7 @@
                 android:layout_weight="1" />
 
             <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etPhoneNumber"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="6"
@@ -108,6 +110,7 @@
             android:background="@drawable/next_btn"
             android:fontFamily="@font/urfa_medium"
             android:text="Next"
+            android:onClick="next"
             android:textColor="@color/colorWhite" />
 
         <TextView
