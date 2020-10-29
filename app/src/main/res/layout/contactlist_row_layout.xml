@@ -7,7 +7,7 @@
 
         <variable
             name="contacts"
-            type="com.ozonetech.ozochat.model.Contacts" />
+            type="com.ozonetech.ozochat.viewmodel.Contacts" />
 
     </data>
 
@@ -44,10 +44,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/dp2"
                 android:fontFamily="@font/urfa_medium"
-                android:text="@{contacts.name+` (`+contacts.phone +`)`,default= ContactName}"
+                android:text="@{contacts.name,default= ContactName}"
                 android:textColor="@color/colorBlack"
                 android:textSize="@dimen/sp12" />
-
+<!--+` (`+contacts.phone +`)`-->
 
             <TextView
                 android:id="@+id/tvContactStatus"
