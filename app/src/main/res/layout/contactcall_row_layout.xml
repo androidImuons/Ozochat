@@ -7,7 +7,7 @@
 
         <variable
             name="contacts"
-            type="com.ozonetech.ozochat.model.Contacts" />
+            type="com.ozonetech.ozochat.viewmodel.Contacts" />
 
     </data>
 

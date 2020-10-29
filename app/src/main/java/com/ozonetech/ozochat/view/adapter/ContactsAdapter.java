@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ContactlistRowLayoutBinding;
-import com.ozonetech.ozochat.model.Contacts;
+import com.ozonetech.ozochat.viewmodel.Contacts;
 
 import java.util.ArrayList;
 import java.util.List;

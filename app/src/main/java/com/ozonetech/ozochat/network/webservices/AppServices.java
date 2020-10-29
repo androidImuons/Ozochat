@@ -32,4 +32,8 @@ public interface AppServices {
             @Part MultipartBody.Part image
     );
 
+
+    @POST("validMembers")
+    Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
+
 }

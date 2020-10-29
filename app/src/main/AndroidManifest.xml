@@ -59,6 +59,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+        </activity>
+       <activity android:name=".view.activity.PhotoVideoRedirectActivity"/>
+
+        <activity android:name=".view.activity.UploadStatus">
         </activity>
         <activity android:name=".view.activity.OTPActivity" />
         <activity android:name=".view.activity.EnterPhoneNumberActivity"></activity>
@@ -78,15 +83,6 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
     </application>
 
 </manifest>

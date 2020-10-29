@@ -1,11 +1,13 @@
 package com.ozonetech.ozochat.view.activity;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
@@ -34,17 +36,23 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
-import com.ozonetech.ozochat.model.Contacts;
+import com.ozonetech.ozochat.listeners.ContactsListener;
+import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.MobileObject;
+import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.view.adapter.ContactsAdapter;
+import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener {
+public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener, ContactsListener {
 
     ActivitySelectContactBinding dataBinding;
     ArrayList<Contacts> selectUsers;
@@ -52,12 +60,14 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     Cursor phones;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private SearchView searchView;
+    Contacts contactsViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         dataBinding = DataBindingUtil.setContentView(SelectContactActivity.this,R.layout.activity_select_contact);
+        contactsViewModel= ViewModelProviders.of(SelectContactActivity.this).get(Contacts.class);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
         init();
@@ -131,16 +141,71 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         }
     }
 
-   /* @Override
+    @Override
     public void onContactSelected(Contacts contact) {
         Intent intent = new Intent(SelectContactActivity.this,UserChatActivity.class);
+        intent.putExtra("chat_room_id",String.valueOf(contact.getUid()));
         intent.putExtra("name",contact.getName());
         intent.putExtra("mobileNo",contact.getPhone());
         intent.putExtra("status",contact.getStatus());
         intent.putExtra("profilePic",contact.getProfilePicture());
         startActivity(intent);
-        Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
-    }*/
+        Toast.makeText(getApplicationContext(), "Selected: " + contact.getUid() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onGetContactsSuccess(LiveData<VerifiedContactsModel> verifiedContactsResponse) {
+        verifiedContactsResponse.observe(SelectContactActivity.this, new Observer<VerifiedContactsModel>() {
+            @Override
+            public void onChanged(VerifiedContactsModel verifiedContactsModel) {
+                //save access token
+                hideProgressDialog();
+                try {
+                    if(verifiedContactsModel.getSuccess()){
+
+                        if(verifiedContactsModel.getData()!=null && verifiedContactsModel.getData().size()!=0){
+                            ArrayList<Contacts> verifiedUsers=new ArrayList<>();
+                            for(int i=0;i<verifiedContactsModel.getData().size();i++){
+                                Contacts contacts=new Contacts();
+                                contacts.setName(verifiedContactsModel.getData().get(i).getName());
+                                contacts.setPhone(verifiedContactsModel.getData().get(i).getPhone());
+                                contacts.setProfilePicture(verifiedContactsModel.getData().get(i).getProfilePicture());
+                                contacts.setUid(verifiedContactsModel.getData().get(i).getUid());
+                                contacts.setStatus("Hii, I am on Ozochat");
+                                verifiedUsers.add(contacts);
+                            }
+                            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            setRecyclerView(inflater,verifiedUsers);
+                        }
+
+
+
+                        Log.d("SelectContactActivity","\n Message : " + verifiedContactsModel.getMessage()+
+                                "\n Data : " + verifiedContactsModel.getData());
+                        Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    }else{
+                        Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("SelectContactActivity","\n Message : " + verifiedContactsModel.getMessage()+
+                                "\n Data : " + verifiedContactsModel.getData());
+                    }
+
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
+            }
+        });
+
+    }
+    private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
+        dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
+        contactsAdapter = new ContactsAdapter(inflater, selectUsers, this);
+        dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        dataBinding.rvContactsList.setAdapter(contactsAdapter);
+        // white background notification bar
+        whiteNotificationBar(dataBinding.rvContactsList);
+    }
 
     class LoadContact extends AsyncTask<Void, Void, Void> {
         @Override
@@ -185,7 +250,6 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             // sortContacts();
             int count=selectUsers.size();
             ArrayList<Contacts> removed=new ArrayList<>();
@@ -202,21 +266,27 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             }
             contacts.addAll(removed);
             selectUsers=removeDuplicates(contacts);
-
-            setRecyclerView(inflater,selectUsers);
-
+            sendContactsList(selectUsers);
 
         }
     }
 
-    private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
-        dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
-        //contactsAdapter = new ContactsAdapter(inflater, selectUsers, this);
-        dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        dataBinding.rvContactsList.setAdapter(contactsAdapter);
-        // white background notification bar
-        whiteNotificationBar(dataBinding.rvContactsList);
+    private void sendContactsList(ArrayList<Contacts> selectUserslist) {
+        ArrayList<MobileObject> conList = new ArrayList();
+        for(int i = 0; i< selectUserslist.size(); i++){
+            String mobile = selectUserslist.get(i).getPhone().contains("+91")? selectUserslist.get(i).getPhone().replace("+91",""): selectUserslist.get(i).getPhone();
+            conList.add(new MobileObject(mobile));
+        }
+        NumberListObject arrayListAge = new NumberListObject();
+        arrayListAge.setMobile(conList);
+        gotoFetchValidMembers(arrayListAge);
     }
+
+    private void gotoFetchValidMembers(NumberListObject arrayListAge) {
+        showProgressDialog("Please wait...");
+        contactsViewModel.sendContacts(SelectContactActivity.this, contactsViewModel.contactsListener=this,arrayListAge);
+    }
+
 
     public ArrayList<Contacts>  removeDuplicates(ArrayList<Contacts> list){
         Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
