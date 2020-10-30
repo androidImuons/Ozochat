@@ -30,6 +30,13 @@ public class User {
     @Expose
     private String profilePicUrl;
 
+    public String getProfilePicUrl() {
+        return profilePicUrl;
+    }
+
+    public void setProfilePicUrl(String profilePicUrl) {
+        this.profilePicUrl = profilePicUrl;
+    }
 
     public Integer getUid() {
         return uid;

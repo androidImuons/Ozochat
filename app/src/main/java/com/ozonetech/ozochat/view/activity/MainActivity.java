@@ -56,12 +56,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        User user = new User(String.valueOf(1),
+       /* User user = new User(String.valueOf(1),
                 "MAYURI",
                 "mayuri@123");
-
+*/
         // storing user in shared preferences
-        MyApplication.getInstance().getPrefManager().storeUser(user);
+       // MyApplication.getInstance().getPrefManager().storeUser(user);
 
     }
 

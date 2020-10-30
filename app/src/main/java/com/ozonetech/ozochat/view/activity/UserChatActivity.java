@@ -86,26 +86,26 @@ public class UserChatActivity extends AppCompatActivity {
             msg.setId(String.valueOf(i));
             msg.setMessage("hii "+i);
             msg.setCreatedAt("04:0"+i);
-            User user = new User(String.valueOf(2),
+          /*  User user = new User(String.valueOf(2),
                     "RUCHITA",
-                    "ruchita@123");
-            msg.setUser(user);
+                    "ruchita@123");*/
+           // msg.setUser(user);
             messageArrayList.add(msg);
         }
         Message msg = new Message();
         msg.setId("3");
         msg.setMessage("hii");
         msg.setCreatedAt("04:00");
-        User user = new User(String.valueOf(1),
+        /*User user = new User(String.valueOf(1),
                 "MAYURI",
-                "mayuri@123");
-        msg.setUser(user);
+                "mayuri@123");*/
+       // msg.setUser(user);
         messageArrayList.add(msg);
 
 
         // self user id is to identify the message owner
-        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
-        mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
+      //  String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+       // mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);
     }

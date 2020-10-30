@@ -39,16 +39,16 @@ public class MyPreferenceManager {
     }
 
 
-    public void storeUser(User user) {
+  /*  public void storeUser(User user) {
         editor.putString(KEY_USER_ID, user.getId());
         editor.putString(KEY_USER_NAME, user.getName());
         editor.putString(KEY_USER_EMAIL, user.getEmail());
         editor.commit();
 
         Log.e(TAG, "User is stored in shared preferences. " + user.getName() + ", " + user.getEmail());
-    }
+    }*/
 
-    public User getUser() {
+   /* public User getUser() {
         if (pref.getString(KEY_USER_ID, null) != null) {
             String id, name, email;
             id = pref.getString(KEY_USER_ID, null);
@@ -59,7 +59,7 @@ public class MyPreferenceManager {
             return user;
         }
         return null;
-    }
+    }*/
 
     public void addNotification(String notification) {
 
