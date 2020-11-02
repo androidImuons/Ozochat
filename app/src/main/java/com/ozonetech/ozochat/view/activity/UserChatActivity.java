@@ -96,7 +96,8 @@ public class UserChatActivity extends AppCompatActivity {
         msg.setId("3");
         msg.setMessage("hii");
         msg.setCreatedAt("04:00");
-        User user = new User(String.valueOf(1),
+        User user = new User
+                (String.valueOf(1),
                 "MAYURI",
                 "mayuri@123");
         msg.setUser(user);
@@ -104,7 +105,7 @@ public class UserChatActivity extends AppCompatActivity {
 
 
         // self user id is to identify the message owner
-        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getUid().toString();
         mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);

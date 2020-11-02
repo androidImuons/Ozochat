@@ -40,12 +40,12 @@ public class MyPreferenceManager {
 
 
     public void storeUser(User user) {
-        editor.putString(KEY_USER_ID, user.getId());
-        editor.putString(KEY_USER_NAME, user.getName());
+        editor.putString(KEY_USER_ID, user.getUid().toString());
+        editor.putString(KEY_USER_NAME, user.getUsername());
         editor.putString(KEY_USER_EMAIL, user.getEmail());
         editor.commit();
 
-        Log.e(TAG, "User is stored in shared preferences. " + user.getName() + ", " + user.getEmail());
+      //  Log.e(TAG, "User is stored in shared preferences. " + user.getName() + ", " + user.getEmail());
     }
 
     public User getUser() {

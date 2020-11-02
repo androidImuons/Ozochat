@@ -10,6 +10,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -23,8 +26,18 @@ import com.ozonetech.ozochat.view.fragment.CameraFragment;
 import com.ozonetech.ozochat.view.fragment.ChatsFragment;
 import com.ozonetech.ozochat.view.fragment.StatusFragment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataBinding= DataBindingUtil.setContentView(MainActivity.this,R.layout.activity_main);
+        dataBinding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
 
@@ -63,10 +76,83 @@ public class MainActivity extends AppCompatActivity {
         // storing user in shared preferences
         MyApplication.getInstance().getPrefManager().storeUser(user);
 
+
+        try {
+
+
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.reconnection = false;
+            opts.multiplex = true;
+            iSocket = IO.socket("http://3.0.49.131/", opts);
+            iSocket.on(Socket.EVENT_CONNECT, connection);
+            iSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+            iSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+            iSocket.on("getMessages", message);
+            iSocket.connect();
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            Log.d(tag, "----exception--" + e.getMessage());
+        }
+
     }
 
+    private Socket iSocket;
+    private String tag = "MainActivity";
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkSocketConnection();
+    }
+
+    private void checkSocketConnection() {
+        if (iSocket.connected()) {
+            Log.d(tag, "----connected- server-" + iSocket.id());
+            JSONObject jsonObject = new JSONObject();
+
+            try {
+                jsonObject.put("message", "Rahul Message..group message karkay...");
+                jsonObject.put("user_id", 80);
+                jsonObject.put("g_id", 31);
+                jsonObject.put("added_id", 82);
+
+                iSocket.emit("sendGroupMessage", jsonObject);
+
+                JSONObject json = new JSONObject();
+                json.put("user_id", 80);
+                iSocket.emit("getMessages", json).on("getMessages", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        JSONArray data = (JSONArray) args[0];
+                        Log.d(tag, "---get message--" + data.toString());
+                    }
+                });
+
+                iSocket.on("getMessages", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+
+
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(tag, "---not-connected--" + iSocket.open().connected());
+            Log.d(tag, "---not-connected--" + iSocket.connected());
+
+
+        }
+    }
+
+
     private void gotoSelectContactActivity() {
-        Intent intent=new Intent(MainActivity.this,SelectContactActivity.class);
+        Intent intent = new Intent(MainActivity.this, SelectContactActivity.class);
         startActivity(intent);
     }
 
@@ -75,10 +161,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new CameraFragment(),"");
+        adapter.addFragment(new CameraFragment(), "");
         adapter.addFragment(new ChatsFragment(), "CHATS");
         adapter.addFragment(new StatusFragment(), "STATUS");
         adapter.addFragment(new CallsFragment(), "CALLS");
@@ -116,7 +201,62 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    Emitter.Listener connection = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
 
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onDisconnect = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onConnectError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener message = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            final JSONArray result = (JSONArray) args[0];
+            new Handler(getMainLooper())
+                    .post(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.d(tag, "---data--" + result.toString());
+                                }
+                            }
+
+                    );
+        }
+    };
+
+    private void connectConnection() {
+
+    }
 }
 
 

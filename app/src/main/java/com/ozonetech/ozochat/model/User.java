@@ -26,9 +26,29 @@ public class User {
     @Expose
     private String isLogin;
 
+    public User(String id, String name, String email) {
+        this.uid=Integer.parseInt(id);
+        this.username=name;
+        this.email=email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @SerializedName("email")
+    @Expose
+    private String email;
+
     @SerializedName("profilePicUrl")
     @Expose
     private String profilePicUrl;
+
+
 
 
     public Integer getUid() {

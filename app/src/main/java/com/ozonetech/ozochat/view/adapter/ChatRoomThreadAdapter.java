@@ -72,7 +72,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
-        if (message.getUser().getId().equals(userId)) {
+        if (message.getUser().getUid().equals(userId)) {
             return SELF;
         }
 
@@ -86,8 +86,8 @@ public class ViewHolder extends RecyclerView.ViewHolder {
 
         String timestamp = getTimeStamp(message.getCreatedAt());
 
-        if (message.getUser().getName() != null)
-            timestamp = message.getUser().getName() + ", " + timestamp;
+        if (message.getUser().getUsername() != null)
+            timestamp = message.getUser().getUsername() + ", " + timestamp;
 
         ((ViewHolder) holder).timestamp.setText(timestamp);
     }
