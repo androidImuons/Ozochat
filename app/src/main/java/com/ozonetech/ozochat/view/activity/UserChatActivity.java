@@ -75,20 +75,22 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         toolbarDataBinding = dataBinding.toolbarLayout;
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
+        prefManager=new MyPreferenceManager(UserChatActivity.this);
+
         chatViewModel = ViewModelProviders.of(UserChatActivity.this).get(UserChatViewModel.class);
         dataBinding.setUserChat(chatViewModel);
         chatViewModel.callback = (CommonResponseInterface) this;
         chatViewModel.groupInterface = (CreateGroupInterface) this;
+
         Intent intent = getIntent();
         chatRoomId = intent.getStringExtra("chat_room_id");
         contactName = intent.getStringExtra("name");
         contactMobileNo = intent.getStringExtra("mobileNo");
         contactStatus = intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
-        myPreferenceManager = new MyPreferenceManager(getApplicationContext());
         init();
 
-        checkGroup();
+
 
     }
 
@@ -99,7 +101,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
         JsonObject member = new JsonObject();
 
-        admin.addProperty("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
+        admin.addProperty("admin", prefManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
         member.addProperty("mobile", contactMobileNo);
         memerArray.add(member);
         JsonObject memersObjeect = new JsonObject();
@@ -111,8 +113,6 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         jsonArray.add(memersObjeect);
         jsonArray.add(groupname);
         chatViewModel.createGroup(getApplicationContext(), jsonArray);
-
-        // getMessage();
     }
 
     private void init() {
@@ -141,7 +141,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        getMessage();
+       // getMessage();
+        checkGroup();
     }
 
     private void sendMessage() {
@@ -153,19 +154,26 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         }
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("user_id", chatRoomId);
+            jsonObject.put("user_id", prefManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID));
             jsonObject.put("group_id", group_id);
             jsonObject.put("message", dataBinding.message.getText().toString());
+            Log.d(tag, "---send message parameter-- user_id : "+prefManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID)+
+                    " \ngroup_id : "+group_id +"\n message : "+message);
+
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
                     Log.d(tag, "---send message--");
+
                     getMessage();
-                    mAdapter.notifyDataSetChanged();
+
+                  //  getMessage();
+
+                  /*  mAdapter.notifyDataSetChanged();
 
                     if (mAdapter.getItemCount() > 1) {
                         dataBinding.recyclerView.getLayoutManager().smoothScrollToPosition(dataBinding.recyclerView, null, mAdapter.getItemCount() - 1);
-                    }
+                    }*/
 
                 }
             });
@@ -174,36 +182,36 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         }
         dataBinding.message.setText("");
 
-  /*  mAdapter.notifyDataSetChanged();
-        if (mAdapter.getItemCount() > 1) {
-            dataBinding.recyclerView.getLayoutManager().smoothScrollToPosition(dataBinding.recyclerView, null, mAdapter.getItemCount() - 1);
-        }*/
+
     }
 
     private void getMessage() {
+        Log.d(tag, "--getMessage called");
+
         JSONObject json = new JSONObject();
         try {
-            json.put("user_id", group_id);
+            json.put("group_id", group_id);
 
-            //json.put("user_id", chatRoomId);
-            // json.put("group_id","GP1604310627098");
+           // json.put("user_id", chatRoomId);
+           //  json.put("group_id","GP1604310627098");
+            Log.d(tag, "---get message para \n group_id : "+group_id);
 
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
                     JSONArray data = (JSONArray) args[0];
                     final JSONArray result = (JSONArray) args[0];
-                    new Handler(getMainLooper())
-                            .post(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Log.d(tag, "--getMessage -data-array-" + data.toString());
-                                            setRecyclerView(data);
-                                        }
-                                    }
+                    Log.d(tag, "--getMessage -data-array-" + data.toString());
+                    runOnUiThread(new Runnable() {
 
-                            );
+                        @Override
+                        public void run() {
+
+                            setRecyclerView(data);
+
+
+                        }
+                    });
 
                 }
             });
