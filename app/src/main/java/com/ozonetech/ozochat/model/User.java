@@ -13,6 +13,9 @@ public class User {
     @SerializedName("mobile")
     @Expose
     private String mobile;
+    @SerializedName("image")
+    @Expose
+    private String profilePic;
     @SerializedName("otp")
     @Expose
     private Integer otp;
@@ -21,15 +24,24 @@ public class User {
     private String otpVerify;
     @SerializedName("deviceId")
     @Expose
-    private Object deviceId;
+    private String deviceId;
     @SerializedName("isLogin")
     @Expose
     private String isLogin;
-
-    @SerializedName("profilePicUrl")
+    @SerializedName("token")
     @Expose
-    private String profilePicUrl;
+    private String token;
 
+    public User(String uid, String username, String mobile, String profilePic, String otpVerify, String deviceId, String isLogin, String token) {
+        this.uid = Integer.valueOf(uid);
+        this.username = username;
+        this.mobile = mobile;
+        this.profilePic = profilePic;
+        this.otpVerify = otpVerify;
+        this.deviceId = deviceId;
+        this.isLogin = isLogin;
+        this.token = token;
+    }
 
     public Integer getUid() {
         return uid;
@@ -43,7 +55,7 @@ public class User {
         return username;
     }
 
-    public void setUsername(String  username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
@@ -53,6 +65,14 @@ public class User {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 
     public Integer getOtp() {
@@ -71,11 +91,11 @@ public class User {
         this.otpVerify = otpVerify;
     }
 
-    public Object getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
     }
 
-    public void setDeviceId(Object deviceId) {
+    public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
 
@@ -85,5 +105,13 @@ public class User {
 
     public void setIsLogin(String isLogin) {
         this.isLogin = isLogin;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

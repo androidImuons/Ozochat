@@ -18,10 +18,12 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.model.OTPResponse;
+import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.AppCommon;
 import com.ozonetech.ozochat.network.ViewUtils;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OTPActivity extends AppCompatActivity {
+    MyPreferenceManager prefManager;
 
     @BindView(R.id.otp_view)
     OtpTextView otpTextView;
@@ -53,6 +56,7 @@ public class OTPActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_o_t_p);
         ButterKnife.bind(this);
+        prefManager=new MyPreferenceManager(OTPActivity.this);
         String a = "Waiting to automatically detect an SMS sent to 9999999999.";
         String b = "<font color='#6553e6'>wrong Number</font>";
         textView.setText(Html.fromHtml(a + b));
@@ -103,10 +107,17 @@ public class OTPActivity extends AppCompatActivity {
                     if (authResponse != null) {
                         Log.i("Response::", new Gson().toJson(authResponse));
                         if (authResponse.getSuccess() == true) {
+
                             showSnackbar(ll_login,authResponse.getMessage(), Snackbar.LENGTH_SHORT);
-                            if(authResponse.getUser().getUsername() == null){
-                                startActivity(new Intent(OTPActivity.this, ProfileInfoNew.class)
+                            if(authResponse.getUser()!= null){
+
+                                User user= new User(String.valueOf(authResponse.getUser().getUid()),authResponse.getUser().getUsername(),authResponse.getUser().getMobile(),
+                                        authResponse.getUser().getProfilePic(),authResponse.getUser().getOtpVerify(),authResponse.getUser().getDeviceId(),
+                                        authResponse.getUser().getIsLogin(),authResponse.getUser().getToken());
+                                prefManager.storeUser(user);
+                                startActivity(new Intent(OTPActivity.this, MainActivity.class)
                                         .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
+
                             }else {
                                 startActivity(new Intent(OTPActivity.this, MainActivity.class)
                                         .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
