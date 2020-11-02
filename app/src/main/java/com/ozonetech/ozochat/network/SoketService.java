@@ -1,58 +1,151 @@
 package com.ozonetech.ozochat.network;
 
+import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-//
-//import com.github.nkzawa.emitter.Emitter;
-//import com.github.nkzawa.socketio.client.IO;
-//import com.github.nkzawa.socketio.client.Socket;
 
-import org.json.JSONObject;
+import com.ozonetech.ozochat.MyApplication;
 
-import java.net.URISyntaxException;
+import org.json.JSONArray;
+
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
 
 public class SoketService extends Service {
-    //private Socket iSocket;
+    private MyApplication signalApplication;
+
+
+    public static SoketService instance = null;
     private String tag="SoketService";
+
+    public static boolean isInstanceCreated() {
+        return instance == null ? false : true;
+    }
+    private final IBinder myBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public SoketService getService() {
+            return SoketService.this;
+        }
+    }
+
+    public void IsBendable() {
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-//        IO.Options opts = new IO.Options();
-////            opts.query = "auth_token=" + authToken;
-//        try {
-//            iSocket = IO.socket("http://3.0.49.131/socket.io/");
-//           // iSocket.connect();
-//            //checkSocketConnection();
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
+        if(isInstanceCreated()){
+            return;
+        }
+        signalApplication=(MyApplication) getApplication();
+        if (signalApplication.getSocket() == null)
+            signalApplication.iSocket = signalApplication.getSocket();
+        signalApplication.iSocket.on(Socket.EVENT_CONNECT, connection);
+        signalApplication.iSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        signalApplication.iSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        signalApplication.iSocket.on("getMessages", message);
+
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (isInstanceCreated()) {
+            return START_STICKY_COMPATIBILITY;
+        }
         super.onStartCommand(intent, flags, startId);
-
+        connectConnection();
         return START_STICKY;
     }
 
-//    private void checkSocketConnection() {
-//        if(iSocket.connected()){
-//            Log.d(tag,"----connected--");
-//        }else{
-//            Log.d(tag,"---not-connected--");
-//
-//        }
-//
-//    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
+        signalApplication.getSocket().off(Socket.EVENT_CONNECT, connection);
+        signalApplication.getSocket().off(Socket.EVENT_DISCONNECT,onDisconnect );
+        signalApplication.getSocket().off(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        signalApplication.getSocket().off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        //@formatter:off
+        signalApplication.getSocket().off("getMessages", message);
+        //@formatter:on
+
+        disconnectConnection();
+    }
+
+    private void connectConnection() {
+        instance = this;
+        signalApplication.getSocket().connect();
+    }
+
+    private void disconnectConnection() {
+        instance = null;
+        signalApplication.getSocket().disconnect();
+    }
+
+    Emitter.Listener connection = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+    private Emitter.Listener onConnectError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onDisconnect = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener message = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            final JSONArray result = (JSONArray) args[0];
+            new Handler(getMainLooper())
+                    .post(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                   // Log.d(tag, "---data--" + result.toString());
+                                }
+                            }
+
+                    );
+        }
+    };
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return myBinder;
     }
 }

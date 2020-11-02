@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,7 +21,15 @@ import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+
+import butterknife.internal.Utils;
+import io.socket.client.On;
+import io.socket.emitter.Emitter;
 
 public class UserChatActivity extends AppCompatActivity {
 
@@ -32,6 +42,7 @@ public class UserChatActivity extends AppCompatActivity {
     String chatRoomId;
     private ArrayList<Message> messageArrayList;
     private ChatRoomThreadAdapter mAdapter;
+    private String tag="UserChatActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +59,7 @@ public class UserChatActivity extends AppCompatActivity {
         contactStatus=intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
         init();
+        getMessage();
     }
 
     private void init() {
@@ -117,15 +129,50 @@ public class UserChatActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("user_id", chatRoomId);
+            jsonObject.put("message", dataBinding.message.getText().toString());
+            MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.d(tag, "---send message--");
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         dataBinding.message.setText("");
 
 
+    }
 
-        //mAdapter.notifyDataSetChanged();
-      /*  if (mAdapter.getItemCount() > 1) {
-            dataBinding.recyclerView.getLayoutManager().smoothScrollToPosition(dataBinding.recyclerView, null, mAdapter.getItemCount() - 1);
-        }*/
+  private void  getMessage(){
+      JSONObject json = new JSONObject();
+      try {
+          json.put("user_id", chatRoomId);
+          MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                  JSONArray data = (JSONArray) args[0];
+                  final JSONArray result = (JSONArray) args[0];
+                  new Handler(getMainLooper())
+                          .post(
+                                  new Runnable() {
+                                      @Override
+                                      public void run() {
+                                          Log.d(tag, "--getMessage -data-array-" + data.toString());
+                                      }
+                                  }
+
+                          );
+
+              }
+          });
+      } catch (JSONException e) {
+          e.printStackTrace();
+      }
+
     }
 
 }

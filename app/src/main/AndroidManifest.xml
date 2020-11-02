@@ -84,6 +84,8 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+        <service android:name=".network.SoketService"
+            android:exported="true"></service>
     </application>
 
 </manifest>

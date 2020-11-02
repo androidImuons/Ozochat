@@ -26,7 +26,7 @@ public class MyApplication extends Application {
 
     private static MyApplication mInstance;
     private MyPreferenceManager pref;
-    private Socket iSocket;
+    public Socket iSocket;
     private String tag = "Myapp";
 
     @Override
@@ -36,64 +36,21 @@ public class MyApplication extends Application {
         mInstance = this;
 
         try {
-//            IO.Options options = new IO.Options();
-//            options.transports = new String[] { WebSocket.NAME, Polling.NAME};
-            iSocket = IO.socket("http://3.0.49.131:8080/socket.io/");
-          //  iSocket = IO.socket("http://3.0.49.131:8080/socket.io/");
-           iSocket.connect();
-            //iSocket.open();
-            checkSocketConnection();
+
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.reconnection = false;
+            opts.multiplex = true;
+            iSocket = IO.socket("http://3.0.49.131/", opts);
         } catch (URISyntaxException e) {
             e.printStackTrace();
             Log.d(tag, "----exception--" + e.getMessage());
         }
     }
 
-    private void checkSocketConnection() {
-        if (iSocket.connected()) {
-          Log.d(tag, "----connected--");
-        } else {
-         Log.d(tag, "---not-connected--"+iSocket.id());
-            Log.d(tag, "---not-connected--"+iSocket.connected());
-
-
-        }
+    public Socket getSocket() {
+        return iSocket;
     }
-
-//    private void checkSocketConnection() {
-//        iSocket.on(iSocket.EVENT_CONNECT, new Emitter.Listener() {
-//            @Override
-//            public void call(Object... args) {
-//                Log.d(tag, "----connected--"+args[0]);
-//            }
-//        });
-//        if (iSocket.connected()) {
-//            Log.d(tag, "----connected--");
-//        } else {
-//            Log.d(tag, "---not-connected--");
-//
-//        }
-//        JSONObject jsonObject = new JSONObject();
-//
-//        try {
-//            jsonObject.put("message", "Rahul Message");
-//            jsonObject.put("user_id", 85);
-//            iSocket.emit("sendMessage", jsonObject);
-//
-//            iSocket.on(iSocket.EVENT_MESSAGE, new Emitter.Listener() {
-//                @Override
-//                public void call(Object... args) {
-//                    JSONObject data = (JSONObject) args[0];
-//                    Log.d(tag, "---data--" + data.toString());
-//
-//                }
-//            });
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-
     public static synchronized MyApplication getInstance() {
         return mInstance;
     }

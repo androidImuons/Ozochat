@@ -77,24 +77,24 @@ public class MainActivity extends AppCompatActivity {
        // MyApplication.getInstance().getPrefManager().storeUser(user);
 
 
-        try {
-
-
-            IO.Options opts = new IO.Options();
-            opts.forceNew = true;
-            opts.reconnection = false;
-            opts.multiplex = true;
-            iSocket = IO.socket("http://3.0.49.131/", opts);
-            iSocket.on(Socket.EVENT_CONNECT, connection);
-            iSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
-            iSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-            iSocket.on("getMessages", message);
-            iSocket.connect();
-
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            Log.d(tag, "----exception--" + e.getMessage());
-        }
+//        try {
+//
+//
+//            IO.Options opts = new IO.Options();
+//            opts.forceNew = true;
+//            opts.reconnection = false;
+//            opts.multiplex = true;
+//            iSocket = IO.socket("http://3.0.49.131/", opts);
+//            iSocket.on(Socket.EVENT_CONNECT, connection);
+//            iSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+//            iSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+//            iSocket.on("getMessages", message);
+//            iSocket.connect();
+//
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//            Log.d(tag, "----exception--" + e.getMessage());
+//        }
 
     }
 
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        checkSocketConnection();
+       // checkSocketConnection();
     }
 
     private void checkSocketConnection() {
@@ -201,17 +201,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    Emitter.Listener connection = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
 
-                }
-            });
-        }
-    };
 
     private Emitter.Listener onDisconnect = new Emitter.Listener() {
         @Override
@@ -225,34 +215,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private Emitter.Listener onConnectError = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
 
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener message = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            final JSONArray result = (JSONArray) args[0];
-            new Handler(getMainLooper())
-                    .post(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.d(tag, "---data--" + result.toString());
-                                }
-                            }
-
-                    );
-        }
-    };
 
     private void connectConnection() {
 
