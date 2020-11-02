@@ -72,8 +72,9 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
-       /* if (message.getUser().getId().equals(userId)) {
+  /* if (message.getUser().getId().equals(userId)) {
             return SELF;
+
         }*/
 
         return position;

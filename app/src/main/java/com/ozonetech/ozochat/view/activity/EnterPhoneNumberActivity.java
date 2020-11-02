@@ -124,8 +124,6 @@ public class EnterPhoneNumberActivity extends AppCompatActivity {
                     showSnackbar(ll_login,getResources().getString(R.string.ServerError),Snackbar.LENGTH_SHORT);
                 }
             });
-
-
         } else {
             showSnackbar(ll_login,getResources().getString(R.string.NoInternet),Snackbar.LENGTH_SHORT);
 

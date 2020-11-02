@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new CameraFragment(), "");
+        adapter.addFragment(new CameraFragment(),"");
         adapter.addFragment(new ChatsFragment(), "CHATS");
         adapter.addFragment(new StatusFragment(), "STATUS");
         adapter.addFragment(new CallsFragment(), "CALLS");

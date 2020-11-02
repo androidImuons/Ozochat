@@ -4,30 +4,20 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-//import com.github.nkzawa.emitter.Emitter;
-//import com.github.nkzawa.engineio.client.transports.Polling;
-//import com.github.nkzawa.engineio.client.transports.WebSocket;
-//import com.github.nkzawa.socketio.client.IO;
-//import com.github.nkzawa.socketio.client.Socket;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.ozonetech.ozochat.network.ConnectivityReceiver;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.view.activity.UserChatActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.SocketException;
-import java.net.SocketOptions;
 import java.net.URISyntaxException;
 
-import io.socket.client.IO;
-import io.socket.client.Socket;
-
 public class MyApplication extends Application {
+    private static final String TAG = MyApplication.class.getName();
 
     private static MyApplication mInstance;
     private MyPreferenceManager pref;
-    public Socket iSocket;
-    private String tag = "Myapp";
+    Socket iSocket;
 
     @Override
     public void onCreate() {
@@ -44,7 +34,7 @@ public class MyApplication extends Application {
             iSocket = IO.socket("http://3.0.49.131/", opts);
         } catch (URISyntaxException e) {
             e.printStackTrace();
-            Log.d(tag, "----exception--" + e.getMessage());
+            Log.d(TAG, "----exception--" + e.getMessage());
         }
     }
 
@@ -66,4 +56,23 @@ public class MyApplication extends Application {
 
         return pref;
     }
+
+/*
+    {
+        try {
+            iSocket = IO.socket(CHAT_SERVER_URL);
+            if (iSocket.connected()) {
+                Log.d("----------check", "Socket connected " + mSocket.io().timeout());
+            } else {
+                Log.d("----------check", "Socket not connected " + mSocket.io().timeout());
+            }
+        } catch (URISyntaxException e) {
+            Log.d("----------check", "Socket connection error : " + e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+*/
+
+
+
 }
