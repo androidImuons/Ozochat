@@ -5,46 +5,54 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/chat_bg">
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/cl_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            tools:context=".view.activity.UserChatActivity">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimaryDark"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-            <include
-                android:id="@+id/toolbar_layout"
-                layout="@layout/toolbar_conversation" />
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/ll_contact_chat"
-            android:layout_above="@+id/ll_bottom"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/cl_toolbar"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/chat_bg">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/cl_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="20dp"
-                tools:listitem="@layout/chat_item_other"
-                android:scrollbars="vertical" />
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                tools:context=".view.activity.UserChatActivity">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@color/colorPrimaryDark"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+                <include
+                    android:id="@+id/toolbar_layout"
+                    layout="@layout/toolbar_conversation" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_contact_chat"
+                android:layout_above="@+id/ll_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/cl_toolbar"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="40dp"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/ll_bottom"
@@ -135,6 +143,7 @@
         </LinearLayout>
 
     </RelativeLayout>
+
 
 
 </layout>

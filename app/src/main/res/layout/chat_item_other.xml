@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingTop="5dp"
     android:paddingLeft="16dp"
@@ -14,6 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
         android:textIsSelectable="true"
+        android:textStyle="bold"
         android:background="@drawable/bg_bubble_white"
         android:textSize="14dp" />
 

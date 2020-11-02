@@ -13,9 +13,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
+
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
@@ -44,17 +45,19 @@ public class UserChatActivity extends AppCompatActivity {
     String chatRoomId;
     private ArrayList<Message> messageArrayList;
     private ChatRoomThreadAdapter mAdapter;
-    private String tag="UserChatActivity";
+    private String tag = "UserChatActivity";
     private Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataBinding= DataBindingUtil.setContentView(UserChatActivity.this,R.layout.activity_user_chat);
-        toolbarDataBinding=dataBinding.toolbarLayout;
+        dataBinding = DataBindingUtil.setContentView(UserChatActivity.this, R.layout.activity_user_chat);
+        toolbarDataBinding = dataBinding.toolbarLayout;
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
+        prefManager=new MyPreferenceManager(UserChatActivity.this);
 
+        Log.d(tag, "---token--  "+prefManager.getUserDetails().get(MyPreferenceManager.KEY_TOKEN));
         Intent intent = getIntent();
         chatRoomId = intent.getStringExtra("chat_room_id");
         contactName = intent.getStringExtra("name");
@@ -62,7 +65,7 @@ public class UserChatActivity extends AppCompatActivity {
         contactStatus = intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
         init();
-        getMessage();
+       // getMessage();
     }
 
     private void init() {
@@ -91,37 +94,7 @@ public class UserChatActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-
-
-     /*   messageArrayList = new ArrayList<>();
-
-        for(int i=0;i<3;i++){
-            Message msg = new Message();
-            msg.setId(String.valueOf(i));
-            msg.setMessage("hii "+i);
-            msg.setCreatedAt("04:0"+i);
-            User user = new User(String.valueOf(2),
-                    "RUCHITA",
-                    "ruchita@123");
-            msg.setUser(user);
-            messageArrayList.add(msg);
-        }
-        Message msg = new Message();
-        msg.setId("3");
-        msg.setMessage("hii");
-        msg.setCreatedAt("04:00");
-        User user = new User(String.valueOf(1),
-                "MAYURI",
-                "mayuri@123");
-        msg.setUser(user);
-        messageArrayList.add(msg);
-
-
-        // self user id is to identify the message owner
-        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
-        mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
-        dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
-        dataBinding.recyclerView.setAdapter(mAdapter);*/
+        getMessage();
     }
 
     private void sendMessage() {
@@ -134,12 +107,19 @@ public class UserChatActivity extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("user_id", chatRoomId);
+            jsonObject.put("group_id","GP1604310627098");
             jsonObject.put("message", dataBinding.message.getText().toString());
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
                     Log.d(tag, "---send message--");
                     getMessage();
+                    mAdapter.notifyDataSetChanged();
+
+                    if (mAdapter.getItemCount() > 1) {
+                        dataBinding.recyclerView.getLayoutManager().smoothScrollToPosition(dataBinding.recyclerView, null, mAdapter.getItemCount() - 1);
+                    }
+
                 }
             });
         } catch (JSONException e) {
@@ -153,131 +133,62 @@ public class UserChatActivity extends AppCompatActivity {
         }*/
     }
 
-  private void  getMessage(){
-      JSONObject json = new JSONObject();
-      try {
-          json.put("user_id", chatRoomId);
-          MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
-              @Override
-              public void call(Object... args) {
-                  JSONArray data = (JSONArray) args[0];
-                  final JSONArray result = (JSONArray) args[0];
-                  new Handler(getMainLooper())
-                          .post(
-                                  new Runnable() {
-                                      @Override
-                                      public void run() {
-                                          Log.d(tag, "--getMessage -data-array-" + data.toString());
-                                      }
-                                  }
+    private void getMessage() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("user_id", chatRoomId);
+           // json.put("group_id","GP1604310627098");
 
-                          );
-
-              }
-          });
-      } catch (JSONException e) {
-          e.printStackTrace();
-      }
-
-    }
-
-    /*private Emitter.Listener onSendMessage = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            UserChatActivity.this.runOnUiThread(new Runnable() {
+            MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
-                public void run() {
-                    if (mSocket == null) return;
-                    mSocket.emit("getMessages", prefManager.getMessageJSON());
-
-                }
-            });
-        }
-    };*/
-
-    /*private Emitter.Listener onNewMessage = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            UserChatActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+                public void call(Object... args) {
                     JSONArray data = (JSONArray) args[0];
-                    Log.d(TAG ,"---get message--" + data.toString());
-                   *//* try {
-                        username = data.getString("username");
-                        message = data.getString("message");
-                    } catch (JSONException e) {
-                        Log.e(TAG, e.getMessage());
-                        return;
-                    }
-*//*
-                  //  addMessage(username, message);
+                    final JSONArray result = (JSONArray) args[0];
+                    new Handler(getMainLooper())
+                            .post(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.d(tag, "--getMessage -data-array-" + data.toString());
+                                            setRecyclerView(data);
+                                        }
+                                    }
+
+                            );
+
                 }
             });
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-    };
-*/
 
-/*
-    private Emitter.Listener onConnect = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            UserChatActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(!isConnected) {
-                        if(null!=mUsername)
-                            mSocket.emit("add user", mUsername);
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                R.string.connect, Toast.LENGTH_LONG).show();
-                        isConnected = true;
-                    }
-                }
-            });
-        }
-    };
-*/
-
-/*
-    private Emitter.Listener onDisconnect = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            UserChatActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i(TAG, "diconnected");
-                    isConnected = false;
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            R.string.disconnect, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    };
-*/
-
-/*
-    private Emitter.Listener onConnectError = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            UserChatActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.e(TAG, "Error connecting");
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            R.string.error_connect, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    };
-*/
-
-/*
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mSocket.disconnect();
-        mSocket.off("new message", onNewMessage);
     }
-*/
+
+    private void setRecyclerView(JSONArray data) {
+        messageArrayList = new ArrayList<>();
+        for (int i = 0; i < data.length(); i++) {
+
+            try {
+                JSONObject messageObj = data.getJSONObject(i);
+                Message message = new Message();
+                message.setId(messageObj.getInt("id"));
+                message.setUserId(messageObj.getInt("user_id"));
+                message.setGroupId(messageObj.getString("group_id"));
+                message.setMessage(messageObj.getString("message"));
+                message.setCreated(messageObj.getString("created"));
+
+                messageArrayList.add(message);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        String selfUserId = MyApplication.getInstance().getPrefManager().getUserId();
+        mAdapter = new ChatRoomThreadAdapter(UserChatActivity.this, messageArrayList, selfUserId);
+        dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
+        dataBinding.recyclerView.setAdapter(mAdapter);
+
+
+    }
 }

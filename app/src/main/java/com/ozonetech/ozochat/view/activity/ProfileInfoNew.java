@@ -82,7 +82,7 @@ public class ProfileInfoNew extends AppCompatActivity {
 
             }else {
                 Name.setText(user.getUsername());
-                sdvImage.setImageURI(user.getProfilePicUrl());
+                sdvImage.setImageURI(user.getProfilePic());
             }
         }
     }
@@ -259,7 +259,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                             Log.i("Response::", new Gson().toJson(authResponse));
                             if (authResponse.getSuccess() == true) {
                                 showSnackbar(ll_login,authResponse.getMessage(), Snackbar.LENGTH_SHORT);
-                                user.setProfilePicUrl(authResponse.getDataObject().getImage_url());
+                                user.setProfilePic(authResponse.getDataObject().getImage_url());
                                 startActivity(new Intent(ProfileInfoNew.this, MainActivity.class)
                                         );
                                 finishAffinity();

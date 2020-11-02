@@ -136,7 +136,7 @@ public class SoketService extends Service {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                   // Log.d(tag, "---data--" + result.toString());
+                                    // Log.d(tag, "---data--" + result.toString());
                                 }
                             }
 
