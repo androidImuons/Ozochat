@@ -181,7 +181,8 @@ chatViewModel.groupInterface=(CreateGroupInterface)this;
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.d(tag, "---send message--");
+
+                    Log.d(tag, "---send message--"+    args[0]);
                     getMessage();
                 }
             });
@@ -196,7 +197,7 @@ chatViewModel.groupInterface=(CreateGroupInterface)this;
     private void getMessage() {
         JSONObject json = new JSONObject();
         try {
-            json.put("user_id", group_id);
+            json.put("group_id", group_id);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {

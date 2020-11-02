@@ -108,6 +108,7 @@ public class ChatsFragment extends BaseFragment {
         Log.d(tag, "=====token--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
         Log.d(tag, "=====id--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         if (MyApplication.getInstance().iSocket.connected()) {
+            Log.d(tag, "=====connected--");
             getMessage();
         } else {
             Log.d(tag, "=====not connected--");
