@@ -105,7 +105,7 @@ public class OTPActivity extends AppCompatActivity {
                     dialog.dismiss();
                     OTPResponse authResponse = (OTPResponse) response.body();
                     if (authResponse != null) {
-                        Log.i("Response::", new Gson().toJson(authResponse));
+                        Log.i("Response::", "---OTP RESPONSE --"+new Gson().toJson(authResponse));
                         if (authResponse.getSuccess() == true) {
 
                             showSnackbar(ll_login,authResponse.getMessage(), Snackbar.LENGTH_SHORT);
