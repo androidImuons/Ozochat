@@ -137,6 +137,7 @@ public class UserChatActivity extends AppCompatActivity {
                 @Override
                 public void call(Object... args) {
                     Log.d(tag, "---send message--");
+                    getMessage();
                 }
             });
         } catch (JSONException e) {
