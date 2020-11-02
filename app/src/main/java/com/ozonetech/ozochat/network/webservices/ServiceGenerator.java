@@ -1,5 +1,9 @@
 package com.ozonetech.ozochat.network.webservices;
 
+import android.util.Log;
+
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +38,7 @@ public class ServiceGenerator {
 
     public static <S> S createService(Class<S> serviceClass, final String authToken) {
 
+
         if (authToken != null) {
             httpClient.interceptors().add(new Interceptor() {
                 @Override
@@ -44,14 +49,16 @@ public class ServiceGenerator {
                     Request.Builder requestBuilder = original.newBuilder()
                             .header("Authorization", "Bearer " + authToken)
                             // .header("Content-Type","application/x-www-form-urlencoded")
-//                            .header("Content-Type","application/json")
+                            .header("Content-Type","application/json")
                             .method(original.method(), original.body());
 
                     Request request = requestBuilder.build();
+
                     return chain.proceed(request);
                 }
             });
         }
+        Log.d("toke","Bearer "+authToken);
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
