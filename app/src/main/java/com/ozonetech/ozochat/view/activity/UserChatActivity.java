@@ -2,6 +2,7 @@ package com.ozonetech.ozochat.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
@@ -17,15 +18,21 @@ import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
 import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
+import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.network.AppCommon;
+import com.ozonetech.ozochat.network.MyPreference;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
+import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import butterknife.internal.Utils;
 import io.socket.client.On;
@@ -42,28 +49,42 @@ public class UserChatActivity extends AppCompatActivity {
     String chatRoomId;
     private ArrayList<Message> messageArrayList;
     private ChatRoomThreadAdapter mAdapter;
-    private String tag="UserChatActivity";
-
+    private String tag = "UserChatActivity";
+    UserChatViewModel chatViewModel;
+    MyPreferenceManager myPreferenceManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataBinding= DataBindingUtil.setContentView(UserChatActivity.this,R.layout.activity_user_chat);
-        toolbarDataBinding=dataBinding.toolbarLayout;
+        dataBinding = DataBindingUtil.setContentView(UserChatActivity.this, R.layout.activity_user_chat);
+        toolbarDataBinding = dataBinding.toolbarLayout;
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
+        chatViewModel = ViewModelProviders.of(UserChatActivity.this).get(UserChatViewModel.class);
+        dataBinding.setUserChat(chatViewModel);
+        chatViewModel.callback=(CommonResponseInterface) this;
 
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         chatRoomId = intent.getStringExtra("chat_room_id");
-        contactName=intent.getStringExtra("name");
-        contactMobileNo=intent.getStringExtra("mobileNo");
-        contactStatus=intent.getStringExtra("status");
+        contactName = intent.getStringExtra("name");
+        contactMobileNo = intent.getStringExtra("mobileNo");
+        contactStatus = intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
+        myPreferenceManager=new MyPreferenceManager(getApplicationContext());
         init();
+
+       checkGroup();
+
+    }
+
+    private void checkGroup() {
+        JSONArray jsonArray=new JSONArray();
+        JSONObject admin=new JSONObject();
+//        admin.put("admin",myPreferenceManager.);
+//        chatViewModel.createGroup(getApplicationContext(),);
         getMessage();
     }
 
     private void init() {
-
 
 
         toolbarDataBinding.actionBarTitle1.setText(contactName);
@@ -93,15 +114,15 @@ public class UserChatActivity extends AppCompatActivity {
 
         messageArrayList = new ArrayList<>();
 
-        for(int i=0;i<3;i++){
+        for (int i = 0; i < 3; i++) {
             Message msg = new Message();
             msg.setId(String.valueOf(i));
-            msg.setMessage("hii "+i);
-            msg.setCreatedAt("04:0"+i);
+            msg.setMessage("hii " + i);
+            msg.setCreatedAt("04:0" + i);
           /*  User user = new User(String.valueOf(2),
                     "RUCHITA",
                     "ruchita@123");*/
-           // msg.setUser(user);
+            // msg.setUser(user);
             messageArrayList.add(msg);
         }
         Message msg = new Message();
@@ -111,13 +132,13 @@ public class UserChatActivity extends AppCompatActivity {
         /*User user = new User(String.valueOf(1),
                 "MAYURI",
                 "mayuri@123");*/
-       // msg.setUser(user);
+        // msg.setUser(user);
         messageArrayList.add(msg);
 
 
         // self user id is to identify the message owner
-      //  String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
-       // mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
+        //  String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        // mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);
     }
@@ -148,31 +169,30 @@ public class UserChatActivity extends AppCompatActivity {
 
     }
 
-  private void  getMessage(){
-      JSONObject json = new JSONObject();
-      try {
-          json.put("user_id", chatRoomId);
-          MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
-              @Override
-              public void call(Object... args) {
-                  JSONArray data = (JSONArray) args[0];
-                  final JSONArray result = (JSONArray) args[0];
-                  new Handler(getMainLooper())
-                          .post(
-                                  new Runnable() {
-                                      @Override
-                                      public void run() {
-                                          Log.d(tag, "--getMessage -data-array-" + data.toString());
-                                      }
-                                  }
+    private void getMessage() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("user_id", chatRoomId);
+            MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    JSONArray data = (JSONArray) args[0];
+                    final JSONArray result = (JSONArray) args[0];
+                    new Handler(getMainLooper())
+                            .post(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.d(tag, "--getMessage -data-array-" + data.toString());
+                                        }
+                                    }
 
-                          );
-
-              }
-          });
-      } catch (JSONException e) {
-          e.printStackTrace();
-      }
+                            );
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -1,10 +1,14 @@
 package com.ozonetech.ozochat.network.webservices;
 
+import com.google.gson.JsonArray;
+import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
+
+import org.json.JSONArray;
 
 import java.util.Map;
 
@@ -43,6 +47,10 @@ public interface AppServices {
     @POST("validMembers")
 
     Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
+//"[\n    {\"admin\":7087741183},\n    {\"members\": [\n        {\"mobile\": \"9509504456\"},\n\t\t{\"mobile\": \"7488713416\"},\n\t\t{\"mobile\": \"7008774118\"}\n\t]},\n    {\"group_name\":\"ABC\"}\n]",
+    @FormUrlEncoded
+    @POST("create-group")
+    Call<CommonResponse> createGroup(@Body JSONArray array);
 
 
 }
