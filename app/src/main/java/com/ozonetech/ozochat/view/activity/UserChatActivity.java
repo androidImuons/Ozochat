@@ -16,12 +16,16 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
 import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
+import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.AppCommon;
@@ -41,7 +45,7 @@ import butterknife.internal.Utils;
 import io.socket.client.On;
 import io.socket.emitter.Emitter;
 
-public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface {
+public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface,CreateGroupInterface {
 
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
@@ -55,6 +59,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private String tag = "UserChatActivity";
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
+    private String group_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +71,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         chatViewModel = ViewModelProviders.of(UserChatActivity.this).get(UserChatViewModel.class);
         dataBinding.setUserChat(chatViewModel);
         chatViewModel.callback = (CommonResponseInterface) this;
-
+chatViewModel.groupInterface=(CreateGroupInterface)this;
         Intent intent = getIntent();
         chatRoomId = intent.getStringExtra("chat_room_id");
         contactName = intent.getStringExtra("name");
@@ -81,29 +86,24 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     }
 
     private void checkGroup() {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject admin = new JSONObject();
-        JSONArray memerArray = new JSONArray();
+        JsonArray jsonArray = new JsonArray();
+        JsonObject admin = new JsonObject();
+        JsonArray memerArray = new JsonArray();
 
-        JSONObject member = new JSONObject();
+        JsonObject member = new JsonObject();
 
-        try {
-            admin.put("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
-            member.put("mobile", contactMobileNo);
-            memerArray.put(member);
-            JSONObject memersObjeect = new JSONObject();
-            memersObjeect.put("members", memerArray);
-            JSONObject groupname=new JSONObject();
-            groupname.put("group_name","");
+        admin.addProperty("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
+        member.addProperty("mobile", contactMobileNo);
+        memerArray.add(member);
+        JsonObject memersObjeect = new JsonObject();
+        memersObjeect.add("members", memerArray);
+        JsonObject groupname=new JsonObject();
+        groupname.addProperty("group_name","");
 
-            jsonArray.put(admin);
-            jsonArray.put(memersObjeect);
-            jsonArray.put(groupname);
-            chatViewModel.createGroup(getApplicationContext(), jsonArray);
-        } catch (JSONException e) {
-
-            e.printStackTrace();
-        }
+        jsonArray.add(admin);
+        jsonArray.add(memersObjeect);
+        jsonArray.add(groupname);
+        chatViewModel.createGroup(getApplicationContext(), jsonArray);
 
     }
 
@@ -176,7 +176,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("user_id", chatRoomId);
-            jsonObject.put("group_id","GP1604310627098");
+            jsonObject.put("group_id",group_id);
             jsonObject.put("message", dataBinding.message.getText().toString());
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
@@ -196,7 +196,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private void getMessage() {
         JSONObject json = new JSONObject();
         try {
-            json.put("user_id", chatRoomId);
+            json.put("user_id", group_id);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -231,7 +231,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         userProfileResponse.observe(UserChatActivity.this, new Observer<CommonResponse>() {
             @Override
             public void onChanged(CommonResponse commonResponse) {
-                getMessage();
+
             }
         });
 
@@ -240,5 +240,18 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     @Override
     public void onCommonFailure(String message) {
 
+    }
+
+    @Override
+    public void onSuccessCreateGroup(LiveData<CreateGRoupREsponse> gRoupREsponse) {
+        gRoupREsponse.observe(UserChatActivity.this, new Observer<CreateGRoupREsponse>() {
+            @Override
+            public void onChanged(CreateGRoupREsponse gRoupREsponse) {
+                if (gRoupREsponse.getSuccess()){
+                    group_id=gRoupREsponse.getData().get(0).getGroupId();
+                    getMessage();
+                }
+            }
+        });
     }
 }

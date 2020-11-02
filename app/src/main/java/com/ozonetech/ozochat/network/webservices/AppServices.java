@@ -2,6 +2,7 @@ package com.ozonetech.ozochat.network.webservices;
 
 import com.google.gson.JsonArray;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
@@ -54,7 +55,7 @@ public interface AppServices {
            "Content-Type: application/json"
    })
    @POST("create-group")
-    Call<CommonResponse> createGroup(@Body JSONArray array);
+    Call<CreateGRoupREsponse> createGroup(@Body JsonArray array);
 
 
 }

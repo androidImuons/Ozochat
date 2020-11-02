@@ -49,7 +49,7 @@ public class ServiceGenerator {
                     Request.Builder requestBuilder = original.newBuilder()
                             .header("Authorization", "Bearer " + authToken)
                             // .header("Content-Type","application/x-www-form-urlencoded")
-//                            .header("Content-Type","application/json")
+                            .header("Content-Type","application/json")
                             .method(original.method(), original.body());
 
                     Request request = requestBuilder.build();

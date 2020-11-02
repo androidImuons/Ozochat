@@ -7,7 +7,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
@@ -21,18 +23,18 @@ import retrofit2.Response;
 public class CreateGroupRepository {
     private String tag="CreateGroupRepository";
 
-    private MutableLiveData<CommonResponse> verifiedContactsResponse;
-    CommonResponse verifiedContactsModel;
+    private MutableLiveData<CreateGRoupREsponse> verifiedContactsResponse;
+    CreateGRoupREsponse verifiedContactsModel;
 
-    public LiveData<CommonResponse> createGroup(JSONArray arrayListAge, Context context) {
+    public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
         Log.d(tag,"-----row body--"+arrayListAge.toString());
         verifiedContactsResponse = new MutableLiveData<>();
         MyPreferenceManager myPreferenceManager=new MyPreferenceManager(context);
 
         AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
-        apiService.createGroup(arrayListAge).enqueue(new Callback<CommonResponse>() {
+        apiService.createGroup(arrayListAge).enqueue(new Callback<CreateGRoupREsponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<CreateGRoupREsponse> call, Response<CreateGRoupREsponse> response) {
 
                 if (response.isSuccessful()) {
                     verifiedContactsModel = response.body();
@@ -48,7 +50,7 @@ public class CreateGroupRepository {
             }
 
             @Override
-            public void onFailure(Call<CommonResponse> call, Throwable t) {
+            public void onFailure(Call<CreateGRoupREsponse> call, Throwable t) {
                 Log.d(tag, "--------------" + t.getMessage());
             }
         });
