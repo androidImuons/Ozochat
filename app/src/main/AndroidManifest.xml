@@ -46,6 +46,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".view.activity.UserChatActivity">
         </activity>
+        <activity android:name=".view.activity.ProfileInfoNew"/>
         <activity android:name=".view.activity.SelectContactActivity" />
         <activity android:name=".view.activity.MainActivity">
             <meta-data
@@ -62,7 +63,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.activity.PhotoVideoRedirectActivity"/>
-        <activity android:name=".view.activity.ProfileInfoNew"/>
 
         <activity android:name=".view.activity.UploadStatus">
         </activity>
@@ -75,10 +75,7 @@
         <activity android:name=".view.activity.ProfileActivity" >
 
         </activity>
-<service android:name=".network.SoketService"
-    android:exported="true">
 
-</service>
 
         <receiver
             android:name=".network.ConnectivityReceiver"

@@ -1,5 +1,6 @@
 package com.ozonetech.ozochat.view.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -39,6 +40,8 @@ import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,6 +82,7 @@ public class ProfileInfoNew extends AppCompatActivity {
 
             }else {
                 Name.setText(user.getUsername());
+                sdvImage.setImageURI(user.getProfilePicUrl());
             }
         }
     }
@@ -231,14 +235,19 @@ public class ProfileInfoNew extends AppCompatActivity {
                 RequestBody uid = RequestBody.create(okhttp3.MultipartBody.FORM, String.valueOf(user.getUid()));
                 RequestBody userName = RequestBody.create(okhttp3.MultipartBody.FORM,Name.getText().toString().trim() );
 
-
                 MultipartBody.Part imageUrl = null;
+                RequestBody requestFile = null;
                 if (isAttachment.equals("1")) {
                     File file = FileUtils.getFile(this, outPutfileUri);
-                    RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
-                    imageUrl = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+                     //requestFile = RequestBody.create(MediaType, file);
+                    //imageUrl = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+                    imageUrl =  prepareFilePart("image", outPutfileUri);
                 }
-                Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
+                Map<String, RequestBody> map = new HashMap<>();
+                map.put("uid", uid);
+                map.put("username", userName);
+               // Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
+                Call call = apiService.REGISTRATION_RESPONSE_CALL(map , imageUrl);
                 call.enqueue(new Callback() {
                     @Override
                     public void onResponse(Call call, Response response) {
@@ -249,9 +258,11 @@ public class ProfileInfoNew extends AppCompatActivity {
                         if (authResponse != null) {
                             Log.i("Response::", new Gson().toJson(authResponse));
                             if (authResponse.getSuccess() == true) {
-                               /* showSnackbar(ll_login,authResponse.getMessage(), Snackbar.LENGTH_SHORT);
-                                startActivity(new Intent(ProfileInfoNew.this, OTPActivity.class)
-                                        .putExtra("mobile" , mobNum));*/
+                                showSnackbar(ll_login,authResponse.getMessage(), Snackbar.LENGTH_SHORT);
+                                user.setProfilePicUrl(authResponse.getDataObject().getImage_url());
+                                startActivity(new Intent(ProfileInfoNew.this, MainActivity.class)
+                                        );
+                                finishAffinity();
 
                             } else {
                                 showSnackbar(ll_login,authResponse.getMessage(),Snackbar.LENGTH_SHORT);
@@ -276,7 +287,22 @@ public class ProfileInfoNew extends AppCompatActivity {
         }
        
     }
+    @NonNull
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+        // use the FileUtils to get the actual file by uri
+        File file = FileUtils.getFile(this, fileUri);
 
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(
+                        MediaType.parse(getContentResolver().getType(fileUri)),
+                        file
+                );
+
+        // MultipartBody.Part is used to send also the actual file name
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }
     public void showSnackbar(View view, String message, int duration) {
         Snackbar snackbar = Snackbar.make(view, message, duration);
         snackbar.setActionTextColor(Color.WHITE);
