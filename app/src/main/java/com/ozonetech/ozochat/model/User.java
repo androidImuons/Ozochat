@@ -32,6 +32,7 @@ public class User {
     @Expose
     private String token;
 
+
     public User(String uid, String username, String mobile, String profilePic, String otpVerify, String deviceId, String isLogin, String token) {
         this.uid = Integer.valueOf(uid);
         this.username = username;

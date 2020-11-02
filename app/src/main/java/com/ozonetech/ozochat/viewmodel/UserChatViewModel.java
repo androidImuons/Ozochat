@@ -26,10 +26,10 @@ public class UserChatViewModel extends ViewModel {
         if (commonResponse == null) {
             commonResponse = new MutableLiveData<CommonResponse>();
             //we will load it asynchronously from server in this method
-            commonResponse = new CreateGroupRepository().createGroup(arrayListAge);
+            commonResponse = new CreateGroupRepository().createGroup(arrayListAge,context);
             callback.onCommonSuccess(commonResponse);
         }else{
-            commonResponse = new CreateGroupRepository().createGroup(arrayListAge);
+            commonResponse = new CreateGroupRepository().createGroup(arrayListAge,context);
             callback.onCommonSuccess(commonResponse);    }
     }
 

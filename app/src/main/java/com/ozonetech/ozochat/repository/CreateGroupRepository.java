@@ -1,5 +1,6 @@
 package com.ozonetech.ozochat.repository;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -7,10 +8,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.model.CommonResponse;
-import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
-import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 
 import org.json.JSONArray;
 
@@ -24,12 +24,16 @@ public class CreateGroupRepository {
     private MutableLiveData<CommonResponse> verifiedContactsResponse;
     CommonResponse verifiedContactsModel;
 
-    public LiveData<CommonResponse> createGroup(JSONArray arrayListAge) {
+    public LiveData<CommonResponse> createGroup(JSONArray arrayListAge, Context context) {
+        Log.d(tag,"-----row body--"+arrayListAge.toString());
         verifiedContactsResponse = new MutableLiveData<>();
-        AppServices apiService = ServiceGenerator.createService(AppServices.class);
+        MyPreferenceManager myPreferenceManager=new MyPreferenceManager(context);
+
+        AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
         apiService.createGroup(arrayListAge).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+
                 if (response.isSuccessful()) {
                     verifiedContactsModel = response.body();
                     verifiedContactsResponse.setValue(verifiedContactsModel);
