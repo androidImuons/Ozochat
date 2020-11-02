@@ -32,10 +32,6 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import butterknife.internal.Utils;
-import io.socket.client.On;
-import io.socket.emitter.Emitter;
-
 public class UserChatActivity extends AppCompatActivity {
     private static final String TAG = UserChatActivity.class.getName();
     MyPreferenceManager prefManager;
