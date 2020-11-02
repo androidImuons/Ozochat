@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +32,10 @@ import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import butterknife.internal.Utils;
+import io.socket.client.On;
+import io.socket.emitter.Emitter;
+
 public class UserChatActivity extends AppCompatActivity {
     private static final String TAG = UserChatActivity.class.getName();
     MyPreferenceManager prefManager;
@@ -43,49 +48,14 @@ public class UserChatActivity extends AppCompatActivity {
     String chatRoomId;
     private ArrayList<Message> messageArrayList;
     private ChatRoomThreadAdapter mAdapter;
+    private String tag="UserChatActivity";
     private Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataBinding = DataBindingUtil.setContentView(UserChatActivity.this, R.layout.activity_user_chat);
-        MyApplication app = (MyApplication) getApplication();
-        mSocket = app.getSocket();
-        mSocket.connect();
-        mSocket.emit("getMessages", prefManager.getMessageJSON()).on("getMessages", new Emitter.Listener() {
-            @Override
-            public void call(final Object... args) {
-                UserChatActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        JSONArray data = (JSONArray) args[0];
-                        Log.d(TAG, "---get message--" + data.toString());
-                   /* try {
-                        username = data.getString("username");
-                        message = data.getString("message");
-                    } catch (JSONException e) {
-                        Log.e(TAG, e.getMessage());
-                        return;
-                    }
-*/
-                        //  addMessage(username, message);
-                    }
-                });
-            }
-        });
-
-       /* mSocket.on(Socket.EVENT_CONNECT,onConnect);
-        mSocket.on(Socket.EVENT_DISCONNECT,onDisconnect);
-        mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-        mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);*/
-        // mSocket.on("sendMessage", onSendMessage);
-
-
-
-       /* mSocket.on("new message", onNewMessage);
-        mSocket.connect();*/
-
-        toolbarDataBinding = dataBinding.toolbarLayout;
+        dataBinding= DataBindingUtil.setContentView(UserChatActivity.this,R.layout.activity_user_chat);
+        toolbarDataBinding=dataBinding.toolbarLayout;
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
 
@@ -96,6 +66,7 @@ public class UserChatActivity extends AppCompatActivity {
         contactStatus = intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
         init();
+        getMessage();
     }
 
     private void init() {
@@ -125,10 +96,36 @@ public class UserChatActivity extends AppCompatActivity {
             finish();
         }
 
-        // messageArrayList = new ArrayList<>();
-        //  mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, chatRoomId);
-        //dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
-        // dataBinding.recyclerView.setAdapter(mAdapter);
+
+     /*   messageArrayList = new ArrayList<>();
+
+        for(int i=0;i<3;i++){
+            Message msg = new Message();
+            msg.setId(String.valueOf(i));
+            msg.setMessage("hii "+i);
+            msg.setCreatedAt("04:0"+i);
+            User user = new User(String.valueOf(2),
+                    "RUCHITA",
+                    "ruchita@123");
+            msg.setUser(user);
+            messageArrayList.add(msg);
+        }
+        Message msg = new Message();
+        msg.setId("3");
+        msg.setMessage("hii");
+        msg.setCreatedAt("04:00");
+        User user = new User(String.valueOf(1),
+                "MAYURI",
+                "mayuri@123");
+        msg.setUser(user);
+        messageArrayList.add(msg);
+
+
+        // self user id is to identify the message owner
+        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
+        dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
+        dataBinding.recyclerView.setAdapter(mAdapter);*/
     }
 
     private void sendMessage() {
@@ -138,26 +135,54 @@ public class UserChatActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (mSocket == null) return;
-        mSocket.emit("sendMessage", prefManager.getSendMessageJSON(message)).on("sendMessage", new Emitter.Listener() {
-            @Override
-            public void call(final Object... args) {
-                UserChatActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mSocket == null) return;
-                        mSocket.emit("getMessages", prefManager.getMessageJSON());
-
-                    }
-                });
-            }
-        });
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("user_id", chatRoomId);
+            jsonObject.put("message", dataBinding.message.getText().toString());
+            MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.d(tag, "---send message--");
+                    getMessage();
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         dataBinding.message.setText("");
 
-      /*  mAdapter.notifyDataSetChanged();
+  /*  mAdapter.notifyDataSetChanged();
         if (mAdapter.getItemCount() > 1) {
             dataBinding.recyclerView.getLayoutManager().smoothScrollToPosition(dataBinding.recyclerView, null, mAdapter.getItemCount() - 1);
         }*/
+    }
+
+  private void  getMessage(){
+      JSONObject json = new JSONObject();
+      try {
+          json.put("user_id", chatRoomId);
+          MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
+              @Override
+              public void call(Object... args) {
+                  JSONArray data = (JSONArray) args[0];
+                  final JSONArray result = (JSONArray) args[0];
+                  new Handler(getMainLooper())
+                          .post(
+                                  new Runnable() {
+                                      @Override
+                                      public void run() {
+                                          Log.d(tag, "--getMessage -data-array-" + data.toString());
+                                      }
+                                  }
+
+                          );
+
+              }
+          });
+      } catch (JSONException e) {
+          e.printStackTrace();
+      }
+
     }
 
     /*private Emitter.Listener onSendMessage = new Emitter.Listener() {

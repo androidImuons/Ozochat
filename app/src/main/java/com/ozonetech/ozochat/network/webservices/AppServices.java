@@ -17,6 +17,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 
 public interface AppServices {
     @FormUrlEncoded
@@ -30,13 +31,18 @@ public interface AppServices {
     @Multipart
     @POST("upload")
     Call<UploadResponse> REGISTRATION_RESPONSE_CALL(
-            @Part("uid") RequestBody uid,
+       /*     @Part("uid") RequestBody uid,
             @Part("username") RequestBody userName,
-            @Part MultipartBody.Part image
-    );
+            @Part MultipartBody.Part image*/
+
+            @PartMap Map<String, RequestBody> map,
+            @Part MultipartBody.Part file);
+
 
 
     @POST("validMembers")
+
     Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
+
 
 }

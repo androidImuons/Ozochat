@@ -1,33 +1,38 @@
 package com.ozonetech.ozochat;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 import com.ozonetech.ozochat.network.ConnectivityReceiver;
-import com.ozonetech.ozochat.network.Constants;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
-
-import java.net.URISyntaxException;
-
-import static com.ozonetech.ozochat.network.Constants.CHAT_SERVER_URL;
 
 public class MyApplication extends Application {
 
     private static MyApplication mInstance;
     private MyPreferenceManager pref;
-    private Socket mSocket;
-
 
     @Override
     public void onCreate() {
         super.onCreate();
         Fresco.initialize(this);
         mInstance = this;
+
+        try {
+
+            IO.Options opts = new IO.Options();
+            opts.forceNew = true;
+            opts.reconnection = false;
+            opts.multiplex = true;
+            iSocket = IO.socket("http://3.0.49.131/", opts);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            Log.d(tag, "----exception--" + e.getMessage());
+        }
     }
 
+    public Socket getSocket() {
+        return iSocket;
+    }
     public static synchronized MyApplication getInstance() {
         return mInstance;
     }
