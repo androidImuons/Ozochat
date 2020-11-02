@@ -19,30 +19,31 @@ import java.util.Date;
 
 public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-private static String TAG = ChatRoomThreadAdapter.class.getSimpleName();
+    private static String TAG = ChatRoomThreadAdapter.class.getSimpleName();
 
-private String userId;
-private int SELF = 100;
-private static String today;
+    private int userId;
+    private int SELF = 100;
+    private int OTHER = 200;
+    private static String today;
 
-private Context mContext;
-private ArrayList<Message> messageArrayList;
+    private Context mContext;
+    private ArrayList<Message> messageArrayList;
 
-public class ViewHolder extends RecyclerView.ViewHolder {
-    TextView message, timestamp;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView message, timestamp;
 
-    public ViewHolder(View view) {
-        super(view);
-        message = (TextView) itemView.findViewById(R.id.message);
-        timestamp = (TextView) itemView.findViewById(R.id.timestamp);
+        public ViewHolder(View view) {
+            super(view);
+            message = (TextView) itemView.findViewById(R.id.message);
+            timestamp = (TextView) itemView.findViewById(R.id.timestamp);
+        }
     }
-}
 
 
     public ChatRoomThreadAdapter(Context mContext, ArrayList<Message> messageArrayList, String userId) {
         this.mContext = mContext;
         this.messageArrayList = messageArrayList;
-        this.userId = userId;
+        this.userId = Integer.parseInt(userId);
 
         Calendar calendar = Calendar.getInstance();
         today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
@@ -50,7 +51,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView;
+        View itemView = null;
 
         // view type is to identify where to render the chat message
         // left or right
@@ -58,7 +59,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
             // self message
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.chat_item_self, parent, false);
-        } else {
+        } else if (viewType == OTHER) {
             // others message
             itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.chat_item_other, parent, false);
@@ -72,11 +73,13 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
-  /* if (message.getUser().getId().equals(userId)) {
+        int check_UserId=message.getUserId();
+        if (check_UserId == userId) {
             return SELF;
-
-        }*/
-
+        }
+        if (check_UserId != userId) {
+            return OTHER;
+        }
         return position;
     }
 
@@ -85,11 +88,11 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         Message message = messageArrayList.get(position);
         ((ViewHolder) holder).message.setText(message.getMessage());
 
-        String timestamp = getTimeStamp(message.getCreatedAt());
+        String timestamp = message.getCreated();
+        timestamp=timestamp.replace("T"," ");
+        timestamp=timestamp.replace(".000Z","");
+        timestamp = getTimeStamp(timestamp);
 
-       /* if (message.getUser().getName() != null)
-            timestamp = message.getUser().getName() + ", " + timestamp;
-*/
         ((ViewHolder) holder).timestamp.setText(timestamp);
     }
 

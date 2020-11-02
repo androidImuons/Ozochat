@@ -5,22 +5,21 @@ import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import com.ozonetech.ozochat.network.ConnectivityReceiver;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 
-
 import java.net.URISyntaxException;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
 
 public class MyApplication extends Application {
     private static final String TAG = MyApplication.class.getName();
 
     private static MyApplication mInstance;
     private MyPreferenceManager pref;
-  public  Socket iSocket;
+    public Socket iSocket;
 
     @Override
     public void onCreate() {
