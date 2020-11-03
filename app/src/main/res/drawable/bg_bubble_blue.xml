@@ -14,13 +14,16 @@
     <padding
         android:left="10dp"
         android:top="4dp"
-        android:right="10dp"
+        android:right="4dp"
         android:bottom="4dp"    >
     </padding>
 
     <!-- Here is the corner radius -->
     <corners
-        android:radius="10dp"   >
+      android:topRightRadius="0dp"
+        android:topLeftRadius="@dimen/dp10"
+        android:bottomRightRadius="@dimen/dp10"
+        android:bottomLeftRadius="@dimen/dp10">
     </corners>
 
 </shape>
