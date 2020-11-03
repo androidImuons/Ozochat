@@ -146,6 +146,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     }
 
     private void sendMessage() {
+        if(MyApplication.getInstance().iSocket.connected()){
+            Log.d(tag,"-----is connectttd");
+        }else{
+            Log.d(tag,"-----not connectttd");
+        }
         final String message = dataBinding.message.getText().toString().trim();
 
         if (TextUtils.isEmpty(message)) {
@@ -186,6 +191,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     }
 
     private void getMessage() {
+        if(MyApplication.getInstance().iSocket.connected()){
+            Log.d(tag,"-----is connectttd");
+        }else{
+            Log.d(tag,"-----not connectttd");
+        }
         Log.d(tag, "--getMessage called");
 
         JSONObject json = new JSONObject();
@@ -275,10 +285,12 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         gRoupREsponse.observe(UserChatActivity.this, new Observer<CreateGRoupREsponse>() {
             @Override
             public void onChanged(CreateGRoupREsponse gRoupREsponse) {
+/*
                 if (gRoupREsponse.getSuccess()){
                     group_id=gRoupREsponse.getData().get(0).getGroupId();
                     getMessage();
                 }
+*/
             }
         });
     }

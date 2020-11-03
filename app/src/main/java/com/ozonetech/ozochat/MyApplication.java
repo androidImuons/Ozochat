@@ -41,6 +41,12 @@ public class MyApplication extends Application {
     }
 
     public Socket getSocket() {
+        if(iSocket.connected()){
+            Log.d(TAG, "----Socket connected--" + iSocket.connected());
+        }else{
+            Log.d(TAG, "----Socket not connected--" + iSocket.connected());
+
+        }
         return iSocket;
     }
     public static synchronized MyApplication getInstance() {
