@@ -66,8 +66,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id;//="GP1604385090323";
-    private Integer admin_id;//=94;
+    private String group_id;   //="GP1604385090323";
+    private Integer admin_id;  //=94;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +113,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         jsonArray.add(admin);
         jsonArray.add(memersObjeect);
         jsonArray.add(groupname);
-       // chatViewModel.createGroup(getApplicationContext(), jsonArray);
-        getMessage();
+        chatViewModel.createGroup(getApplicationContext(), jsonArray);
+       // getMessage();
     }
 
     private void init() {
