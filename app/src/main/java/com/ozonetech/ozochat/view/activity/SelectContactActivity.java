@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,22 +35,30 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
+import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
+import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ContactsAdapter;
 import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener, ContactsListener {
-
+public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener, ContactsListener{
+    MyPreferenceManager prefManager;
     ActivitySelectContactBinding dataBinding;
     ArrayList<Contacts> selectUsers;
     ContactsAdapter contactsAdapter;
@@ -68,6 +77,11 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         contactsViewModel= ViewModelProviders.of(SelectContactActivity.this).get(Contacts.class);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
+        dataBinding.etGroupName.setVisibility(View.GONE);
+        dataBinding.llNewGroup.setVisibility(View.VISIBLE);
+        dataBinding.llNewContact.setVisibility(View.VISIBLE);
+        prefManager=new MyPreferenceManager(SelectContactActivity.this);
+        actionModeCallback = new ActionModeCallback();
         init();
 
     }
@@ -78,6 +92,15 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         selectUsers = new ArrayList<Contacts>();
         requestContactPermission();
+
+        dataBinding.llNewGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                dataBinding.llNewGroup.setVisibility(View.GONE);
+                dataBinding.llNewContact.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void showContacts() {
@@ -171,10 +194,11 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         if (count == 0) {
             actionMode.finish();
         } else {
-            actionMode.setTitle(String.valueOf(count));
+            actionMode.setTitle("Participants : "+String.valueOf(count));
             actionMode.invalidate();
         }
     }
+
 
     private class ActionModeCallback implements ActionMode.Callback {
         @Override
@@ -194,11 +218,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.action_delete:
-                    // delete all the selected messages
-                    //deleteMessages();
-                    mode.finish();
-                    return true;
+                case R.id.action_create_group:
+                    if(!TextUtils.isEmpty(dataBinding.etGroupName.getText().toString().trim())){
+                        String groupName=dataBinding.etGroupName.getText().toString().trim();
+                        createGroup(groupName);
+                        mode.finish();
+                        return true;
+                    }else{
+                        showSnackbar(dataBinding.clSelectContacts, "Please enter group name", Snackbar.LENGTH_SHORT);
+                        return false;
+                    }
 
                 default:
                     return false;
@@ -210,6 +239,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             contactsAdapter.clearSelections();
            // swipeRefreshLayout.setEnabled(true);
             actionMode = null;
+            dataBinding.etGroupName.setVisibility(View.GONE);
+            dataBinding.llNewGroup.setVisibility(View.VISIBLE);
+            dataBinding.llNewContact.setVisibility(View.VISIBLE);
             dataBinding.rvContactsList.post(new Runnable() {
                 @Override
                 public void run() {
@@ -220,6 +252,33 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         }
     }
 
+    private void createGroup(String groupName) {
+        contactsAdapter.resetAnimationIndex();
+        List<Integer> selectedItemPositions = contactsAdapter.getSelectedItems();
+        //[ {"admin":9922803527}, {"members": [ {"mobile": "9922803527"}, {"mobile": "7507828337"}]}, {"group_name":"Android"} ]
+        JsonObject member = new JsonObject();
+        JsonArray memerArray = new JsonArray();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            String selectedMobileNo=contactsAdapter.getData(selectedItemPositions.get(i));
+            member.addProperty("mobile", selectedMobileNo);
+            memerArray.add(member);
+        }
+        JsonArray jsonArray = new JsonArray();
+        JsonObject admin = new JsonObject();
+        admin.addProperty("admin", prefManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE));
+        JsonObject memersObjeect = new JsonObject();
+        memersObjeect.add("members", memerArray);
+        JsonObject groupname = new JsonObject();
+        groupname.addProperty("group_name",groupName );
+        jsonArray.add(admin);
+        jsonArray.add(memersObjeect);
+        jsonArray.add(groupname);
+        Log.d("SelectContactActiivty", "---jsonarray Create group : "+jsonArray);
+
+        showProgressDialog("Please wait...");
+        contactsViewModel.createGroup(SelectContactActivity.this,contactsViewModel.contactsListener=this,jsonArray);
+
+    }
     @Override
     public void onGetContactsSuccess(LiveData<VerifiedContactsModel> verifiedContactsResponse) {
         verifiedContactsResponse.observe(SelectContactActivity.this, new Observer<VerifiedContactsModel>() {
@@ -273,6 +332,40 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         });
 
     }
+
+    @Override
+    public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
+        createGroupResponse.observe(SelectContactActivity.this, new Observer<CreateGRoupREsponse>() {
+            @Override
+            public void onChanged(CreateGRoupREsponse createGRoupREsponse) {
+                //save access token
+                hideProgressDialog();
+                Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
+                        "\n Data : " + createGRoupREsponse.getData());
+
+                try {
+                    if(createGRoupREsponse.getSuccess()){
+
+                        Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
+                                "\n Data : " + createGRoupREsponse.getData());
+                        //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    }else{
+                        Toast.makeText(SelectContactActivity.this, createGRoupREsponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
+                                "\n Data : " + createGRoupREsponse.getData());
+                    }
+
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
+
+            }
+        });
+    }
+
+
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
         dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
         contactsAdapter = new ContactsAdapter(SelectContactActivity.this,inflater, selectUsers, this);

@@ -19,14 +19,14 @@ xmlns:tools="http://schemas.android.com/tools">
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:theme="@style/AppTheme.AppBarOverlay">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/colorPrimaryDark"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,6 +35,21 @@ xmlns:tools="http://schemas.android.com/tools">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/etGroupName"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp50"
+                android:layout_margin="@dimen/dp10"
+                android:fontFamily="@font/urfa_medium"
+                android:hint="@string/type_group_name"
+                android:textColorHint="@color/colorHint"
+                android:layout_gravity="center"
+                android:gravity="start|center"
+                android:padding="@dimen/dp10"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sp12" />
+
 
             <LinearLayout
                 android:id="@+id/ll_new_group"

@@ -1,16 +1,20 @@
 package com.ozonetech.ozochat.repository;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import org.json.JSONArray;
@@ -31,6 +35,9 @@ public class SelectContactRepository {
 
     private MutableLiveData<VerifiedContactsModel> verifiedContactsResponse;
     VerifiedContactsModel verifiedContactsModel;
+
+    private MutableLiveData<CreateGRoupREsponse> createGeoupResponse;
+    CreateGRoupREsponse createGroupModel;
 
     public LiveData<VerifiedContactsModel> sendValidContacts( NumberListObject arrayListAge) {
         verifiedContactsResponse=new MutableLiveData<>();
@@ -57,5 +64,37 @@ public class SelectContactRepository {
             }
         });
         return verifiedContactsResponse;
+    }
+
+    public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
+
+        Log.d(tag,"-----row body--"+arrayListAge.toString());
+        createGeoupResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager=new MyPreferenceManager(context);
+
+        AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.createGroup(arrayListAge).enqueue(new Callback<CreateGRoupREsponse>() {
+            @Override
+            public void onResponse(Call<CreateGRoupREsponse> call, Response<CreateGRoupREsponse> response) {
+
+                if (response.isSuccessful()) {
+                    createGroupModel = response.body();
+                    createGeoupResponse.setValue(createGroupModel);
+                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+
+                } else {
+                    createGroupModel = response.body();
+                    createGeoupResponse.setValue(createGroupModel);
+                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CreateGRoupREsponse> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return createGeoupResponse;
     }
 }

@@ -63,6 +63,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
         holder.binding.setContacts(contactListFiltered.get(position));
+        // change the row state to activated
+        holder.binding.llContactRow.setActivated(selectedItems.get(position, false));
         holder.binding.llContactRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,6 +79,21 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
     public int getItemCount() {
         return contactListFiltered.size();
     }
+
+    public List<Integer> getSelectedItems() {
+        List<Integer> items =
+                new ArrayList<>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+
+    public String getData(int position) {
+       String mobile = contactListFiltered.get(position).getPhone();
+       return mobile;
+    }
+
 
     public void toggleSelection(int pos) {
         currentSelectedIndex = pos;
