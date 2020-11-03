@@ -114,7 +114,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         jsonArray.add(memersObjeect);
         jsonArray.add(groupname);
         chatViewModel.createGroup(getApplicationContext(), jsonArray);
-       // getMessage();
+
     }
 
     private void init() {
