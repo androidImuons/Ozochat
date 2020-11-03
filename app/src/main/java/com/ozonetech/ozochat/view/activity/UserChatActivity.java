@@ -66,8 +66,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id;   //="GP1604385090323";
-    private Integer admin_id;  //=94;
+    private String group_id="GP1604394738550";
+    private Integer admin_id=94;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +90,6 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         contactStatus = intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
         init();
-
-
 
     }
 
@@ -143,8 +141,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-       // getMessage();
-        checkGroup();
+        getMessage();
+        //checkGroup();
     }
 
     private void sendMessage() {
@@ -226,7 +224,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
     private void setRecyclerView(JSONArray data) {
         messageArrayList = new ArrayList<>();
-        for (int i = 0; i < data.length(); i++) {
+        for (int i = data.length()-1; i > 0; i--) {
 
             try {
                 JSONObject messageObj = data.getJSONObject(i);
