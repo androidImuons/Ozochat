@@ -66,7 +66,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id;
+    private String group_id;//="GP1604385090323";
+    private Integer admin_id;//=94;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         jsonArray.add(admin);
         jsonArray.add(memersObjeect);
         jsonArray.add(groupname);
-        chatViewModel.createGroup(getApplicationContext(), jsonArray);
+       // chatViewModel.createGroup(getApplicationContext(), jsonArray);
+        getMessage();
     }
 
     private void init() {
@@ -154,27 +156,23 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         }
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("user_id", prefManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID));
+            jsonObject.put("sender_id",MyApplication.getInstance().getPrefManager().getUserId());
+            jsonObject.put("user_id", admin_id);
             jsonObject.put("group_id", group_id);
             jsonObject.put("message", dataBinding.message.getText().toString());
-            Log.d(tag, "---send message parameter-- user_id : "+prefManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID)+
-                    " \ngroup_id : "+group_id +"\n message : "+message);
+            Log.d(tag, "---send message parameter-- user_id :"+jsonObject);
+
+            if(MyApplication.getInstance().iSocket.connected()){
+                Log.d(tag,"-----is connectttd");
+            }else{
+                Log.d(tag,"-----not connectttd");
+            }
 
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.d(tag, "---send message--");
-
+                    Log.d(tag, "---send message--"+args[0]);
                     getMessage();
-
-                  //  getMessage();
-
-                  /*  mAdapter.notifyDataSetChanged();
-
-                    if (mAdapter.getItemCount() > 1) {
-                        dataBinding.recyclerView.getLayoutManager().smoothScrollToPosition(dataBinding.recyclerView, null, mAdapter.getItemCount() - 1);
-                    }*/
-
                 }
             });
         } catch (JSONException e) {
@@ -191,16 +189,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         JSONObject json = new JSONObject();
         try {
             json.put("group_id", group_id);
-
-           // json.put("user_id", chatRoomId);
-           //  json.put("group_id","GP1604310627098");
-            Log.d(tag, "---get message para \n group_id : "+group_id);
-
+            Log.d(tag, "---get message para  group_id : "+group_id);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
                     JSONArray data = (JSONArray) args[0];
-                    final JSONArray result = (JSONArray) args[0];
                     Log.d(tag, "--getMessage -data-array-" + data.toString());
                     runOnUiThread(new Runnable() {
 
@@ -229,7 +222,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                 JSONObject messageObj = data.getJSONObject(i);
                 Message message = new Message();
                 message.setId(messageObj.getInt("id"));
-                message.setUserId(messageObj.getInt("user_id"));
+                message.setUserId(messageObj.getInt("sender_id"));
                 message.setGroupId(messageObj.getString("group_id"));
                 message.setMessage(messageObj.getString("message"));
                 message.setCreated(messageObj.getString("created"));
@@ -277,6 +270,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             public void onChanged(CreateGRoupREsponse gRoupREsponse) {
                 if (gRoupREsponse.getSuccess()){
                     group_id=gRoupREsponse.getData().get(0).getGroupId();
+                    admin_id=gRoupREsponse.getData().get(0).getAdmin_user_id();
                     getMessage();
                 }
             }
