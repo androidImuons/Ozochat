@@ -90,7 +90,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         String timestamp = message.getCreated();
         timestamp=timestamp.replace("T"," ");
-        timestamp=timestamp.replace(".000Z","");
+       // timestamp=timestamp.replace(".000Z","");
         timestamp = getTimeStamp(timestamp);
 
         ((ViewHolder) holder).timestamp.setText(timestamp);

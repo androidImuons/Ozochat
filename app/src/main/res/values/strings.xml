@@ -29,4 +29,5 @@
     <string name="remove">Remove</string>
     <string name="cancel">Cancel</string>
     <string name="internal_storage">InternalStore</string>
+    <string name="select">select group members</string>
 </resources>

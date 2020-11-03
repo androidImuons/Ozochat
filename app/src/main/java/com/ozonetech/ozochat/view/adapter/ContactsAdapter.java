@@ -1,5 +1,8 @@
 package com.ozonetech.ozochat.view.adapter;
 
+import android.content.Context;
+import android.util.SparseBooleanArray;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,23 +20,32 @@ import com.ozonetech.ozochat.viewmodel.Contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyViewHolder> implements Filterable {
+public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyViewHolder> implements Filterable{
 
+    Context context;
     private LayoutInflater layoutInflater;
     public List<Contacts> contacts;
     private ArrayList<Contacts> contactsArrayList;
     private List<Contacts> contactListFiltered;
     private ContactsAdapterListener listener;
+    private SparseBooleanArray selectedItems;
+    // array used to perform multiple animation at once
+    private SparseBooleanArray animationItemsIndex;
+    private boolean reverseAllAnimations = false;
+    private static int currentSelectedIndex = -1;
 
 
-    public ContactsAdapter(LayoutInflater inflater, List<Contacts> items,ContactsAdapterListener listener) {
+    public ContactsAdapter(Context context, LayoutInflater inflater, List<Contacts> items, ContactsAdapterListener listener) {
+        this.context = context;
         this.layoutInflater = inflater;
         this.contacts = items;
         this.contactsArrayList = new ArrayList<Contacts>();
-        this.contactListFiltered=new ArrayList<Contacts>();
+        this.contactListFiltered = new ArrayList<Contacts>();
         this.contactsArrayList.addAll(contacts);
         this.contactListFiltered.addAll(contacts);
-        this.listener=listener;
+        this.listener = listener;
+        selectedItems = new SparseBooleanArray();
+        animationItemsIndex = new SparseBooleanArray();
     }
 
     @NonNull
@@ -43,7 +55,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
             layoutInflater = LayoutInflater.from(parent.getContext());
         }
 
-        ContactlistRowLayoutBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.contactlist_row_layout,parent,false);
+        ContactlistRowLayoutBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.contactlist_row_layout, parent, false);
         return new MyViewHolder(binding);
     }
 
@@ -66,13 +78,49 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
         return contactListFiltered.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public void toggleSelection(int pos) {
+        currentSelectedIndex = pos;
+        if (selectedItems.get(pos, false)) {
+            selectedItems.delete(pos);
+            animationItemsIndex.delete(pos);
+        } else {
+            selectedItems.put(pos, true);
+            animationItemsIndex.put(pos, true);
+        }
+        notifyItemChanged(pos);
+    }
+
+    public void clearSelections() {
+        reverseAllAnimations = true;
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    public void resetAnimationIndex() {
+        reverseAllAnimations = false;
+        animationItemsIndex.clear();
+    }
+    public int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         private final ContactlistRowLayoutBinding binding;
+
         public MyViewHolder(final ContactlistRowLayoutBinding itemBinding) {
             super(itemBinding.getRoot());
-            this.binding= itemBinding;
+            this.binding = itemBinding;
+            itemBinding.getRoot().setOnLongClickListener(this);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            listener.onRowLongClicked(getAdapterPosition());
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            return true;
         }
     }
+
+
 
     @Override
     public Filter getFilter() {
@@ -111,5 +159,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
 
     public interface ContactsAdapterListener {
         void onContactSelected(Contacts contact);
+
+        void onRowLongClicked(int position);
     }
 }
