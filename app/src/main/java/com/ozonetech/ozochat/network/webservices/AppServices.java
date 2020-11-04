@@ -37,7 +37,7 @@ public interface AppServices {
 
     @FormUrlEncoded
     @POST("updateUserInfo")
-    Call<CommonResponse> updateUserInfo(@FieldMap Map<String,String> entityMap);
+    Call<CommonResponse> updateUserInfo(@FieldMap Map<String, String> entityMap);
 
     @Multipart
     @POST("upload")
@@ -48,11 +48,16 @@ public interface AppServices {
 
     @POST("validMembers")
     Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
-     @Headers({
-           "Content-Type: application/json"
-   })
-   @POST("create-group")
+
+    @Headers({
+            "Content-Type: application/json"
+    })
+    @POST("create-group")
     Call<CreateGRoupREsponse> createGroup(@Body JsonArray array);
+
+    @FormUrlEncoded
+    @POST("recentChat")
+    Call<Object> getResentChat(@FieldMap Map<String, String> arg);
 
 
 }

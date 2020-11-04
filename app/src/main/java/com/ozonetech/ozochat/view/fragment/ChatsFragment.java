@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
@@ -17,10 +18,13 @@ import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import com.ozonetech.ozochat.view.adapter.ChatRoomsAdapter;
+import com.ozonetech.ozochat.viewmodel.ChatListViewModel;
+import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,12 +38,12 @@ import io.socket.emitter.Emitter;
 import static android.os.Looper.getMainLooper;
 
 
-public class ChatsFragment extends BaseFragment {
+public class ChatsFragment extends BaseFragment  {
 
     FragmentChatsBinding dataBinding;
     private ChatRoomsAdapter mAdapter;
     private String tag = "ChatsFragment";
-
+ChatListViewModel chatViewModel;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +56,10 @@ public class ChatsFragment extends BaseFragment {
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chats, container, false);
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
+        chatViewModel= ViewModelProviders.of(ChatsFragment.this).get(ChatListViewModel.class);
+        dataBinding.setChatlist(chatViewModel);
+
+
         ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
         for (int i = 1; i < 10; i++) {
             ChatRoom chatRoom = new ChatRoom();
@@ -112,6 +120,7 @@ public class ChatsFragment extends BaseFragment {
         } else {
             Log.d(tag, "=====not connected--");
         }
+        chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());
 
     }
 
