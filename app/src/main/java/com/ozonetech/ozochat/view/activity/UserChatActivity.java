@@ -66,8 +66,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id ="GP1604394738550";
-    private Integer admin_id = 94;
+    private String group_id ;//="GP1604394738550";
+    private Integer admin_id ;//= 94;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,8 +143,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        getMessage();
-       // checkGroup();
+        //getMessage();
+        checkGroup();
     }
 
     private void sendMessage() {
@@ -278,13 +278,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         gRoupREsponse.observe(UserChatActivity.this, new Observer<CreateGRoupREsponse>() {
             @Override
             public void onChanged(CreateGRoupREsponse gRoupREsponse) {
-/*
                 if (gRoupREsponse.getSuccess()){
                     group_id=gRoupREsponse.getData().get(0).getGroupId();
                     admin_id=gRoupREsponse.getData().get(0).getAdmin_user_id();
                     getMessage();
                 }
-*/
             }
         });
     }
