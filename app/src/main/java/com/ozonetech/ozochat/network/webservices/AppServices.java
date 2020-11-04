@@ -38,20 +38,13 @@ public interface AppServices {
     @Multipart
     @POST("upload")
     Call<UploadResponse> REGISTRATION_RESPONSE_CALL(
-       /*     @Part("uid") RequestBody uid,
-            @Part("username") RequestBody userName,
-            @Part MultipartBody.Part image*/
-
             @PartMap Map<String, RequestBody> map,
             @Part MultipartBody.Part file);
 
 
     @POST("validMembers")
     Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
-   // Content-Type: text/plain
-    //"[\n    {\"admin\":7087741183},\n    {\"members\": [\n        {\"mobile\": \"9509504456\"},\n\t\t{\"mobile\": \"7488713416\"},\n\t\t{\"mobile\": \"7008774118\"}\n\t]},\n    {\"group_name\":\"ABC\"}\n]",
-   @Headers({
-           //"Accept: application/json",
+     @Headers({
            "Content-Type: application/json"
    })
    @POST("create-group")
