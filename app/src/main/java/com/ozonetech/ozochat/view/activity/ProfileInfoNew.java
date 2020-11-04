@@ -270,10 +270,10 @@ public class ProfileInfoNew extends AppCompatActivity {
                     map.put("uid", uid);
                     map.put("username", userName);
                     // Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
-                    Call call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
-                    call.enqueue(new Callback() {
+                    Call<UploadResponse> call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
+                    call.enqueue(new Callback<UploadResponse>() {
                         @Override
-                        public void onResponse(Call call, Response response) {
+                        public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                             // Log.i("upload Response": response);
                             AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                             dialog.dismiss();
@@ -301,7 +301,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call call, Throwable t) {
+                        public void onFailure(Call<UploadResponse> call, Throwable t) {
                             dialog.dismiss();
                             AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                             showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
