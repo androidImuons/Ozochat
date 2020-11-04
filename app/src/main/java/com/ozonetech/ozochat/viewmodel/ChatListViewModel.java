@@ -21,7 +21,7 @@ public class ChatListViewModel extends ViewModel {
 
     public void getchat(Context context,String id) {
         Map<String, String> param = new HashMap<>();
-        param.put("user_id", id);
+        param.put("sender_id", id);
         if (commonResponse == null) {
             commonResponse = new MutableLiveData<Object>();
             //we will load it asynchronously from server in this method

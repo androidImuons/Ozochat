@@ -76,6 +76,7 @@
                     android:layout_height="20dp"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
+                    android:visibility="gone"
                     android:layout_marginRight="@dimen/dp5"
                     android:src="@drawable/emoji" />
 
@@ -87,7 +88,47 @@
                     android:layout_toLeftOf="@id/emojIcon"
                     android:background="@null"
                     android:fontFamily="@font/urfa_regular"
-                    android:hint="Type hear"
+                    android:hint="Your Name"
+                    android:paddingLeft="@dimen/dp10"
+                    android:paddingRight="@dimen/dp10"
+                    android:textColor="@color/black"
+
+                    />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/colorPrimary" />
+
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="40dp"
+                android:minHeight="45dp">
+
+                <ImageView
+
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone"
+                    android:layout_marginRight="@dimen/dp5"
+                    android:src="@drawable/emoji" />
+
+                <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                    android:id="@+id/about_us"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginRight="@dimen/dp5"
+                    android:background="@null"
+                    android:fontFamily="@font/urfa_regular"
+                    android:hint="About Us"
                     android:paddingLeft="@dimen/dp10"
                     android:paddingRight="@dimen/dp10"
                     android:textColor="@color/black"

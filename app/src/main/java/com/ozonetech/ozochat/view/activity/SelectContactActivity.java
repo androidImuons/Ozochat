@@ -68,6 +68,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     Contacts contactsViewModel;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
+    private boolean is_group_create;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +97,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         dataBinding.llNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                is_group_create=true;
                 dataBinding.etGroupName.setVisibility(View.VISIBLE);
                 dataBinding.llNewGroup.setVisibility(View.GONE);
                 dataBinding.llNewContact.setVisibility(View.GONE);

@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class MyPreferenceManager {
 
-    private static final String KEY_ABOUT_US  ="about_us";
+    public static final String KEY_ABOUT_US  ="about_us";
     private String TAG = MyPreferenceManager.class.getSimpleName();
     SharedPreferences pref;
     SharedPreferences.Editor editor;

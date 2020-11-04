@@ -283,6 +283,9 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                 if (gRoupREsponse == null) {
                     finish();
                 }
+                if (gRoupREsponse.getSuccess()==null){
+                    finish();
+                }
                 if (gRoupREsponse.getSuccess()) {
                     group_id = gRoupREsponse.getData().get(0).getGroupId();
                     admin_id = 99;//gRoupREsponse.getData().get(0).getAdmin_user_id();
