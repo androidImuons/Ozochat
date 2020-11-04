@@ -57,11 +57,13 @@ public class OTPActivity extends AppCompatActivity {
         setContentView(R.layout.activity_o_t_p);
         ButterKnife.bind(this);
         prefManager=new MyPreferenceManager(OTPActivity.this);
-        String a = "Waiting to automatically detect an SMS sent to 9999999999.";
-        String b = "<font color='#6553e6'>wrong Number</font>";
-        textView.setText(Html.fromHtml(a + b));
+
+
         if(getIntent()!= null){
             mob = getIntent().getStringExtra("mobile");
+            String a = "Waiting to automatically detect an SMS sent to "+mob;
+            String b = "<font color='#6553e6'> Wrong Number</font>";
+            textView.setText(Html.fromHtml(a + b));
         }
 
         otpTextView.setOtpListener(new OTPListener() {
@@ -115,16 +117,19 @@ public class OTPActivity extends AppCompatActivity {
                                         authResponse.getUser().getProfilePic(),authResponse.getUser().getOtpVerify(),authResponse.getUser().getDeviceId(),
                                         authResponse.getUser().getIsLogin(),authResponse.getUser().getToken());
                                 prefManager.storeUser(user);
-                                startActivity(new Intent(OTPActivity.this, MainActivity.class)
+//                                startActivity(new Intent(OTPActivity.this, MainActivity.class)
+//                                        .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
+                                startActivity(new Intent(OTPActivity.this, ProfileInfoNew.class)
                                         .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
 
                             }else {
-                                startActivity(new Intent(OTPActivity.this, MainActivity.class)
-                                        .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
+
+                            startActivity(new Intent(OTPActivity.this, ProfileInfoNew.class)
+                                    .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
+//                                startActivity(new Intent(OTPActivity.this, MainActivity.class)
+//                                        .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
                             }
                             finishAffinity();
-                           /* startActivity(new Intent(OTPActivity.this, ProfileInfoNew.class)
-                                    .putExtra("userData" , new Gson().toJson(authResponse.getUser())));*/
                             AppCommon.getInstance(OTPActivity.this).setUserObject(new Gson().toJson(authResponse.getUser()));
                             AppCommon.getInstance(OTPActivity.this).setUserLogin(String.valueOf(authResponse.getUser().getUid()),true);
 

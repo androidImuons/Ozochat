@@ -35,6 +35,10 @@ public interface AppServices {
     @POST("verifyOtp")
     Call<OTPResponse> verifyOtpCall(@FieldMap Map<String, String> entityMap);
 
+    @FormUrlEncoded
+    @POST("updateUserInfo")
+    Call<CommonResponse> updateUserInfo(@FieldMap Map<String,String> entityMap);
+
     @Multipart
     @POST("upload")
     Call<UploadResponse> REGISTRATION_RESPONSE_CALL(

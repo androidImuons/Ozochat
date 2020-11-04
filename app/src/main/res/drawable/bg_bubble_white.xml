@@ -5,7 +5,8 @@
 
     <!-- view background color -->
     <solid
-        android:color="@android:color/white" >
+
+        android:color="#ffffff" >
     </solid>
 
 
@@ -15,12 +16,16 @@
         android:left="10dp"
         android:top="4dp"
         android:right="10dp"
-        android:bottom="4dp"    >
+        android:bottom="4dp">
     </padding>
 
     <!-- Here is the corner radius -->
     <corners
-        android:radius="10dp"   >
+        android:topRightRadius="10dp"
+        android:topLeftRadius="0dp"
+        android:bottomRightRadius="@dimen/dp10"
+        android:bottomLeftRadius="@dimen/dp10">
     </corners>
+
 
 </shape>

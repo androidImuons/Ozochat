@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 public class MyPreferenceManager {
 
+    private static final String KEY_ABOUT_US  ="about_us";
     private String TAG = MyPreferenceManager.class.getSimpleName();
     SharedPreferences pref;
     SharedPreferences.Editor editor;
@@ -55,6 +56,19 @@ public class MyPreferenceManager {
         Log.e(TAG, "User is stored in shared preferences. " + user.getUsername());
     }
 
+    public void setProfilePic(String url){
+        editor.putString(KEY_PROFILE_PIC,url);
+        editor.commit();
+    }
+    public void setUserName(String name){
+        editor.putString(KEY_USER_NAME,name);
+        editor.commit();
+    }
+    public void setAboutus(String name){
+        editor.putString(KEY_ABOUT_US,name);
+        editor.commit();
+    }
+
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<String, String>();
 
@@ -65,7 +79,7 @@ public class MyPreferenceManager {
         user.put(KEY_OTP_VERIFY, pref.getString(KEY_OTP_VERIFY, null));
         user.put(KEY_DEVICE_ID, pref.getString(KEY_DEVICE_ID, null));
         user.put(KEY_TOKEN, pref.getString(KEY_TOKEN, null));
-
+        user.put(KEY_ABOUT_US,pref.getString(KEY_ABOUT_US,null));
         // return user
         return user;
     }

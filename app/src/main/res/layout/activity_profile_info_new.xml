@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/ll_login"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     tools:context=".view.activity.ProfileInfoNew">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg"
-        >
+        android:background="@drawable/bg">
 
         <LinearLayout
             android:id="@+id/cl_profile_info"
@@ -46,13 +46,20 @@
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/sdvImage"
-                android:onClick="uploadImg"
+
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
+                android:onClick="uploadImg"
                 fresco:backgroundImage="@drawable/profile_grp"
-                fresco:placeholderImageScaleType="fitXY" />
+                fresco:placeholderImageScaleType="fitXY"
+                fresco:roundBottomEnd="false"
+                fresco:roundBottomStart="false"
+                fresco:roundWithOverlayColor="@color/colorBlack"
+                fresco:roundedCornerRadius="5dp"
+                fresco:roundingBorderColor="@color/colorBlack"
+                fresco:roundingBorderWidth="1dp" />
 
 
             <RelativeLayout
@@ -73,9 +80,9 @@
                     android:src="@drawable/emoji" />
 
                 <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                    android:id="@+id/Name"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:id="@+id/Name"
                     android:layout_marginRight="@dimen/dp5"
                     android:layout_toLeftOf="@id/emojIcon"
                     android:background="@null"
@@ -104,8 +111,8 @@
                 android:layout_marginTop="30dp"
                 android:background="@drawable/next_btn"
                 android:fontFamily="@font/urfa_medium"
-                android:text="Next"
                 android:onClick="next"
+                android:text="Next"
                 android:textColor="@color/colorWhite" />
 
 

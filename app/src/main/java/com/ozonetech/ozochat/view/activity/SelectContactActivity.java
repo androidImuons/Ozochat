@@ -406,7 +406,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                     selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
                     selectUser.setPhone(phoneNumber);
                     selectUser.setStatus("I am a Naturalist");
-                    selectUsers.add(selectUser);
+                    if (!prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE).equals(phoneNumber)){
+                        selectUsers.add(selectUser);
+                    }
 
 
                 }
