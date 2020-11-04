@@ -88,6 +88,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 intent.putExtra("chat_room_id", chatRoom.getGroupId());
                 intent.putExtra("name", chatRoom.getUsername());
                 intent.putExtra("profilePic", chatRoom.getProfilePicture());
+                intent.putExtra("mobileNo",chatRoom.getMobile());
+                intent.putExtra("status","Online");
                 startActivity(intent);
             }
 
@@ -175,7 +177,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                         }else{
                             dataBinding.llStartChat.setVisibility(View.VISIBLE);
                         }
-                        dataBinding.llStartChat.setVisibility(View.VISIBLE);
+
 
                     } else {
                         showSnackbar(dataBinding.flChat, userChatListModel.getMessage(), Snackbar.LENGTH_SHORT);
