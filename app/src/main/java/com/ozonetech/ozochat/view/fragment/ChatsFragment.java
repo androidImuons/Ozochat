@@ -156,16 +156,16 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                         if(userChatListModel.getChatRoom()!=null){
                             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
                             chatRoomList= (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
-                            for (int i = 1; i < chatRoomList.size(); i++) {
-                                ChatRoom chatRoom = new ChatRoom();
-                                chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
-                                chatRoom.setProfilePicture(chatRoom.getProfilePicture());
-                                chatRoom.setUsername(chatRoomList.get(i).getUsername());
-                                chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
-                                chatRoom.setTimestamp("12 : 00 pm");
-                                chatRoom.setUnreadCount(i + 1);
-                                chatRoomList.add(chatRoom);
-                            }
+//                            for (int i = 1; i < chatRoomList.size(); i++) {
+////                                ChatRoom chatRoom = new ChatRoom();
+////                                chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
+////                                chatRoom.setProfilePicture(chatRoom.getProfilePicture());
+////                                chatRoom.setUsername(chatRoomList.get(i).getUsername());
+////                                chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
+////                                chatRoom.setTimestamp("12 : 00 pm");
+////                                chatRoom.setUnreadCount(i + 1);
+////                                chatRoomList.add(chatRoom);
+////                            }
                             if (chatRoomList.size() != 0) {
                                 setRecyclerView(chatRoomList);
                                 dataBinding.llStartChat.setVisibility(View.GONE);

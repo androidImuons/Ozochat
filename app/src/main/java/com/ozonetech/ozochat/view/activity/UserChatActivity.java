@@ -283,7 +283,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                 if (gRoupREsponse == null) {
                     finish();
                 }
-                if (gRoupREsponse.getSuccess()==null){
+                if (gRoupREsponse.getSuccess().equals(null)){
                     finish();
                 }
                 if (gRoupREsponse.getSuccess()) {

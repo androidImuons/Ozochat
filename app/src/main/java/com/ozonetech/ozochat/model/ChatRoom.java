@@ -78,8 +78,9 @@ public class ChatRoom implements Serializable {
     }
 
 
-    String lastMessage, timestamp;
-    int unreadCount;
+    String lastMessage="last message";
+     String   timestamp="12:00 pm";
+    int unreadCount=5;
 
     public ChatRoom() {
     }

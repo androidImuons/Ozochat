@@ -42,8 +42,9 @@ public class CreateGroupRepository {
                     Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
 
                 } else {
-                    verifiedContactsModel = response.body();
-                    verifiedContactsResponse.setValue(verifiedContactsModel);
+                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+//                    verifiedContactsModel = response.body();
+//                    verifiedContactsResponse.setValue(verifiedContactsModel);
                     Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
 
                 }
