@@ -153,7 +153,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     if (userChatListModel.getSuccess()) {
                         Log.d("ChatFragment", "--Response : Code" + userChatListModel.getChatRoom());
 
-/*                        if(userChatListModel.getData()!=null){
+                        if(userChatListModel.getChatRoom()!=null){
                             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
                             chatRoomList= (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
                             for (int i = 1; i < chatRoomList.size(); i++) {
@@ -175,7 +175,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                             }
                         }else{
                             dataBinding.llStartChat.setVisibility(View.VISIBLE);
-                        }*/
+                        }
                         dataBinding.llStartChat.setVisibility(View.VISIBLE);
 
                     } else {
