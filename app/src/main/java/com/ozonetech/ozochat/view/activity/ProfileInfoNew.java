@@ -168,12 +168,6 @@ public class ProfileInfoNew extends AppCompatActivity {
 
     private void startCameraIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        File file = new File(Environment.getExternalStorageDirectory(),
-//                "attachment.jpg");
-//        outPutfileUri = FileProvider.getUriForFile(this,
-//                BuildConfig.APPLICATION_ID + ".provider",
-//                file);
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutfileUri);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -216,18 +210,13 @@ public class ProfileInfoNew extends AppCompatActivity {
                 sdvImage.setImageURI(outPutfileUri);
             } else if (requestCode == REQUEST_CAMERA) {
                 Bitmap bitmap = null;
-                //   try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outPutfileUri);
-//                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+
                 bitmap = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                 String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
                 outPutfileUri = Uri.parse(url);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+
                 isAttachment = "1";
                 sdvImage.setImageURI(outPutfileUri);
 
@@ -262,18 +251,15 @@ public class ProfileInfoNew extends AppCompatActivity {
                     RequestBody requestFile = null;
                     if (isAttachment.equals("1")) {
                         File file = FileUtils.getFile(this, outPutfileUri);
-                        //requestFile = RequestBody.create(MediaType, file);
-                        //imageUrl = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
                         imageUrl = prepareFilePart("image", outPutfileUri);
                     }
                     Map<String, RequestBody> map = new HashMap<>();
                     map.put("uid", uid);
                     map.put("username", userName);
-                    // Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
-                    Call<UploadResponse> call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
-                    call.enqueue(new Callback<UploadResponse>() {
+                    Call call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
+                    call.enqueue(new Callback() {
                         @Override
-                        public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                        public void onResponse(Call call, Response response) {
                             // Log.i("upload Response": response);
                             AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                             dialog.dismiss();
@@ -301,8 +287,9 @@ public class ProfileInfoNew extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<UploadResponse> call, Throwable t) {
+                        public void onFailure(Call call, Throwable t) {
                             dialog.dismiss();
+                            Log.d("image fail","----"+t.getMessage());
                             AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                             showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                         }
@@ -340,8 +327,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                     if (authResponse != null) {
                         showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                         myPreferenceManager.setUserName(Name.getText().toString());
-                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class)
-                        );
+                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
                         finishAffinity();
                     } else {
                         AppCommon.getInstance(ProfileInfoNew.this).showDialog(ProfileInfoNew.this, authResponse.getMessage());
@@ -351,6 +337,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, Throwable t) {
                     dialog.dismiss();
+                    Log.d("name and about us","----"+t.getMessage());
                     AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                     showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                 }
