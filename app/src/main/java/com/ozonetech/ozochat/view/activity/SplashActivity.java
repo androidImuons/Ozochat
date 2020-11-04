@@ -54,9 +54,9 @@ public class SplashActivity extends AppCompatActivity {
                 try {
                     sleep(2000);
                     if (AppCommon.getInstance(SplashActivity.this).isUserLogIn()) {
-                    //   startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                        startActivity(new Intent(SplashActivity.this, ProfileInfoNew.class)
-                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
+                       startActivity(new Intent(SplashActivity.this, MainActivity.class));
+//                        startActivity(new Intent(SplashActivity.this, ProfileInfoNew.class)
+//                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
                     } else {
                         startActivity(new Intent(SplashActivity.this, WelcomeScreen.class));
                     }

@@ -168,12 +168,6 @@ public class ProfileInfoNew extends AppCompatActivity {
 
     private void startCameraIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        File file = new File(Environment.getExternalStorageDirectory(),
-//                "attachment.jpg");
-//        outPutfileUri = FileProvider.getUriForFile(this,
-//                BuildConfig.APPLICATION_ID + ".provider",
-//                file);
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutfileUri);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -216,18 +210,13 @@ public class ProfileInfoNew extends AppCompatActivity {
                 sdvImage.setImageURI(outPutfileUri);
             } else if (requestCode == REQUEST_CAMERA) {
                 Bitmap bitmap = null;
-                //   try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outPutfileUri);
-//                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+
                 bitmap = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                 String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
                 outPutfileUri = Uri.parse(url);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+
                 isAttachment = "1";
                 sdvImage.setImageURI(outPutfileUri);
 
@@ -262,14 +251,11 @@ public class ProfileInfoNew extends AppCompatActivity {
                     RequestBody requestFile = null;
                     if (isAttachment.equals("1")) {
                         File file = FileUtils.getFile(this, outPutfileUri);
-                        //requestFile = RequestBody.create(MediaType, file);
-                        //imageUrl = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
                         imageUrl = prepareFilePart("image", outPutfileUri);
                     }
                     Map<String, RequestBody> map = new HashMap<>();
                     map.put("uid", uid);
                     map.put("username", userName);
-                    // Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
                     Call call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
                     call.enqueue(new Callback() {
                         @Override
@@ -288,8 +274,8 @@ public class ProfileInfoNew extends AppCompatActivity {
                                     if (!Name.getText().toString().isEmpty()) {
                                         updateNameAboutUs();
                                     } else {
-//                                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
-//                                        finishAffinity();
+                                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
+                                        finishAffinity();
                                     }
 
                                 } else {
@@ -341,8 +327,8 @@ public class ProfileInfoNew extends AppCompatActivity {
                     if (authResponse != null) {
                         showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                         myPreferenceManager.setUserName(Name.getText().toString());
-                       // startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
-                      //  finishAffinity();
+                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
+                        finishAffinity();
                     } else {
                         AppCommon.getInstance(ProfileInfoNew.this).showDialog(ProfileInfoNew.this, authResponse.getMessage());
                     }
