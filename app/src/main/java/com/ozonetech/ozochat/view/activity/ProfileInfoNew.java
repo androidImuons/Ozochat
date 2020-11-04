@@ -27,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.BuildConfig;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.model.User;
@@ -35,6 +36,7 @@ import com.ozonetech.ozochat.network.FileUtils;
 import com.ozonetech.ozochat.network.ViewUtils;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 
 
 import java.io.ByteArrayOutputStream;
@@ -69,21 +71,30 @@ public class ProfileInfoNew extends AppCompatActivity {
     EmojiconEditText Name;
 
 
-    User user;
+    //  User user;
+    MyPreferenceManager myPreferenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_info_new);
         ButterKnife.bind(this);
-        user = new Gson().fromJson(AppCommon.getInstance(this).getUserObject() , User.class);
-        if(user != null){
-            if(user.getUsername() == null || user.getUsername().equals("")){
+        myPreferenceManager = new MyPreferenceManager(getApplicationContext());
+        RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+        roundingParams.setBorder(getResources().getColor(R.color.colorBlack), 1.0f);
+        roundingParams.setRoundAsCircle(true);
+        sdvImage.getHierarchy().setRoundingParams(roundingParams);
 
-            }else {
-                Name.setText(user.getUsername());
-                sdvImage.setImageURI(user.getProfilePic());
+        if (myPreferenceManager != null) {
+            if (myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_NAME) != null && !myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_NAME).equals("")) {
+                Name.setText(myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_NAME));
             }
+            if (myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC) != null) {
+                Log.d("image url", "--details-" + (myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC)));
+                sdvImage.setImageURI(myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC));
+            }
+        } else {
+            Log.d("details", "--details-null");
         }
     }
 
@@ -157,12 +168,12 @@ public class ProfileInfoNew extends AppCompatActivity {
 
     private void startCameraIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File file = new File(Environment.getExternalStorageDirectory(),
-                "attachment.jpg");
-        outPutfileUri = FileProvider.getUriForFile(this,
-                BuildConfig.APPLICATION_ID + ".provider",
-                file);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutfileUri);
+//        File file = new File(Environment.getExternalStorageDirectory(),
+//                "attachment.jpg");
+//        outPutfileUri = FileProvider.getUriForFile(this,
+//                BuildConfig.APPLICATION_ID + ".provider",
+//                file);
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutfileUri);
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -198,22 +209,25 @@ public class ProfileInfoNew extends AppCompatActivity {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                     String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
                     outPutfileUri = Uri.parse(url);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 isAttachment = "1";
                 sdvImage.setImageURI(outPutfileUri);
             } else if (requestCode == REQUEST_CAMERA) {
                 Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outPutfileUri);
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
-                    String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
-                    outPutfileUri = Uri.parse(url);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                //   try {
+//                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outPutfileUri);
+//                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                bitmap = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+                outPutfileUri = Uri.parse(url);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 isAttachment = "1";
                 sdvImage.setImageURI(outPutfileUri);
 
@@ -227,66 +241,125 @@ public class ProfileInfoNew extends AppCompatActivity {
 
 
     public void next(View view) {
-        if(Name.getText().toString().trim() != null) {
-            if (AppCommon.getInstance(this).isConnectingToInternet(this)) {
-                final Dialog dialog = ViewUtils.getProgressBar(this);
-                AppCommon.getInstance(this).setNonTouchableFlags(this);
-                AppServices apiService = ServiceGenerator.createService(AppServices.class);
-                RequestBody uid = RequestBody.create(okhttp3.MultipartBody.FORM, String.valueOf(user.getUid()));
-                RequestBody userName = RequestBody.create(okhttp3.MultipartBody.FORM,Name.getText().toString().trim() );
 
-                MultipartBody.Part imageUrl = null;
-                RequestBody requestFile = null;
-                if (isAttachment.equals("1")) {
-                    File file = FileUtils.getFile(this, outPutfileUri);
-                     //requestFile = RequestBody.create(MediaType, file);
-                    //imageUrl = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
-                    imageUrl =  prepareFilePart("image", outPutfileUri);
-                }
-                Map<String, RequestBody> map = new HashMap<>();
-                map.put("uid", uid);
-                map.put("username", userName);
-               // Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
-                Call call = apiService.REGISTRATION_RESPONSE_CALL(map , imageUrl);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onResponse(Call call, Response response) {
-                       // Log.i("upload Response": response);
-                        AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
-                        dialog.dismiss();
-                        UploadResponse authResponse = (UploadResponse) response.body();
-                        if (authResponse != null) {
-                            Log.i("Response::", new Gson().toJson(authResponse));
-                            if (authResponse.getSuccess() == true) {
-                                showSnackbar(ll_login,authResponse.getMessage(), Snackbar.LENGTH_SHORT);
-                                user.setProfilePic(authResponse.getDataObject().getImage_url());
-                                startActivity(new Intent(ProfileInfoNew.this, MainActivity.class)
-                                        );
-                                finishAffinity();
+        if (isAttachment.equals("0")) {
+            if (!Name.getText().toString().isEmpty()) {
+                updateNameAboutUs();
+            }else{
+                startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
+                finishAffinity();
+            }
+        } else {
+            if (Name.getText().toString().trim() != null) {
+                if (AppCommon.getInstance(this).isConnectingToInternet(this)) {
+                    final Dialog dialog = ViewUtils.getProgressBar(this);
+                    AppCommon.getInstance(this).setNonTouchableFlags(this);
+                    AppServices apiService = ServiceGenerator.createService(AppServices.class);
+                    RequestBody uid = RequestBody.create(okhttp3.MultipartBody.FORM, String.valueOf(myPreferenceManager.getUserId()));
+                    RequestBody userName = RequestBody.create(okhttp3.MultipartBody.FORM, Name.getText().toString().trim());
 
+                    MultipartBody.Part imageUrl = null;
+                    RequestBody requestFile = null;
+                    if (isAttachment.equals("1")) {
+                        File file = FileUtils.getFile(this, outPutfileUri);
+                        //requestFile = RequestBody.create(MediaType, file);
+                        //imageUrl = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+                        imageUrl = prepareFilePart("image", outPutfileUri);
+                    }
+                    Map<String, RequestBody> map = new HashMap<>();
+                    map.put("uid", uid);
+                    map.put("username", userName);
+                    // Call call = apiService.REGISTRATION_RESPONSE_CALL(uid, userName, imageUrl);
+                    Call call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) {
+                            // Log.i("upload Response": response);
+                            AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
+                            dialog.dismiss();
+                            UploadResponse authResponse = (UploadResponse) response.body();
+                            if (authResponse != null) {
+                                Log.i("Response::", new Gson().toJson(authResponse));
+                                if (authResponse.getSuccess() == true) {
+                                    showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
+                                    myPreferenceManager.setProfilePic(authResponse.getDataObject().getImage_url());
+                                    Log.d("image set", "---" + myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC));
+
+                                    if (!Name.getText().toString().isEmpty()) {
+                                        updateNameAboutUs();
+                                    } else {
+                                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
+                                        finishAffinity();
+                                    }
+
+                                } else {
+                                    showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
+                                }
                             } else {
-                                showSnackbar(ll_login,authResponse.getMessage(),Snackbar.LENGTH_SHORT);
+                                AppCommon.getInstance(ProfileInfoNew.this).showDialog(ProfileInfoNew.this, authResponse.getMessage());
                             }
-                        } else {
-                            AppCommon.getInstance(ProfileInfoNew.this).showDialog(ProfileInfoNew.this, authResponse.getMessage());
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call call, Throwable t) {
-                        dialog.dismiss();
-                        AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
-                        showSnackbar(ll_login,getResources().getString(R.string.ServerError),Snackbar.LENGTH_SHORT);
-                    }
-                });
+                        @Override
+                        public void onFailure(Call call, Throwable t) {
+                            dialog.dismiss();
+                            AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
+                            showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
+                        }
+                    });
+
+
+                }
 
 
             }
+        }
+
+
+    }
+
+    public void updateNameAboutUs() {
+        if (AppCommon.getInstance(this).isConnectingToInternet(this)) {
+            final Dialog dialog = ViewUtils.getProgressBar(this);
+            AppCommon.getInstance(this).setNonTouchableFlags(this);
+            AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+
+            Map<String, String> map = new HashMap<>();
+            map.put("uid", myPreferenceManager.getUserId());
+            map.put("username", Name.getText().toString().trim());
+            Call call = apiService.updateUserInfo(map);
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    // Log.i("upload Response": response);
+                    AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
+                    dialog.dismiss();
+                    Log.i("Response::", new Gson().toJson(response.body()));
+                    CommonResponse authResponse = (CommonResponse) response.body();
+
+                    if (authResponse != null) {
+                        showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
+                        myPreferenceManager.setUserName(Name.getText().toString());
+                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class)
+                        );
+                        finishAffinity();
+                    } else {
+                        AppCommon.getInstance(ProfileInfoNew.this).showDialog(ProfileInfoNew.this, authResponse.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    dialog.dismiss();
+                    AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
+                    showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
+                }
+            });
 
 
         }
-       
     }
+
     @NonNull
     private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
         // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
@@ -303,6 +376,7 @@ public class ProfileInfoNew extends AppCompatActivity {
         // MultipartBody.Part is used to send also the actual file name
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
+
     public void showSnackbar(View view, String message, int duration) {
         Snackbar snackbar = Snackbar.make(view, message, duration);
         snackbar.setActionTextColor(Color.WHITE);

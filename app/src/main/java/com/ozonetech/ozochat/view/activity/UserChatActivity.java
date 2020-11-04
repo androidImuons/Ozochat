@@ -51,7 +51,7 @@ import butterknife.internal.Utils;
 import io.socket.client.On;
 import io.socket.emitter.Emitter;
 
-public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface,CreateGroupInterface {
+public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface, CreateGroupInterface {
     private static final String TAG = UserChatActivity.class.getName();
     MyPreferenceManager prefManager;
 
@@ -68,8 +68,8 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id="GP1604394738550";
-    private Integer admin_id=94;
+    private String group_id;//="GP1604394738550";
+    private Integer admin_id;//=94;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         toolbarDataBinding = dataBinding.toolbarLayout;
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
-        prefManager=new MyPreferenceManager(UserChatActivity.this);
+        prefManager = new MyPreferenceManager(UserChatActivity.this);
 
         chatViewModel = ViewModelProviders.of(UserChatActivity.this).get(UserChatViewModel.class);
         dataBinding.setUserChat(chatViewModel);
@@ -144,15 +144,15 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        getMessage();
-        //checkGroup();
+        // getMessage();
+        checkGroup();
     }
 
     private void sendMessage() {
-        if(MyApplication.getInstance().iSocket.connected()){
-            Log.d(tag,"-----is connectttd");
-        }else{
-            Log.d(tag,"-----not connectttd");
+        if (MyApplication.getInstance().iSocket.connected()) {
+            Log.d(tag, "-----is connectttd");
+        } else {
+            Log.d(tag, "-----not connectttd");
         }
         final String message = dataBinding.message.getText().toString().trim();
 
@@ -162,22 +162,22 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         }
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("sender_id",MyApplication.getInstance().getPrefManager().getUserId());
+            jsonObject.put("sender_id", MyApplication.getInstance().getPrefManager().getUserId());
             jsonObject.put("user_id", admin_id);
             jsonObject.put("group_id", group_id);
             jsonObject.put("message", dataBinding.message.getText().toString());
-            Log.d(tag, "---send message parameter-- user_id :"+jsonObject);
+            Log.d(tag, "---send message parameter-- user_id :" + jsonObject);
 
-            if(MyApplication.getInstance().iSocket.connected()){
-                Log.d(tag,"-----is connectttd");
-            }else{
-                Log.d(tag,"-----not connectttd");
+            if (MyApplication.getInstance().iSocket.connected()) {
+                Log.d(tag, "-----is connectttd");
+            } else {
+                Log.d(tag, "-----not connectttd");
             }
 
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.d(tag, "---send message--"+args[0]);
+                    Log.d(tag, "---send message--" + args[0]);
                     getMessage();
                 }
             });
@@ -190,17 +190,17 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     }
 
     private void getMessage() {
-        if(MyApplication.getInstance().iSocket.connected()){
-            Log.d(tag,"-----is connectttd");
-        }else{
-            Log.d(tag,"-----not connectttd");
+        if (MyApplication.getInstance().iSocket.connected()) {
+            Log.d(tag, "-----is connectttd");
+        } else {
+            Log.d(tag, "-----not connectttd");
         }
         Log.d(tag, "--getMessage called");
 
         JSONObject json = new JSONObject();
         try {
             json.put("group_id", group_id);
-            Log.d(tag, "---get message para  group_id : "+group_id);
+            Log.d(tag, "---get message para  group_id : " + group_id);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -227,7 +227,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
     private void setRecyclerView(JSONArray data) {
         messageArrayList = new ArrayList<>();
-        for (int i = data.length()-1; i > 0; i--) {
+        for (int i = data.length() - 1; i >= 0; i--) {
 
             try {
                 JSONObject messageObj = data.getJSONObject(i);
@@ -249,7 +249,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         mAdapter = new ChatRoomThreadAdapter(UserChatActivity.this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);
-        dataBinding.recyclerView.scrollToPosition(messageArrayList.size()-1);
+        dataBinding.recyclerView.scrollToPosition(messageArrayList.size() - 1);
 
     }
 
@@ -280,13 +280,15 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         gRoupREsponse.observe(UserChatActivity.this, new Observer<CreateGRoupREsponse>() {
             @Override
             public void onChanged(CreateGRoupREsponse gRoupREsponse) {
-/*
-                if (gRoupREsponse.getSuccess()){
-                    group_id=gRoupREsponse.getData().get(0).getGroupId();
-                    admin_id=gRoupREsponse.getData().get(0).getAdmin_user_id();
+                if (gRoupREsponse == null) {
+                    finish();
+                }
+                if (gRoupREsponse.getSuccess()) {
+                    group_id = gRoupREsponse.getData().get(0).getGroupId();
+                    admin_id = gRoupREsponse.getData().get(0).getAdmin_user_id();
                     getMessage();
                 }
-*/
+
             }
         });
     }

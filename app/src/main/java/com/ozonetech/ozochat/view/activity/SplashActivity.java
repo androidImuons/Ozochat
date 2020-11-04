@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.network.AppCommon;
@@ -53,7 +54,9 @@ public class SplashActivity extends AppCompatActivity {
                 try {
                     sleep(2000);
                     if (AppCommon.getInstance(SplashActivity.this).isUserLogIn()) {
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                       startActivity(new Intent(SplashActivity.this, MainActivity.class));
+//                        startActivity(new Intent(SplashActivity.this, ProfileInfoNew.class)
+//                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
                     } else {
                         startActivity(new Intent(SplashActivity.this, WelcomeScreen.class));
                     }
