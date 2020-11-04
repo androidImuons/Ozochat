@@ -7,6 +7,7 @@ import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
+import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import org.json.JSONArray;
@@ -57,7 +58,7 @@ public interface AppServices {
 
     @FormUrlEncoded
     @POST("recentChat")
-    Call<Object> getResentChat(@FieldMap Map<String, String> arg);
+    Call<UserChatListModel> getUserResentChat(@FieldMap Map<String, String> arg);
 
 
 }

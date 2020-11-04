@@ -14,22 +14,44 @@ import java.io.Serializable;
 
 public class ChatRoom implements Serializable {
 
-    @SerializedName("profile_picture")
+    @SerializedName("group_id")
+    @Expose
+    private String groupId;
+    @SerializedName("mobile")
+    @Expose
+    private String mobile;
+    @SerializedName("username")
+    @Expose
+    private String username;
+    @SerializedName("image")
     @Expose
     private String profilePicture;
-    String id, name, lastMessage, timestamp;
-    int unreadCount;
+    @SerializedName("uid")
+    @Expose
+    private Integer uid;
 
-    public ChatRoom() {
+    public String getGroupId() {
+        return groupId;
     }
 
-    public ChatRoom(String id,String profilePicture, String name, String lastMessage, String timestamp, int unreadCount) {
-        this.id = id;
-        this.profilePicture= profilePicture;
-        this.name = name;
-        this.lastMessage = lastMessage;
-        this.timestamp = timestamp;
-        this.unreadCount = unreadCount;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @BindingAdapter({"profilePicture"})
@@ -40,32 +62,37 @@ public class ChatRoom implements Serializable {
                 .placeholder(R.drawable.profile_icon)
                 .into(view);
 
-        // If you consider Picasso, follow the below
-        // Picasso.with(view.getContext()).load(imageUrl).placeholder(R.drawable.placeholder).into(view);
     }
     public String getProfilePicture() {
         return profilePicture;
     }
-
+    public Integer getUid() {
+        return uid;
+    }
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 
-    public String getId() {
-        return id;
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+
+    String lastMessage, timestamp;
+    int unreadCount;
+
+    public ChatRoom() {
     }
 
-    public String getName() {
-        return name;
+    public ChatRoom(String groupId,String profilePicture, String username, String lastMessage, String timestamp, int unreadCount) {
+        this.groupId = groupId;
+        this.profilePicture= profilePicture;
+        this.username = username;
+        this.lastMessage = lastMessage;
+        this.timestamp = timestamp;
+        this.unreadCount = unreadCount;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getLastMessage() {
         return lastMessage;

@@ -67,7 +67,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
                 .load(chatRoom.getProfilePicture())
                 .placeholder(R.drawable.profile_icon)
                 .into(holder.thumbnail);
-        holder.name.setText(chatRoom.getName());
+        holder.name.setText(chatRoom.getUsername());
         holder.message.setText(chatRoom.getLastMessage());
         if (chatRoom.getUnreadCount() > 0) {
             holder.count.setText(String.valueOf(chatRoom.getUnreadCount()));
