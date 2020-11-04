@@ -12,6 +12,7 @@ import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import java.util.Map;
@@ -23,37 +24,37 @@ import retrofit2.Response;
 public class RecentChatList {
     private String tag="RecentChatList";
 
-    private MutableLiveData<Object> rechentlivedata;
-    Object verifiedContactsModel;
-    public LiveData<Object> recentChat(Map <String,String>arrayListAge, Context context) {
+    private MutableLiveData<UserChatListModel> userChatListResponse;
+    UserChatListModel userChatListModel;
+    public LiveData<UserChatListModel> getUserResentChat(Map<String,String> arrayListAge, Context context) {
 
         Log.d(tag,"-----row body--"+arrayListAge.toString());
-        rechentlivedata = new MutableLiveData<>();
+        userChatListResponse = new MutableLiveData<>();
         MyPreferenceManager myPreferenceManager=new MyPreferenceManager(context);
 
         AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
-        apiService.getResentChat(arrayListAge).enqueue(new Callback<Object>() {
+        apiService.getUserResentChat(arrayListAge).enqueue(new Callback<UserChatListModel>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<UserChatListModel> call, Response<UserChatListModel> response) {
                 Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
 
                 if (response.isSuccessful()) {
-                    verifiedContactsModel = response.body();
-                    rechentlivedata.setValue(verifiedContactsModel);
+                    userChatListModel = response.body();
+                    userChatListResponse.setValue(userChatListModel);
 
                 } else {
-                    verifiedContactsModel = response.body();
-                    rechentlivedata.setValue(verifiedContactsModel);
+                    userChatListModel = response.body();
+                    userChatListResponse.setValue(userChatListModel);
                     Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
 
                 }
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<UserChatListModel> call, Throwable t) {
                 Log.d(tag, "--------------" + t.getMessage());
             }
         });
-        return rechentlivedata;
+        return userChatListResponse;
     }
 }

@@ -4,7 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -14,36 +15,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
+import com.ozonetech.ozochat.listeners.UserRecentChatListener;
 import com.ozonetech.ozochat.model.ChatRoom;
-import com.ozonetech.ozochat.model.CommonResponse;
-import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import com.ozonetech.ozochat.view.adapter.ChatRoomsAdapter;
-import com.ozonetech.ozochat.viewmodel.ChatListViewModel;
-import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
+import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.socket.emitter.Emitter;
 
 import static android.os.Looper.getMainLooper;
 
 
-public class ChatsFragment extends BaseFragment  {
+public class ChatsFragment extends BaseFragment implements UserRecentChatListener {
 
     FragmentChatsBinding dataBinding;
     private ChatRoomsAdapter mAdapter;
     private String tag = "ChatsFragment";
-ChatListViewModel chatViewModel;
+    UserChatListModel userChatListModel;
+    MyPreferenceManager myPreferenceManager;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,32 +59,19 @@ ChatListViewModel chatViewModel;
                              Bundle savedInstanceState) {
 
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chats, container, false);
+        userChatListModel= ViewModelProviders.of(ChatsFragment.this).get(UserChatListModel.class);
+        myPreferenceManager = new MyPreferenceManager(getActivity());
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
-        chatViewModel= ViewModelProviders.of(ChatsFragment.this).get(ChatListViewModel.class);
-        dataBinding.setChatlist(chatViewModel);
-
-
-        ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
-        for (int i = 1; i < 10; i++) {
-            ChatRoom chatRoom = new ChatRoom();
-            chatRoom.setId(String.valueOf(i));
-            chatRoom.setProfilePicture("https://api.androidhive.info/images/nature/" + i + ".jpg");
-            chatRoom.setName("name" + String.valueOf(i));
-            chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
-            chatRoom.setTimestamp("12 : 00 pm");
-            chatRoom.setUnreadCount(i + 1);
-
-            chatRoomList.add(chatRoom);
-        }
-        if (chatRoomList.size() != 0) {
-            setRecyclerView(chatRoomList);
-            dataBinding.llStartChat.setVisibility(View.GONE);
-        } else {
-            dataBinding.llStartChat.setVisibility(View.VISIBLE);
-        }
-
+        renderUserChatList();
         return view;
+    }
+
+    private void renderUserChatList() {
+        Map<String, String> chatMap = new HashMap<>();
+        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+        showProgressDialog("Please wait...");
+        userChatListModel.getUserResentChat(getActivity(),userChatListModel.userRecentChatListener=this,chatMap);
     }
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
@@ -93,8 +85,8 @@ ChatListViewModel chatViewModel;
                 // when chat is clicked, launch full chat thread activity
                 ChatRoom chatRoom = chatRoomList.get(position);
                 Intent intent = new Intent(getActivity(), UserChatActivity.class);
-                intent.putExtra("chat_room_id", chatRoom.getId());
-                intent.putExtra("name", chatRoom.getName());
+                intent.putExtra("chat_room_id", chatRoom.getGroupId());
+                intent.putExtra("name", chatRoom.getUsername());
                 intent.putExtra("profilePic", chatRoom.getProfilePicture());
                 startActivity(intent);
             }
@@ -107,12 +99,11 @@ ChatListViewModel chatViewModel;
         }));
     }
 
-    MyPreferenceManager myPreferenceManager;
 
     @Override
     public void onResume() {
         super.onResume();
-        myPreferenceManager = new MyPreferenceManager(getContext());
+       /* myPreferenceManager = new MyPreferenceManager(getContext());
         Log.d(tag, "=====token--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
         Log.d(tag, "=====id--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         if (MyApplication.getInstance().iSocket.connected()) {
@@ -120,7 +111,7 @@ ChatListViewModel chatViewModel;
         } else {
             Log.d(tag, "=====not connected--");
         }
-        chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());
+        chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
 
     }
 
@@ -152,4 +143,49 @@ ChatListViewModel chatViewModel;
 
     }
 
+    @Override
+    public void onUserRecentChatSuccess(LiveData<UserChatListModel> userChatListResponse) {
+        userChatListResponse.observe(getViewLifecycleOwner(), new Observer<UserChatListModel>() {
+            @Override
+            public void onChanged(UserChatListModel userChatListModel) {
+                hideProgressDialog();
+                try {
+                    if (userChatListModel.getSuccess()) {
+                        Log.d("ChatFragment", "--Response : Code" + userChatListModel.getChatRoom());
+
+/*                        if(userChatListModel.getData()!=null){
+                            ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
+                            chatRoomList= (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
+                            for (int i = 1; i < chatRoomList.size(); i++) {
+                                ChatRoom chatRoom = new ChatRoom();
+                                chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
+                                chatRoom.setProfilePicture("https://api.androidhive.info/images/nature/" + i + ".jpg");
+                                chatRoom.setUsername(chatRoomList.get(i).getUsername());
+                                chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
+                                chatRoom.setTimestamp("12 : 00 pm");
+                                chatRoom.setUnreadCount(i + 1);
+
+                                chatRoomList.add(chatRoom);
+                            }
+                            if (chatRoomList.size() != 0) {
+                                setRecyclerView(chatRoomList);
+                                dataBinding.llStartChat.setVisibility(View.GONE);
+                            } else {
+                                dataBinding.llStartChat.setVisibility(View.VISIBLE);
+                            }
+                        }else{
+                            dataBinding.llStartChat.setVisibility(View.VISIBLE);
+                        }*/
+                        dataBinding.llStartChat.setVisibility(View.VISIBLE);
+
+                    } else {
+                        showSnackbar(dataBinding.flChat, userChatListModel.getMessage(), Snackbar.LENGTH_SHORT);
+                    }
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
+            }
+        });
+    }
 }
