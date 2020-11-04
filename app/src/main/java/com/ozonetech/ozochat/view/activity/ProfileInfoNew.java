@@ -288,8 +288,8 @@ public class ProfileInfoNew extends AppCompatActivity {
                                     if (!Name.getText().toString().isEmpty()) {
                                         updateNameAboutUs();
                                     } else {
-                                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
-                                        finishAffinity();
+//                                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
+//                                        finishAffinity();
                                     }
 
                                 } else {
@@ -303,6 +303,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                         @Override
                         public void onFailure(Call call, Throwable t) {
                             dialog.dismiss();
+                            Log.d("image fail","----"+t.getMessage());
                             AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                             showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                         }
@@ -340,9 +341,8 @@ public class ProfileInfoNew extends AppCompatActivity {
                     if (authResponse != null) {
                         showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                         myPreferenceManager.setUserName(Name.getText().toString());
-                        startActivity(new Intent(ProfileInfoNew.this, MainActivity.class)
-                        );
-                        finishAffinity();
+                       // startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
+                      //  finishAffinity();
                     } else {
                         AppCommon.getInstance(ProfileInfoNew.this).showDialog(ProfileInfoNew.this, authResponse.getMessage());
                     }
@@ -351,6 +351,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, Throwable t) {
                     dialog.dismiss();
+                    Log.d("name and about us","----"+t.getMessage());
                     AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                     showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                 }
