@@ -64,7 +64,6 @@ public class UserChatListModel extends ViewModel {
         } else {
             userChatListResponse = new RecentChatList().getUserResentChat(chatMap, context);
             userRecentChatListener.onUserRecentChatSuccess(userChatListResponse);
-
         }
     }
 }

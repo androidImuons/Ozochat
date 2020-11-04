@@ -153,18 +153,17 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     if (userChatListModel.getSuccess()) {
                         Log.d("ChatFragment", "--Response : Code" + userChatListModel.getChatRoom());
 
-/*                        if(userChatListModel.getData()!=null){
+                        if(userChatListModel.getChatRoom()!=null){
                             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
                             chatRoomList= (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
                             for (int i = 1; i < chatRoomList.size(); i++) {
                                 ChatRoom chatRoom = new ChatRoom();
                                 chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
-                                chatRoom.setProfilePicture("https://api.androidhive.info/images/nature/" + i + ".jpg");
+                                chatRoom.setProfilePicture(chatRoom.getProfilePicture());
                                 chatRoom.setUsername(chatRoomList.get(i).getUsername());
                                 chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
                                 chatRoom.setTimestamp("12 : 00 pm");
                                 chatRoom.setUnreadCount(i + 1);
-
                                 chatRoomList.add(chatRoom);
                             }
                             if (chatRoomList.size() != 0) {
@@ -175,7 +174,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                             }
                         }else{
                             dataBinding.llStartChat.setVisibility(View.VISIBLE);
-                        }*/
+                        }
                         dataBinding.llStartChat.setVisibility(View.VISIBLE);
 
                     } else {

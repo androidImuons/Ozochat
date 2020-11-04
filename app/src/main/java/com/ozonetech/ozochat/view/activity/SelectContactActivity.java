@@ -97,11 +97,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         dataBinding.llNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                is_group_create=true;
-                contactsAdapter.setGroupFlaf(true);
-                dataBinding.etGroupName.setVisibility(View.VISIBLE);
-                dataBinding.llNewGroup.setVisibility(View.GONE);
-                dataBinding.llNewContact.setVisibility(View.GONE);
+
+                if(contactsAdapter!=null){
+                    is_group_create=true;
+                    contactsAdapter.setGroupFlaf(true);
+                    dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                    dataBinding.llNewGroup.setVisibility(View.GONE);
+                    dataBinding.llNewContact.setVisibility(View.GONE);
+                }
+
+
             }
         });
     }
