@@ -25,7 +25,6 @@ public class CreateGroupRepository {
 
     private MutableLiveData<CreateGRoupREsponse> verifiedContactsResponse;
     CreateGRoupREsponse verifiedContactsModel;
-
     public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
         Log.d(tag,"-----row body--"+arrayListAge.toString());
         verifiedContactsResponse = new MutableLiveData<>();
