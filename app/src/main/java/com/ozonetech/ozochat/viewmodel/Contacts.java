@@ -10,13 +10,19 @@ import androidx.lifecycle.ViewModel;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
+import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
+import com.ozonetech.ozochat.view.activity.SelectContactActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,20 +94,33 @@ public class Contacts extends ViewModel {
 
 
     public LiveData<VerifiedContactsModel> commonResponse;
+    public LiveData<CreateGRoupREsponse> createGroupResponse;
     public ContactsListener contactsListener;
 
 
-     public void sendContacts(Context context, ContactsListener contactsListener, NumberListObject arrayListAge) {
+    public void sendContacts(Context context, ContactsListener contactsListener, NumberListObject arrayListAge) {
 
         if (commonResponse == null) {
             commonResponse = new MutableLiveData<VerifiedContactsModel>();
             //we will load it asynchronously from server in this method
             commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
             contactsListener.onGetContactsSuccess(commonResponse);
-        }else{
-             commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
-            contactsListener.onGetContactsSuccess(commonResponse);      }
+        } else {
+            commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
+            contactsListener.onGetContactsSuccess(commonResponse);
+        }
     }
 
 
+    public void createGroup(Context context, ContactsListener contactsListener, JsonArray jsonArray) {
+        if (createGroupResponse == null) {
+            createGroupResponse = new MutableLiveData<CreateGRoupREsponse>();
+            //we will load it asynchronously from server in this method
+            createGroupResponse = new SelectContactRepository().createGroup(jsonArray,context);
+            contactsListener.onCreateGroupSuccess(createGroupResponse);
+        } else {
+            createGroupResponse = new SelectContactRepository().createGroup(jsonArray,context);
+            contactsListener.onCreateGroupSuccess(createGroupResponse);
+        }
+    }
 }

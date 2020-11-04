@@ -15,5 +15,6 @@
     <color name="dark_graw">#212121</color>
     <color name="colorchat">#BFADDF</color>
     <color name="row_activated">#e0e0e0</color>
+    <color name="bg_action_mode">#757575</color>
 
 </resources>

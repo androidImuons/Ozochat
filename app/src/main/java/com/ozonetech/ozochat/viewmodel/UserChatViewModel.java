@@ -22,7 +22,7 @@ public class UserChatViewModel extends ViewModel {
 
     public LiveData<CreateGRoupREsponse> commonResponse;
     public CommonResponseInterface callback;
-public CreateGroupInterface groupInterface;
+    public CreateGroupInterface groupInterface;
 
     public void createGroup(Context context, JsonArray arrayListAge) {
 
