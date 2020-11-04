@@ -68,8 +68,9 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id;//="GP1604394738550";
-    private Integer admin_id;//=94;
+    private String group_id;//="GP1604496777685";
+    private Integer admin_id;//=99;
+    private String start_flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +87,23 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         chatViewModel.groupInterface = (CreateGroupInterface) this;
 
         Intent intent = getIntent();
-        chatRoomId = intent.getStringExtra("chat_room_id");
+        start_flag=intent.getStringExtra("flag");
+
         contactName = intent.getStringExtra("name");
-        contactMobileNo = intent.getStringExtra("mobileNo");
-        contactStatus = intent.getStringExtra("status");
-        contactProfilePic = intent.getStringExtra("profilePic");
+        if (start_flag.equals("gp")){
+            admin_id=intent.getIntExtra("admin_id",0);
+            group_id = intent.getStringExtra("chat_room_id");
+            contactMobileNo = "";
+            contactStatus = "";
+            contactProfilePic = "";
+            chatRoomId="";
+        }else{
+            chatRoomId = intent.getStringExtra("chat_room_id");
+            contactMobileNo = intent.getStringExtra("mobileNo");
+            contactStatus = intent.getStringExtra("status");
+            contactProfilePic = intent.getStringExtra("profilePic");
+        }
+
 
         init();
 
@@ -144,8 +157,13 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        // getMessage();
-        checkGroup();
+        if(start_flag.equals("gp")){
+            getMessage();
+        }else{
+            checkGroup();
+        }
+
+
     }
 
     private void sendMessage() {

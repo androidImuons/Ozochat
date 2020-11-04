@@ -44,6 +44,7 @@ import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.GroupCreateRecord;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
@@ -178,8 +179,10 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("mobileNo",contact.getPhone());
         intent.putExtra("status",contact.getStatus());
         intent.putExtra("profilePic",contact.getProfilePicture());
+        intent.putExtra("flag","user");
         startActivity(intent);
-        Toast.makeText(getApplicationContext(), "Selected: " + contact.getUid() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+        finish();
+      //  Toast.makeText(getApplicationContext(), "Selected: " + contact.getUid() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -359,7 +362,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                         Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
                                 "\n Data : " + createGRoupREsponse.getData());
                         //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
-
+                            callChatActivity(createGRoupREsponse.getData().get(0));
                     }else{
                         Toast.makeText(SelectContactActivity.this, createGRoupREsponse.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
@@ -373,6 +376,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
             }
         });
+    }
+
+    private void callChatActivity(GroupCreateRecord groupCreateRecord) {
+        Intent intent = new Intent(SelectContactActivity.this,UserChatActivity.class);
+        intent.putExtra("chat_room_id",groupCreateRecord.getGroupId());
+        intent.putExtra("name",dataBinding.etGroupName.getText().toString().trim());
+        intent.putExtra("admin_id",groupCreateRecord.getAdmin_user_id());
+        intent.putExtra("flag","gp");
+        startActivity(intent);
+        finish();
     }
 
 
