@@ -46,7 +46,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         this.userId = Integer.parseInt(userId);
 
         Calendar calendar = Calendar.getInstance();
-        today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)); //2020-11-04T10:25:31.000Z
     }
 
     @Override

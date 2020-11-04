@@ -45,7 +45,7 @@ public class RecentChatList {
                 } else {
                     userChatListModel = response.body();
                     userChatListResponse.setValue(userChatListModel);
-                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+                    Log.d(tag,"- unsuccess-"+new Gson().toJson(response.body()));
 
                 }
             }

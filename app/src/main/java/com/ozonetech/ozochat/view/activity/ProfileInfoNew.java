@@ -69,6 +69,8 @@ public class ProfileInfoNew extends AppCompatActivity {
 
     @BindView(R.id.Name)
     EmojiconEditText Name;
+    @BindView(R.id.about_us)
+    EmojiconEditText about_us;
 
 
     //  User user;
@@ -92,6 +94,9 @@ public class ProfileInfoNew extends AppCompatActivity {
             if (myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC) != null) {
                 Log.d("image url", "--details-" + (myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC)));
                 sdvImage.setImageURI(myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC));
+            }
+            if(myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_ABOUT_US)!=null){
+                about_us.setText(myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_ABOUT_US));
             }
         } else {
             Log.d("details", "--details-null");
@@ -234,7 +239,7 @@ public class ProfileInfoNew extends AppCompatActivity {
         if (isAttachment.equals("0")) {
             if (!Name.getText().toString().isEmpty()) {
                 updateNameAboutUs();
-            }else{
+            } else {
                 startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
                 finishAffinity();
             }
@@ -256,6 +261,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                     Map<String, RequestBody> map = new HashMap<>();
                     map.put("uid", uid);
                     map.put("username", userName);
+
                     Call call = apiService.REGISTRATION_RESPONSE_CALL(map, imageUrl);
                     call.enqueue(new Callback() {
                         @Override
@@ -289,7 +295,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                         @Override
                         public void onFailure(Call call, Throwable t) {
                             dialog.dismiss();
-                            Log.d("image fail","----"+t.getMessage());
+                            Log.d("image fail", "----" + t.getMessage());
                             AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                             showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                         }
@@ -309,11 +315,18 @@ public class ProfileInfoNew extends AppCompatActivity {
         if (AppCommon.getInstance(this).isConnectingToInternet(this)) {
             final Dialog dialog = ViewUtils.getProgressBar(this);
             AppCommon.getInstance(this).setNonTouchableFlags(this);
-            AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+            AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
 
             Map<String, String> map = new HashMap<>();
             map.put("uid", myPreferenceManager.getUserId());
             map.put("username", Name.getText().toString().trim());
+            if(about_us.getText().toString().isEmpty()){
+                map.put("user_status", "Hii,I am using Ozochat");
+            }else{
+                map.put("user_status", about_us.getText().toString());
+            }
+
+
             Call call = apiService.updateUserInfo(map);
             call.enqueue(new Callback() {
                 @Override
@@ -327,6 +340,11 @@ public class ProfileInfoNew extends AppCompatActivity {
                     if (authResponse != null) {
                         showSnackbar(ll_login, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                         myPreferenceManager.setUserName(Name.getText().toString());
+                        if(about_us.getText().toString().isEmpty()){
+                            myPreferenceManager.setAboutus("Hii,I am using Ozochat");
+                        }else{
+                            myPreferenceManager.setAboutus(about_us.getText().toString());
+                        }
                         startActivity(new Intent(ProfileInfoNew.this, MainActivity.class));
                         finishAffinity();
                     } else {
@@ -337,7 +355,7 @@ public class ProfileInfoNew extends AppCompatActivity {
                 @Override
                 public void onFailure(Call call, Throwable t) {
                     dialog.dismiss();
-                    Log.d("name and about us","----"+t.getMessage());
+                    Log.d("name and about us", "----" + t.getMessage());
                     AppCommon.getInstance(ProfileInfoNew.this).clearNonTouchableFlags(ProfileInfoNew.this);
                     showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                 }

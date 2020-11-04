@@ -33,7 +33,8 @@ public class UserChatViewModel extends ViewModel {
             groupInterface.onSuccessCreateGroup(commonResponse);
         }else{
             commonResponse = new CreateGroupRepository().createGroup(arrayListAge,context);
-            groupInterface.onSuccessCreateGroup(commonResponse);    }
+            groupInterface.onSuccessCreateGroup(commonResponse);
+        }
     }
 
 }

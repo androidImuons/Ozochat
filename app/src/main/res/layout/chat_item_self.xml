@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:paddingTop="@dimen/dp10"
     android:paddingBottom="5dp"
-    android:paddingLeft="16dp"
+    android:paddingLeft="150dp"
     android:paddingRight="16dp">
 
 

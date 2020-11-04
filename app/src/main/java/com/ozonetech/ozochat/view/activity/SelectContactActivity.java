@@ -68,6 +68,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     Contacts contactsViewModel;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
+    public boolean is_group_create;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +97,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         dataBinding.llNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataBinding.etGroupName.setVisibility(View.VISIBLE);
-                dataBinding.llNewGroup.setVisibility(View.GONE);
-                dataBinding.llNewContact.setVisibility(View.GONE);
+
+                if(contactsAdapter!=null){
+                    is_group_create=true;
+                    contactsAdapter.setGroupFlaf(true);
+                    dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                    dataBinding.llNewGroup.setVisibility(View.GONE);
+                    dataBinding.llNewContact.setVisibility(View.GONE);
+                }
+
+
             }
         });
     }
@@ -370,7 +378,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
         dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
-        contactsAdapter = new ContactsAdapter(SelectContactActivity.this,inflater, selectUsers, this);
+        contactsAdapter = new ContactsAdapter(SelectContactActivity.this,inflater, selectUsers, this,is_group_create);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         dataBinding.rvContactsList.setAdapter(contactsAdapter);
         // white background notification bar

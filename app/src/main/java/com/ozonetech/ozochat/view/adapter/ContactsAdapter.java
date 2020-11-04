@@ -33,9 +33,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
     private SparseBooleanArray animationItemsIndex;
     private boolean reverseAllAnimations = false;
     private static int currentSelectedIndex = -1;
+private boolean isGroupCreate;
 
-
-    public ContactsAdapter(Context context, LayoutInflater inflater, List<Contacts> items, ContactsAdapterListener listener) {
+    public ContactsAdapter(Context context, LayoutInflater inflater, List<Contacts> items, ContactsAdapterListener listener, boolean is_group_create) {
         this.context = context;
         this.layoutInflater = inflater;
         this.contacts = items;
@@ -44,8 +44,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
         this.contactsArrayList.addAll(contacts);
         this.contactListFiltered.addAll(contacts);
         this.listener = listener;
+        this.isGroupCreate=is_group_create;
         selectedItems = new SparseBooleanArray();
         animationItemsIndex = new SparseBooleanArray();
+
     }
 
     @NonNull
@@ -69,10 +71,19 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onContactSelected(contactListFiltered.get(position));
+                    if (isGroupCreate){
+                        listener.onRowLongClicked(position);
+                        view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    }else{
+                        listener.onContactSelected(contactListFiltered.get(position));
+                    }
+
                 }
             }
         });
+    }
+    public void setGroupFlaf(boolean flag){
+        isGroupCreate=flag;
     }
 
     @Override
@@ -168,6 +179,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
                 contactListFiltered = (ArrayList<Contacts>) filterResults.values;
                 notifyDataSetChanged();
             }
