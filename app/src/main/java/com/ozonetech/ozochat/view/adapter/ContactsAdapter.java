@@ -72,7 +72,8 @@ private boolean isGroupCreate;
             public void onClick(View view) {
                 if (listener != null) {
                     if (isGroupCreate){
-
+                        listener.onRowLongClicked(position);
+                        view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                     }else{
                         listener.onContactSelected(contactListFiltered.get(position));
                     }
