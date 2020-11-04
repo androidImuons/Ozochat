@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener, ContactsListener {
+public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener, ContactsListener{
     MyPreferenceManager prefManager;
     ActivitySelectContactBinding dataBinding;
     ArrayList<Contacts> selectUsers;
@@ -73,14 +73,14 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dataBinding = DataBindingUtil.setContentView(SelectContactActivity.this, R.layout.activity_select_contact);
-        contactsViewModel = ViewModelProviders.of(SelectContactActivity.this).get(Contacts.class);
+        dataBinding = DataBindingUtil.setContentView(SelectContactActivity.this,R.layout.activity_select_contact);
+        contactsViewModel= ViewModelProviders.of(SelectContactActivity.this).get(Contacts.class);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
         dataBinding.etGroupName.setVisibility(View.GONE);
         dataBinding.llNewGroup.setVisibility(View.VISIBLE);
         dataBinding.llNewContact.setVisibility(View.VISIBLE);
-        prefManager = new MyPreferenceManager(SelectContactActivity.this);
+        prefManager=new MyPreferenceManager(SelectContactActivity.this);
         actionModeCallback = new ActionModeCallback();
         init();
 
@@ -164,12 +164,12 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
     @Override
     public void onContactSelected(Contacts contact) {
-        Intent intent = new Intent(SelectContactActivity.this, UserChatActivity.class);
-        intent.putExtra("chat_room_id", String.valueOf(contact.getUid()));
-        intent.putExtra("name", contact.getName());
-        intent.putExtra("mobileNo", contact.getPhone());
-        intent.putExtra("status", contact.getStatus());
-        intent.putExtra("profilePic", contact.getProfilePicture());
+        Intent intent = new Intent(SelectContactActivity.this,UserChatActivity.class);
+        intent.putExtra("chat_room_id",String.valueOf(contact.getUid()));
+        intent.putExtra("name",contact.getName());
+        intent.putExtra("mobileNo",contact.getPhone());
+        intent.putExtra("status",contact.getStatus());
+        intent.putExtra("profilePic",contact.getProfilePicture());
         startActivity(intent);
         Toast.makeText(getApplicationContext(), "Selected: " + contact.getUid() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
     }
@@ -194,7 +194,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         if (count == 0) {
             actionMode.finish();
         } else {
-            actionMode.setTitle("Participants : " + String.valueOf(count));
+            actionMode.setTitle("Participants : "+String.valueOf(count));
             actionMode.invalidate();
         }
     }
@@ -206,7 +206,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             mode.getMenuInflater().inflate(R.menu.menu_action_mode, menu);
 
             // disable swipe refresh if action mode is enabled
-            // swipeRefreshLayout.setEnabled(false);
+           // swipeRefreshLayout.setEnabled(false);
             return true;
         }
 
@@ -219,12 +219,12 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_create_group:
-                    if (!TextUtils.isEmpty(dataBinding.etGroupName.getText().toString().trim())) {
-                        String groupName = dataBinding.etGroupName.getText().toString().trim();
+                    if(!TextUtils.isEmpty(dataBinding.etGroupName.getText().toString().trim())){
+                        String groupName=dataBinding.etGroupName.getText().toString().trim();
                         createGroup(groupName);
                         mode.finish();
                         return true;
-                    } else {
+                    }else{
                         showSnackbar(dataBinding.clSelectContacts, "Please enter group name", Snackbar.LENGTH_SHORT);
                         return false;
                     }
@@ -237,7 +237,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             contactsAdapter.clearSelections();
-            // swipeRefreshLayout.setEnabled(true);
+           // swipeRefreshLayout.setEnabled(true);
             actionMode = null;
             dataBinding.etGroupName.setVisibility(View.GONE);
             dataBinding.llNewGroup.setVisibility(View.VISIBLE);
@@ -256,10 +256,12 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         contactsAdapter.resetAnimationIndex();
         List<Integer> selectedItemPositions = contactsAdapter.getSelectedItems();
         //[ {"admin":9922803527}, {"members": [ {"mobile": "9922803527"}, {"mobile": "7507828337"}]}, {"group_name":"Android"} ]
-        JsonObject member = new JsonObject();
+
         JsonArray memerArray = new JsonArray();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-            String selectedMobileNo = contactsAdapter.getData(selectedItemPositions.get(i));
+       // for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            for (int i = 0; i< selectedItemPositions.size(); i++) {
+            String selectedMobileNo=contactsAdapter.getData(selectedItemPositions.get(i));
+            JsonObject member = new JsonObject();
             member.addProperty("mobile", selectedMobileNo);
             memerArray.add(member);
         }
@@ -269,17 +271,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         JsonObject memersObjeect = new JsonObject();
         memersObjeect.add("members", memerArray);
         JsonObject groupname = new JsonObject();
-        groupname.addProperty("group_name", groupName);
+        groupname.addProperty("group_name",groupName );
         jsonArray.add(admin);
         jsonArray.add(memersObjeect);
         jsonArray.add(groupname);
-        Log.d("SelectContactActiivty", "---jsonarray Create group : " + jsonArray);
+        Log.d("SelectContactActiivty", "---jsonarray Create group : "+jsonArray);
 
         showProgressDialog("Please wait...");
-        contactsViewModel.createGroup(SelectContactActivity.this, contactsViewModel.contactsListener = this, jsonArray);
+        contactsViewModel.createGroup(SelectContactActivity.this,contactsViewModel.contactsListener=this,jsonArray);
 
     }
-
     @Override
     public void onGetContactsSuccess(LiveData<VerifiedContactsModel> verifiedContactsResponse) {
         verifiedContactsResponse.observe(SelectContactActivity.this, new Observer<VerifiedContactsModel>() {
@@ -288,15 +289,15 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                 //save access token
                 hideProgressDialog();
                 try {
-                    if (verifiedContactsModel.getSuccess()) {
+                    if(verifiedContactsModel.getSuccess()){
 
-                        if (verifiedContactsModel.getData() != null && verifiedContactsModel.getData().size() != 0) {
-                            ArrayList<Contacts> verifiedUsers = new ArrayList<>();
-                            for (int i = 0; i < verifiedContactsModel.getData().size(); i++) {
-                                Contacts contacts = new Contacts();
-                                for (int j = 0; j < selectUsers.size(); j++) {
-                                    String mobile = selectUsers.get(j).getPhone().contains("+91") ? selectUsers.get(j).getPhone().replace("+91", "") : selectUsers.get(j).getPhone();
-                                    if (verifiedContactsModel.getData().get(i).getPhone().equalsIgnoreCase(mobile)) {
+                        if(verifiedContactsModel.getData()!=null && verifiedContactsModel.getData().size()!=0){
+                            ArrayList<Contacts> verifiedUsers=new ArrayList<>();
+                            for(int i=0;i<verifiedContactsModel.getData().size();i++){
+                                Contacts contacts=new Contacts();
+                                for(int j=0;j<selectUsers.size();j++){
+                                    String mobile = selectUsers.get(j).getPhone().contains("+91")? selectUsers.get(j).getPhone().replace("+91",""): selectUsers.get(j).getPhone();
+                                    if(verifiedContactsModel.getData().get(i).getPhone().equalsIgnoreCase(mobile)){
                                         contacts.setName(selectUsers.get(j).getName());
                                     }
                                 }
@@ -308,18 +309,20 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                             }
 
 
+
                             LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                            setRecyclerView(inflater, verifiedUsers);
+                            setRecyclerView(inflater,verifiedUsers);
                         }
 
 
-                        Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
-                                "\n Data : " + verifiedContactsModel.getData());
-                        //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    } else {
+                        Log.d("SelectContactActivity","----\n Message : " + verifiedContactsModel.getMessage()+
+                                "\n Data : " + verifiedContactsModel.getData());
+                      //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    }else{
                         Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
+                        Log.d("SelectContactActivity","----\n Message : " + verifiedContactsModel.getMessage()+
                                 "\n Data : " + verifiedContactsModel.getData());
                     }
 
@@ -339,19 +342,19 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             public void onChanged(CreateGRoupREsponse createGRoupREsponse) {
                 //save access token
                 hideProgressDialog();
-                Log.d("SelectContactActivity", "----\n Message : " + createGRoupREsponse.getMessage() +
+                Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
                         "\n Data : " + createGRoupREsponse.getData());
 
                 try {
-                    if (createGRoupREsponse.getSuccess()) {
+                    if(createGRoupREsponse.getSuccess()){
 
-                        Log.d("SelectContactActivity", "----\n Message : " + createGRoupREsponse.getMessage() +
+                        Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
                                 "\n Data : " + createGRoupREsponse.getData());
                         //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    } else {
+                    }else{
                         Toast.makeText(SelectContactActivity.this, createGRoupREsponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("SelectContactActivity", "----\n Message : " + createGRoupREsponse.getMessage() +
+                        Log.d("SelectContactActivity","----\n Message : " + createGRoupREsponse.getMessage()+
                                 "\n Data : " + createGRoupREsponse.getData());
                     }
 
@@ -366,8 +369,8 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
 
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
-        dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size()) + " contacts");
-        contactsAdapter = new ContactsAdapter(SelectContactActivity.this, inflater, selectUsers, this);
+        dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
+        contactsAdapter = new ContactsAdapter(SelectContactActivity.this,inflater, selectUsers, this);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         dataBinding.rvContactsList.setAdapter(contactsAdapter);
         // white background notification bar
@@ -403,9 +406,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                     selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
                     selectUser.setPhone(phoneNumber);
                     selectUser.setStatus("I am a Naturalist");
-                    if (!prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE).equals(phoneNumber)) {
-                        selectUsers.add(selectUser);
-                    }
+                    selectUsers.add(selectUser);
 
 
                 }
@@ -420,21 +421,21 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             // sortContacts();
-            int count = selectUsers.size();
-            ArrayList<Contacts> removed = new ArrayList<>();
-            ArrayList<Contacts> contacts = new ArrayList<>();
-            for (int i = 0; i < selectUsers.size(); i++) {
+            int count=selectUsers.size();
+            ArrayList<Contacts> removed=new ArrayList<>();
+            ArrayList<Contacts> contacts=new ArrayList<>();
+            for(int i=0;i<selectUsers.size();i++){
                 Contacts inviteFriendsProjo = selectUsers.get(i);
 
-                if (inviteFriendsProjo.getName().matches("\\d+(?:\\.\\d+)?") || inviteFriendsProjo.getName().trim().length() == 0) {
+                if(inviteFriendsProjo.getName().matches("\\d+(?:\\.\\d+)?")||inviteFriendsProjo.getName().trim().length()==0){
                     removed.add(inviteFriendsProjo);
-                    Log.d("Removed Contact", new Gson().toJson(inviteFriendsProjo));
-                } else {
+                    Log.d("Removed Contact",new Gson().toJson(inviteFriendsProjo));
+                }else{
                     contacts.add(inviteFriendsProjo);
                 }
             }
             contacts.addAll(removed);
-            selectUsers = removeDuplicates(contacts);
+            selectUsers=removeDuplicates(contacts);
             sendContactsList(selectUsers);
 
         }
@@ -442,8 +443,8 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
     private void sendContactsList(ArrayList<Contacts> selectUserslist) {
         ArrayList<MobileObject> conList = new ArrayList();
-        for (int i = 0; i < selectUserslist.size(); i++) {
-            String mobile = selectUserslist.get(i).getPhone().contains("+91") ? selectUserslist.get(i).getPhone().replace("+91", "") : selectUserslist.get(i).getPhone();
+        for(int i = 0; i< selectUserslist.size(); i++){
+            String mobile = selectUserslist.get(i).getPhone().contains("+91")? selectUserslist.get(i).getPhone().replace("+91",""): selectUserslist.get(i).getPhone();
             conList.add(new MobileObject(mobile));
         }
         NumberListObject arrayListAge = new NumberListObject();
@@ -453,16 +454,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
     private void gotoFetchValidMembers(NumberListObject arrayListAge) {
         showProgressDialog("Please wait...");
-        contactsViewModel.sendContacts(SelectContactActivity.this, contactsViewModel.contactsListener = this, arrayListAge);
+        contactsViewModel.sendContacts(SelectContactActivity.this, contactsViewModel.contactsListener=this,arrayListAge);
     }
 
 
-    public ArrayList<Contacts> removeDuplicates(ArrayList<Contacts> list) {
+    public ArrayList<Contacts>  removeDuplicates(ArrayList<Contacts> list){
         Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
 
             @Override
             public int compare(Contacts o1, Contacts o2) {
-                if (o1.getPhone().equalsIgnoreCase(o2.getPhone())) {
+                if(o1.getPhone().equalsIgnoreCase(o2.getPhone())){
                     return 0;
                 }
                 return 1;
