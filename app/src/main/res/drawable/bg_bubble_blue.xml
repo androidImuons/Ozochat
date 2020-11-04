@@ -5,7 +5,7 @@
 
     <!-- view background color -->
     <solid
-        android:color="@color/colorchat" >
+        android:color="#a3cd7d" >
     </solid>
 
 

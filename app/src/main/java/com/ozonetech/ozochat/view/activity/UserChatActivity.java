@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -89,6 +91,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         contactMobileNo = intent.getStringExtra("mobileNo");
         contactStatus = intent.getStringExtra("status");
         contactProfilePic = intent.getStringExtra("profilePic");
+
         init();
 
     }
@@ -246,6 +249,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         mAdapter = new ChatRoomThreadAdapter(UserChatActivity.this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);
+        dataBinding.recyclerView.scrollToPosition(messageArrayList.size()-1);
 
     }
 
