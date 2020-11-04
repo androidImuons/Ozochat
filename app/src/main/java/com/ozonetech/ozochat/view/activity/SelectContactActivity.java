@@ -256,10 +256,12 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         contactsAdapter.resetAnimationIndex();
         List<Integer> selectedItemPositions = contactsAdapter.getSelectedItems();
         //[ {"admin":9922803527}, {"members": [ {"mobile": "9922803527"}, {"mobile": "7507828337"}]}, {"group_name":"Android"} ]
-        JsonObject member = new JsonObject();
+
         JsonArray memerArray = new JsonArray();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+       // for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+            for (int i = 0; i< selectedItemPositions.size(); i++) {
             String selectedMobileNo=contactsAdapter.getData(selectedItemPositions.get(i));
+            JsonObject member = new JsonObject();
             member.addProperty("mobile", selectedMobileNo);
             memerArray.add(member);
         }
