@@ -185,6 +185,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     @Override
     public void onRowLongClicked(int position) {
 // long press is performed, enable action mode
+        dataBinding.etGroupName.setVisibility(View.VISIBLE);
         enableActionMode(position);
     }
 
@@ -200,6 +201,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         int count = contactsAdapter.getSelectedItemCount();
 
         if (count == 0) {
+            dataBinding.etGroupName.setVisibility(View.GONE);
             actionMode.finish();
         } else {
             actionMode.setTitle("Participants : "+String.valueOf(count));
