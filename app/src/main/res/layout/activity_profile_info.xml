@@ -1,12 +1,363 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+<data>
+    <variable
+        name="profile"
+        type="com.ozonetech.ozochat.viewmodel.ProfileInfoViewModel" />
+</data>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_profile_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/cl_profile_info"
         tools:context=".view.activity.ProfileInfoActivity">
 
+    <include
+        android:id="@+id/toolbar_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp50"
+        layout="@layout/back_arrow_titel_toolbar"
+        bind:toolbar="@{profile}"></include>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="55dp">
+
+            <LinearLayout
+                android:id="@+id/ll_profile_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:paddingTop="@dimen/dp20"
+                android:paddingEnd="@dimen/dp10">
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/sdvImage"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    fresco:backgroundImage="@drawable/ic_profile_pic"
+                    fresco:placeholderImageScaleType="fitXY"
+                    fresco:roundBottomEnd="false"
+                    fresco:roundBottomStart="false"
+                    fresco:roundedCornerRadius="5dp"
+                    fresco:roundingBorderColor="@color/colorBlack"
+                    fresco:roundingBorderWidth="1dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txt_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dp30"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp10"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Rahul vh"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="20dp"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:id="@+id/txt_about_us"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp5"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Rahul vh"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/dp60"
+                android:paddingEnd="@dimen/dp10">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/ic_notification"
+                    android:backgroundTint="#98368d"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/dp5"
+                    android:layout_marginLeft="@dimen/dp10">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Account"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp5"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Privacy,Security,Change number"
+                        android:textColor="@color/colorGrey"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:gravity="center_vertical"
+              android:layout_marginTop="@dimen/dp20"
+                android:paddingEnd="@dimen/dp10">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:backgroundTint="#98368d"
+                    android:background="@drawable/ic_chat" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/dp5"
+                    android:layout_marginLeft="@dimen/dp10">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Chats"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp5"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Theme,wallpapers,chat history"
+                        android:textColor="@color/colorGrey"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/dp20"
+                android:paddingEnd="@dimen/dp10">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:backgroundTint="#98368d"
+                    android:background="@drawable/ic_notification" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/dp5"
+                    android:layout_marginLeft="@dimen/dp10">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Notification"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp5"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Message,group &amp; call tones"
+                        android:textColor="@color/colorGrey"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/dp20"
+                android:paddingEnd="@dimen/dp10">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:backgroundTint="#98368d"
+                    android:background="@drawable/ic_data_usage" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/dp5"
+                    android:layout_marginLeft="@dimen/dp10">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Data and storage usage"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp5"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Network usage,audio-download"
+                        android:textColor="@color/colorGrey"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/dp20"
+                android:paddingEnd="@dimen/dp10">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:backgroundTint="#98368d"
+                    android:background="@drawable/ic_help" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/dp5"
+                    android:layout_marginLeft="@dimen/dp10">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Help"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="@dimen/dp5"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="FAQ,contact,us,privacy policy"
+                        android:textColor="@color/colorGrey"
+                        android:textIsSelectable="true"
+                        android:textSize="14dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp10"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/dp20"
+                android:paddingEnd="@dimen/dp10">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:backgroundTint="#98368d"
+                    android:background="@drawable/ic_invite" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/dp5"
+                    android:layout_marginLeft="@dimen/dp10">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/urfa_regular"
+                        android:gravity="center_vertical"
+                        android:text="Invite a friend"
+                        android:textColor="@color/colorBlack"
+                        android:textIsSelectable="true"
+                        android:textSize="16dp"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

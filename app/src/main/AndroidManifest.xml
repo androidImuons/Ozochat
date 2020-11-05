@@ -77,7 +77,7 @@
         <activity android:name=".view.activity.SettingActivity" >
 
         </activity>
-        <activity android:name=".view.activity.ProfileActivity" >
+        <activity android:name=".view.activity.ProfileUpdateActivity" >
 
         </activity>
 

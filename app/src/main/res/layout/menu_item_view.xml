@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_round_bottum_right"
+     android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp">
+
+
+
+        <TextView
+            android:id="@+id/txt_new_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:fontFamily="@font/urfa_regular"
+            android:paddingLeft="10dp"
+            android:text="New Group"
+            android:textColor="@color/colorPrimaryDark"
+            >
+
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        >
+
+
+        <TextView
+            android:id="@+id/txt_new_brodcast"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:fontFamily="@font/urfa_regular"
+            android:text="New Broadcast"
+            android:textColor="@color/colorPrimaryDark"
+            >
+
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        >
+
+
+        <TextView
+            android:id="@+id/txt_ozo_chat_web"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:text="OzoChat Web"
+            android:fontFamily="@font/urfa_regular"
+            android:textColor="@color/colorPrimaryDark"
+            >
+
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:visibility="gone"
+        android:layout_marginTop="5dp"
+        >
+
+
+        <TextView
+            android:id="@+id/mune_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:text="My list"
+            android:fontFamily="@font/urfa_regular"
+            android:textColor="@color/colorPrimaryDark"
+            >
+
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        >
+
+
+        <TextView
+            android:id="@+id/txt_setting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:fontFamily="@font/urfa_regular"
+            android:paddingLeft="10dp"
+            android:text="Settings"
+            android:textColor="@color/colorPrimaryDark"
+            >
+
+        </TextView>
+    </LinearLayout>
+</LinearLayout>
