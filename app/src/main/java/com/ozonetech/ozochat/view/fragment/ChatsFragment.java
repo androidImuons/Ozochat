@@ -63,13 +63,13 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         myPreferenceManager = new MyPreferenceManager(getActivity());
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
-        renderUserChatList();
+
         return view;
     }
 
     private void renderUserChatList() {
         Map<String, String> chatMap = new HashMap<>();
-        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+        chatMap.put("user_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         showProgressDialog("Please wait...");
         userChatListModel.getUserResentChat(getActivity(),userChatListModel.userRecentChatListener=this,chatMap);
     }
@@ -90,6 +90,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 intent.putExtra("profilePic", chatRoom.getProfilePicture());
                 intent.putExtra("mobileNo",chatRoom.getMobile());
                 intent.putExtra("status","Online");
+                intent.putExtra("flag","user");
                 startActivity(intent);
             }
 
@@ -114,7 +115,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             Log.d(tag, "=====not connected--");
         }
         chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
-
+        renderUserChatList();
     }
 
     private void getMessage() {

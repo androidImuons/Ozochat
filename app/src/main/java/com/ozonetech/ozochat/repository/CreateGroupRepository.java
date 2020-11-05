@@ -21,30 +21,33 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CreateGroupRepository {
-    private String tag="CreateGroupRepository";
+    private String tag = "CreateGroupRepository";
 
     private MutableLiveData<CreateGRoupREsponse> verifiedContactsResponse;
     CreateGRoupREsponse verifiedContactsModel;
-    public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
-        Log.d(tag,"-----row body--"+arrayListAge.toString());
-        verifiedContactsResponse = new MutableLiveData<>();
-        MyPreferenceManager myPreferenceManager=new MyPreferenceManager(context);
 
-        AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+    public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
+        Log.d(tag, "-----row body--" + arrayListAge.toString());
+        verifiedContactsResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
         apiService.createGroup(arrayListAge).enqueue(new Callback<CreateGRoupREsponse>() {
             @Override
             public void onResponse(Call<CreateGRoupREsponse> call, Response<CreateGRoupREsponse> response) {
-
+                if (response.body() == null) {
+                  return;
+                }
                 if (response.isSuccessful()) {
                     verifiedContactsModel = response.body();
                     verifiedContactsResponse.setValue(verifiedContactsModel);
-                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
 
                 } else {
-                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
                     verifiedContactsModel = response.body();
                     verifiedContactsResponse.setValue(verifiedContactsModel);
-                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
 
                 }
             }
