@@ -180,14 +180,16 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("status",contact.getStatus());
         intent.putExtra("profilePic",contact.getProfilePicture());
         intent.putExtra("flag","user");
+        intent.putExtra("activityFrom","SelectContactActivity");
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        finish();
       //  Toast.makeText(getApplicationContext(), "Selected: " + contact.getUid() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onRowLongClicked(int position) {
 // long press is performed, enable action mode
+        dataBinding.etGroupName.setVisibility(View.VISIBLE);
         enableActionMode(position);
     }
 
@@ -203,6 +205,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         int count = contactsAdapter.getSelectedItemCount();
 
         if (count == 0) {
+            dataBinding.etGroupName.setVisibility(View.GONE);
             actionMode.finish();
         } else {
             actionMode.setTitle("Participants : "+String.valueOf(count));
@@ -384,8 +387,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("name",dataBinding.etGroupName.getText().toString().trim());
         intent.putExtra("admin_id",groupCreateRecord.getAdmin_user_id());
         intent.putExtra("flag","gp");
+        intent.putExtra("activityFrom","SelectContactActivity");
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        finish();
     }
 
 

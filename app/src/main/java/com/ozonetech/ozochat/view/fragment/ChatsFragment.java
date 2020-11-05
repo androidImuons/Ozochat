@@ -93,7 +93,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 intent.putExtra("admin_id",chatRoom.getAdmin_id());
                 intent.putExtra("status","Online");
                 intent.putExtra("flag","user");
-                startActivity(intent);
+                intent.putExtra("activityFrom","MainActivity");
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                getActivity().startActivity(intent);
             }
 
             @Override

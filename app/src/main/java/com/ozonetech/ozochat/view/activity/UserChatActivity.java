@@ -71,6 +71,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private String group_id;//="GP1604496777685";
     private Integer admin_id;//=99;
     private String start_flag;
+    private String activityFrom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
         Intent intent = getIntent();
         start_flag=intent.getStringExtra("flag");
+        activityFrom=intent.getStringExtra("activityFrom");
 
         contactName = intent.getStringExtra("name");
         if (start_flag.equals("gp")){
@@ -281,6 +283,15 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent=new Intent(UserChatActivity.this,MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     public void onCommoStarted() {
