@@ -45,11 +45,14 @@
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activity.UserChatActivity">
+        <activity android:name=".view.activity.UserChatActivity"
+            android:launchMode = "singleTop">
         </activity>
         <activity android:name=".view.activity.ProfileInfoNew"/>
-        <activity android:name=".view.activity.SelectContactActivity" />
-        <activity android:name=".view.activity.MainActivity">
+        <activity android:name=".view.activity.SelectContactActivity"
+            android:launchMode = "singleTop"/>
+        <activity android:name=".view.activity.MainActivity"
+            android:launchMode = "singleTop">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
