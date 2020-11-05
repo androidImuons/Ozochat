@@ -1,6 +1,9 @@
 package com.ozonetech.ozochat.view.activity;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -8,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,12 +19,19 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityMainBinding;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.network.AppCommon;
+import com.ozonetech.ozochat.utils.DeviceScreenUtil;
 import com.ozonetech.ozochat.view.fragment.CallsFragment;
 import com.ozonetech.ozochat.view.fragment.CameraFragment;
 import com.ozonetech.ozochat.view.fragment.ChatsFragment;
@@ -45,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private int[] tabIcons = {
             R.drawable.camera_icon
     };
+    private ImageView iv_menu;
 
 
     @Override
@@ -53,12 +65,61 @@ public class MainActivity extends AppCompatActivity {
         dataBinding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
-
+        setPopUpWindow();
+        setActionBar();
+        //setupUi();
         init();
+    }
+    private PopupWindow mypopupWindow;
+    private void setActionBar() {
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+
+        LayoutInflater mInflater = LayoutInflater.from(this);
+        View mCustomView = mInflater.inflate(R.layout.dash_top_bar_view, null);
+        ActionBar.LayoutParams layout = new ActionBar.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layout.setMargins(0, 0, 5, 0);
+        actionBar.setCustomView(mCustomView, layout);
+        // actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setDisplayShowCustomEnabled(true);
+        iv_menu = mCustomView.findViewById(R.id.white_topup_iv_menu);
+
+        iv_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mypopupWindow.showAsDropDown(v, -100, -150);
+
+            }
+        });
+
+    }
+    private void setPopUpWindow() {
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.menu_item_view, null);
+
+        TextView txt_setting = view.findViewById(R.id.txt_setting);
+
+
+        txt_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                startActivity(new Intent(MainActivity.this, ProfileInfoNew.class)
+//                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
+
+                startActivity(new Intent(MainActivity.this,ProfileInfoActivity.class));
+            }
+        });
+
+        mypopupWindow = new PopupWindow(view, 500, RelativeLayout.LayoutParams.WRAP_CONTENT, true);
     }
 
     private void init() {
-        setSupportActionBar(dataBinding.toolbar);
+       // setSupportActionBar(dataBinding.toolbar);
         setupViewPager(dataBinding.viewpager);
         dataBinding.tabs.setupWithViewPager(dataBinding.viewpager);
         setupTabIcons();
@@ -74,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 "mayuri@123");
 */
         // storing user in shared preferences
-       // MyApplication.getInstance().getPrefManager().storeUser(user);
+        // MyApplication.getInstance().getPrefManager().storeUser(user);
 
 
 //        try {
@@ -105,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-       // checkSocketConnection();
+        // checkSocketConnection();
     }
 
     private void checkSocketConnection() {
@@ -136,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
                     public void call(Object... args) {
 
 
-
                     }
                 });
             } catch (JSONException e) {
@@ -163,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new CameraFragment(),"");
+        adapter.addFragment(new CameraFragment(), "");
         adapter.addFragment(new ChatsFragment(), "CHATS");
         adapter.addFragment(new StatusFragment(), "STATUS");
         adapter.addFragment(new CallsFragment(), "CALLS");
@@ -199,8 +259,6 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
         }
     }
-
-
 
 
     private Emitter.Listener onDisconnect = new Emitter.Listener() {

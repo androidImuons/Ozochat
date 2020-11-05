@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:elevation="@dimen/dp2"
+        app:cardBackgroundColor="@color/colorWhite"
+        app:cardElevation="@dimen/dp2"
+        app:contentPadding="@dimen/dp10">
+
+        <LinearLayout
+            android:id="@+id/ll_bg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <ProgressBar
+                android:layout_width="@dimen/dp60"
+                android:layout_height="@dimen/dp60" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tv_loader_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/card_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp5"
+        android:gravity="center"
+        android:text="Wait..."
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/dp15"
+      android:fontFamily="@font/urfa_regular" />
+</RelativeLayout>

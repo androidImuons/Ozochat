@@ -69,7 +69,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void renderUserChatList() {
         Map<String, String> chatMap = new HashMap<>();
-        chatMap.put("user_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         showProgressDialog("Please wait...");
         userChatListModel.getUserResentChat(getActivity(),userChatListModel.userRecentChatListener=this,chatMap);
     }

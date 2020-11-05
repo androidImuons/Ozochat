@@ -15,6 +15,7 @@
         android:layout_marginLeft="10dp"
         android:textIsSelectable="true"
         android:textStyle="bold"
+        android:fontFamily="@font/urfa_regular"
         android:background="@drawable/bg_bubble_white"
         android:textSize="14dp" />
 

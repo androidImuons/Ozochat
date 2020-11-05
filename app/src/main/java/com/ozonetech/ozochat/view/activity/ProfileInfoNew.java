@@ -25,7 +25,6 @@ import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.ozonetech.ozochat.BuildConfig;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.LoginResponse;
