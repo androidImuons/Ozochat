@@ -30,6 +30,18 @@ public class ChatRoom implements Serializable {
     @Expose
     private Integer uid;
 
+    public Integer getAdmin_id() {
+        return admin_id;
+    }
+
+    public void setAdmin_id(Integer admin_id) {
+        this.admin_id = admin_id;
+    }
+
+    @SerializedName("admin_id")
+    @Expose
+    private Integer admin_id;
+
     public String getGroupId() {
         return groupId;
     }
