@@ -76,6 +76,8 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
             holder.count.setVisibility(View.GONE);
         }
 
+        //2020-11-05T05:21:41.000Z
+
 
         holder.timestamp.setText(getTimeStamp(chatRoom.getTimestamp()));
     }

@@ -16,5 +16,6 @@
     <color name="colorchat">#BFADDF</color>
     <color name="row_activated">#e0e0e0</color>
     <color name="bg_action_mode">#757575</color>
+    <color name="green">#075E54</color>
 
 </resources>

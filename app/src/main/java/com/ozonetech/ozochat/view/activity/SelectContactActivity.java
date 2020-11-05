@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -13,6 +14,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
@@ -51,6 +53,10 @@ import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ContactsAdapter;
 import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -394,6 +400,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
 
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
+        prefManager.saveArrayListContact(selectUsers,"Contacts");
         dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size())+" contacts");
         contactsAdapter = new ContactsAdapter(SelectContactActivity.this,inflater, selectUsers, this,is_group_create);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -401,6 +408,8 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         // white background notification bar
         whiteNotificationBar(dataBinding.rvContactsList);
     }
+
+
 
     class LoadContact extends AsyncTask<Void, Void, Void> {
         @Override

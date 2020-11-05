@@ -4,12 +4,21 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.viewmodel.Contacts;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MyPreferenceManager {
 
@@ -21,6 +30,9 @@ public class MyPreferenceManager {
     int PRIVATE_MODE = 0;
     private static final String PREF_NAME = "ozochat";
     private static final String IS_LOGIN = "IsLoggedIn";
+    private static final String CONTACT_TAG = "MyContacts";
+    JSONArray jsonArrayContact= new JSONArray();
+
 
     // All Shared Preferences Keys
     public static final String KEY_USER_ID = "user_id";
@@ -31,6 +43,7 @@ public class MyPreferenceManager {
     public static final String KEY_DEVICE_ID = "user_device_id";
     public static final String KEY_IS_LOGIN = "user_is_login";
     public static final String KEY_TOKEN = "token";
+    public static final String KEY_CONTACTS= "contacts";
 
     // Constructor
     public MyPreferenceManager(Context context) {
@@ -89,41 +102,24 @@ public class MyPreferenceManager {
     }
 
 
-    //{user_id:85,message:"your message"}
-    public String getSendMessageJSON(String message) {
-        String json = null;
-
-        try {
-            JSONObject jObj = new JSONObject();
-            jObj.put("user_id", getUserId());
-            jObj.put("message", message);
-
-            json = jObj.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return json;
+    public void saveArrayListContact(ArrayList<Contacts> list, String KEY_CONTACTS){
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(KEY_CONTACTS, json);
+        editor.apply();     // This line is IMPORTANT !!!
     }
 
-    public String getMessageJSON() {
-        String json = null;
-
-        try {
-            JSONObject jObj = new JSONObject();
-            jObj.put("user_id", getUserId());
-
-            json = jObj.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return json;
+    public ArrayList<Contacts> getArrayListContact(String KEY_CONTACTS){
+        Gson gson = new Gson();
+        String json = pref.getString(KEY_CONTACTS, null);
+        Type type = new TypeToken<ArrayList<Contacts>>() {}.getType();
+        return gson.fromJson(json, type);
     }
-
 
     public void clear() {
         editor.clear();
         editor.commit();
     }
+
+
 }
