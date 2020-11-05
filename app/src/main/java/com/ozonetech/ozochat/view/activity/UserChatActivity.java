@@ -99,11 +99,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             chatRoomId="";
         }else{
             chatRoomId = intent.getStringExtra("chat_room_id");
+            group_id = intent.getStringExtra("chat_room_id");
             contactMobileNo = intent.getStringExtra("mobileNo");
             contactStatus = intent.getStringExtra("status");
             contactProfilePic = intent.getStringExtra("profilePic");
         }
-
 
         init();
 
