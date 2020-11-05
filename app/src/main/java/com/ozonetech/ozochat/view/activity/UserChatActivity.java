@@ -100,9 +100,13 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         }else{
             chatRoomId = intent.getStringExtra("chat_room_id");
             group_id = intent.getStringExtra("chat_room_id");
+
             contactMobileNo = intent.getStringExtra("mobileNo");
             contactStatus = intent.getStringExtra("status");
             contactProfilePic = intent.getStringExtra("profilePic");
+            if (intent.hasExtra("admin_id")){
+                admin_id=intent.getIntExtra("admin_id",0);
+            }
         }
 
         init();
@@ -160,7 +164,13 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         if(start_flag.equals("gp")){
             getMessage();
         }else{
-            checkGroup();
+            Intent intent = getIntent();
+            if (intent.hasExtra("admin_id")){
+                getMessage();
+            }else{
+                checkGroup();
+            }
+
         }
 
 

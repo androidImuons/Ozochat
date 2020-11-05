@@ -85,7 +85,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     }
 
     public static String getTimeStamp(String dateStr) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         String timestamp = "";
 
         today = today.length() < 2 ? "0" + today : today;
@@ -94,7 +94,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
             Date date = format.parse(dateStr);
             SimpleDateFormat todayFormat = new SimpleDateFormat("dd");
             String dateToday = todayFormat.format(date);
-            format = dateToday.equals(today) ? new SimpleDateFormat("hh:mm a") : new SimpleDateFormat("dd LLL, hh:mm a");
+            format = dateToday.equals(today) ? new SimpleDateFormat("hh:mm") : new SimpleDateFormat("dd LLL, hh:mm a");
             String date1 = format.format(date);
             timestamp = date1.toString();
         } catch (ParseException e) {

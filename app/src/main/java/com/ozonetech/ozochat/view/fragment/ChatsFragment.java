@@ -83,12 +83,14 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             @Override
             public void onClick(View view, int position) {
                 // when chat is clicked, launch full chat thread activity
+                Log.d(tag,"---chat user click--");
                 ChatRoom chatRoom = chatRoomList.get(position);
                 Intent intent = new Intent(getActivity(), UserChatActivity.class);
                 intent.putExtra("chat_room_id", chatRoom.getGroupId());
                 intent.putExtra("name", chatRoom.getUsername());
                 intent.putExtra("profilePic", chatRoom.getProfilePicture());
                 intent.putExtra("mobileNo",chatRoom.getMobile());
+                intent.putExtra("admin_id",chatRoom.getAdmin_id());
                 intent.putExtra("status","Online");
                 intent.putExtra("flag","user");
                 startActivity(intent);
