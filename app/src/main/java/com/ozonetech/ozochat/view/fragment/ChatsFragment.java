@@ -24,6 +24,7 @@ import com.ozonetech.ozochat.model.ChatRoom;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import com.ozonetech.ozochat.view.adapter.ChatRoomsAdapter;
+import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 
 import org.json.JSONArray;
@@ -69,12 +70,41 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void renderUserChatList() {
         Map<String, String> chatMap = new HashMap<>();
+//        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+       // chatMap.put("sender_id", "103");
+
         chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         showProgressDialog("Please wait...");
         userChatListModel.getUserResentChat(getActivity(),userChatListModel.userRecentChatListener=this,chatMap);
     }
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
+
+        ArrayList<Contacts> myContactsArrayList=new ArrayList<>();
+        myContactsArrayList=myPreferenceManager.getArrayListContact("Contacts");
+        Log.d(tag,"---myContactsArrayList : "+ myContactsArrayList);
+
+        for(int i=0;i<chatRoomList.size();i++){
+
+            String contactMobileNo=chatRoomList.get(i).getMobile();
+            boolean flag=true;
+            for (int j=0;j<myContactsArrayList.size();j++){
+
+                String myContactMobileNo=myContactsArrayList.get(j).getPhone();
+                if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
+                    String myContactName=myContactsArrayList.get(j).getName();
+                    chatRoomList.get(i).setUsername(myContactName);
+                    flag=true;
+                    break;
+                }else{
+                    flag=false;
+                }
+            }
+            if(!flag){
+                chatRoomList.get(i).setUsername(contactMobileNo);
+            }
+
+        }
 
         mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
