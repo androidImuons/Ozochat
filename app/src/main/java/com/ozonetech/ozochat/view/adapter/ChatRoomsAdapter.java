@@ -76,6 +76,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
             holder.count.setVisibility(View.GONE);
         }
 
+
         holder.timestamp.setText(getTimeStamp(chatRoom.getTimestamp()));
     }
 
