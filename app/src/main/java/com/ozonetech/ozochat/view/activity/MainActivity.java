@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         View view = inflater.inflate(R.layout.menu_item_view, null);
 
         TextView txt_setting = view.findViewById(R.id.txt_setting);
-
+TextView txt_new_group=view.findViewById(R.id.txt_new_group);
 
         txt_setting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +112,15 @@ public class MainActivity extends AppCompatActivity {
 //                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
 
                 startActivity(new Intent(MainActivity.this,ProfileInfoActivity.class));
+            }
+        });
+
+        txt_new_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, SelectContactActivity.class);
+                intent.putExtra("action","group");
+                startActivity(intent);
             }
         });
 
