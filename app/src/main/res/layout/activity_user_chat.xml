@@ -2,21 +2,25 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="UserChat"
             type="com.ozonetech.ozochat.viewmodel.UserChatViewModel" />
     </data>
+
     <RelativeLayout
+        android:id="@+id/rl_user_chat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginBottom="40dp"
-            android:background="@drawable/chat_bg">
+            android:background="@drawable/chat_bg"
+            android:orientation="vertical">
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:id="@+id/cl_toolbar"
@@ -40,9 +44,9 @@
 
             <LinearLayout
                 android:id="@+id/ll_contact_chat"
-                android:layout_above="@+id/ll_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_above="@+id/ll_bottom"
                 android:layout_below="@+id/cl_toolbar"
                 android:orientation="vertical">
 
@@ -52,19 +56,51 @@
                     android:layout_height="match_parent"
                     android:scrollbars="vertical" />
 
+
             </LinearLayout>
 
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ll_bottom"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <com.devlomi.record_view.RecordView
+                android:id="@+id/record_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_toLeftOf="@id/record_button"
+                app:counter_time_color="#ff0000"
+                app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
+                app:slide_to_cancel_arrow_color="#000000"
+                app:slide_to_cancel_bounds="8dp"
+                app:slide_to_cancel_margin_right="10dp"
+                app:slide_to_cancel_text="Slide To Cancel" />
+
+            <com.devlomi.record_view.RecordButton
+                android:id="@+id/record_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/dp10"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/recv_bg_mic"
+                android:scaleType="centerInside"
+                app:mic_icon="@drawable/recv_ic_mic" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/ll_bottom"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/msg_box"
             android:layout_margin="@dimen/dp10"
+            android:background="@drawable/msg_box"
             android:orientation="horizontal">
 
             <ImageView
@@ -90,6 +126,7 @@
 
 
             <ImageView
+                android:id="@+id/iv_attach_action"
                 android:layout_width="@dimen/dp20"
                 android:layout_height="@dimen/dp20"
                 android:layout_gravity="center"
@@ -98,6 +135,7 @@
                 android:src="@drawable/attach_icon" />
 
             <ImageView
+                android:id="@+id/iv_camera"
                 android:layout_width="@dimen/dp20"
                 android:layout_height="@dimen/dp20"
                 android:layout_gravity="center"
@@ -106,12 +144,12 @@
                 android:src="@drawable/camera_icon" />
 
             <ImageView
+                android:id="@+id/iv_mic"
                 android:layout_width="@dimen/dp20"
                 android:layout_height="@dimen/dp20"
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/dp10"
                 android:layout_marginRight="@dimen/dp10"
-                android:visibility="gone"
                 android:src="@drawable/mic_icon" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -126,4 +164,12 @@
 
     </RelativeLayout>
 
-</layout>
+</layout><!--                <ImageView
+                    android:id="@+id/iv_pic"
+                    android:layout_width="@dimen/dp200"
+                    android:layout_height="@dimen/dp200"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/dp10"
+                    android:layout_marginRight="@dimen/dp10"
+                    android:src="@drawable/camera_icon" />
+-->

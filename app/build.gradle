@@ -89,6 +89,7 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
+    implementation 'com.devlomi.record-view:record-view:2.0.1'
     // Supernova Emoji
     implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
 }

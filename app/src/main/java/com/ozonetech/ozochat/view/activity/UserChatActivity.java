@@ -8,16 +8,26 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.devlomi.record_view.OnBasketAnimationEnd;
+import com.devlomi.record_view.OnRecordClickListener;
+import com.devlomi.record_view.OnRecordListener;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -33,9 +43,6 @@ import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.Message;
-import com.ozonetech.ozochat.model.User;
-import com.ozonetech.ozochat.network.AppCommon;
-import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
 import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
@@ -45,14 +52,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.prefs.Preferences;
-
-import butterknife.internal.Utils;
-import io.socket.client.On;
-import io.socket.emitter.Emitter;
 
 public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface, CreateGroupInterface {
     private static final String TAG = UserChatActivity.class.getName();
+    private static final int IMAGE_PICKER_SELECT = 1;
+    private static final int VIDEO_PICKER_SELECT = 2;
+    private static final int AUDIO_PICKER_SELECT = 3;
+    private static final int CAMERA_PIC_REQUEST = 4;
+    private static final int REQUEST_RECORDING = 5;
     MyPreferenceManager prefManager;
 
     ActivityUserChatBinding dataBinding;
@@ -88,26 +95,26 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         chatViewModel.groupInterface = (CreateGroupInterface) this;
 
         Intent intent = getIntent();
-        start_flag=intent.getStringExtra("flag");
-        activityFrom=intent.getStringExtra("activityFrom");
+        start_flag = intent.getStringExtra("flag");
+        activityFrom = intent.getStringExtra("activityFrom");
 
         contactName = intent.getStringExtra("name");
-        if (start_flag.equals("gp")){
-            admin_id=intent.getIntExtra("admin_id",0);
+        if (start_flag.equals("gp")) {
+            admin_id = intent.getIntExtra("admin_id", 0);
             group_id = intent.getStringExtra("chat_room_id");
             contactMobileNo = "";
             contactStatus = "";
             contactProfilePic = "";
-            chatRoomId="";
-        }else{
+            chatRoomId = "";
+        } else {
             chatRoomId = intent.getStringExtra("chat_room_id");
             group_id = intent.getStringExtra("chat_room_id");
 
             contactMobileNo = intent.getStringExtra("mobileNo");
             contactStatus = intent.getStringExtra("status");
             contactProfilePic = intent.getStringExtra("profilePic");
-            if (intent.hasExtra("admin_id")){
-                admin_id=intent.getIntExtra("admin_id",0);
+            if (intent.hasExtra("admin_id")) {
+                admin_id = intent.getIntExtra("admin_id", 0);
             }
         }
 
@@ -159,17 +166,112 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             }
         });
 
+        dataBinding.ivAttachAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDialog();
+            }
+        });
+
+        dataBinding.ivCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+            }
+        });
+
+        dataBinding.ivMic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(
+                        MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+                startActivityForResult(intent, REQUEST_RECORDING);
+            }
+        });
+
+        dataBinding.recordButton.setRecordView(dataBinding.recordView);
+        dataBinding.recordView.setOnRecordListener(new OnRecordListener() {
+            @Override
+            public void onStart() {
+                //Start Recording..
+                Log.d("RecordView", "onStart");
+            }
+
+            @Override
+            public void onCancel() {
+                //On Swipe To Cancel
+                Log.d("RecordView", "onCancel");
+
+            }
+
+            @Override
+            public void onFinish(long recordTime) {
+                //Stop Recording..
+               // String time = getHumanTimeText(recordTime);
+                Log.d("RecordView", "onFinish");
+
+                Log.d("RecordTime", String.valueOf(recordTime));
+            }
+
+            @Override
+            public void onLessThanSecond() {
+                //When the record time is less than One Second
+                Log.d("RecordView", "onLessThanSecond");
+            }
+        });
+
+        dataBinding.recordButton.setListenForRecord(false);
+
+        //ListenForRecord must be false ,otherwise onClick will not be called
+        dataBinding.recordButton.setOnRecordClickListener(new OnRecordClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(UserChatActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
+                Log.d("RecordButton","RECORD BUTTON CLICKED");
+            }
+        });
+
+        dataBinding.recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+            @Override
+            public void onAnimationEnd() {
+                Log.d("RecordView", "Basket Animation Finished");
+            }
+        });
+
+        dataBinding.recordView.setCancelBounds(8);//dp
+        dataBinding.recordView.setSmallMicColor(Color.parseColor("#c2185b"));
+
+        dataBinding.recordView.setSlideToCancelText("TEXT");
+
+        //disable Sounds
+        dataBinding.recordView.setSoundEnabled(false);
+
+        //prevent recording under one Second (it's false by default)
+        dataBinding.recordView.setLessThanSecondAllowed(false);
+
+        //set Custom sounds onRecord
+        //you can pass 0 if you don't want to play sound in certain state
+        dataBinding.recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished,0);
+
+        //change slide To Cancel Text Color
+        dataBinding.recordView.setSlideToCancelTextColor(Color.parseColor("#ff0000"));
+        //change slide To Cancel Arrow Color
+        dataBinding.recordView.setSlideToCancelArrowColor(Color.parseColor("#ff0000"));
+        //change Counter Time (Chronometer) color
+        dataBinding.recordView.setCounterTimeColor(Color.parseColor("#ff0000"));
+
         if (chatRoomId == null) {
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        if(start_flag.equals("gp")){
+        if (start_flag.equals("gp")) {
             getMessage();
-        }else{
+        } else {
             Intent intent = getIntent();
-            if (intent.hasExtra("admin_id")){
+            if (intent.hasExtra("admin_id")) {
                 getMessage();
-            }else{
+            } else {
                 checkGroup();
             }
 
@@ -287,7 +389,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent=new Intent(UserChatActivity.this,MainActivity.class);
+        Intent intent = new Intent(UserChatActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
@@ -322,7 +424,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                 if (gRoupREsponse == null) {
                     finish();
                 }
-                if (gRoupREsponse.getSuccess().equals(null)){
+                if (gRoupREsponse.getSuccess().equals(null)) {
                     finish();
                 }
                 if (gRoupREsponse.getSuccess()) {
@@ -334,4 +436,85 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             }
         });
     }
+
+
+    private void openDialog() {
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.custom_dialog_options_menu, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        LinearLayout layoutGallery = popupView.findViewById(R.id.layoutGallery);
+        layoutGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickIntent, IMAGE_PICKER_SELECT);
+            }
+        });
+
+
+        LinearLayout layoutVideo = popupView.findViewById(R.id.layoutVideo);
+        layoutVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickIntent, VIDEO_PICKER_SELECT);
+
+            }
+        });
+
+        LinearLayout layoutAudio = popupView.findViewById(R.id.layoutAudio);
+        layoutAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickIntent, AUDIO_PICKER_SELECT);
+
+            }
+        });
+
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(dataBinding.rlUserChat, Gravity.BOTTOM, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Uri selectedMediaUri = data.getData();
+            if (requestCode == IMAGE_PICKER_SELECT) {
+                Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+            } else if (requestCode == VIDEO_PICKER_SELECT) {
+                Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+            } else if (requestCode == AUDIO_PICKER_SELECT) {
+                Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+            } else if (requestCode == CAMERA_PIC_REQUEST) {
+                Bitmap image = (Bitmap) data.getExtras().get("data");
+                // dataBinding.ivPic.setImageBitmap(image);
+            } else if (requestCode == REQUEST_RECORDING) {
+                Uri savedUri = data.getData();
+                Toast.makeText(UserChatActivity.this,
+                        "Saved: " + savedUri.getPath(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }
