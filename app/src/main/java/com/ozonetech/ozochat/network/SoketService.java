@@ -101,6 +101,9 @@ MyPreferenceManager myPreferenceManager;
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                   // Log.d("socketid","---"+args[0]);
+                    Log.d("socketid","---"+signalApplication.getSocket().id());
+
                     JSONObject jsonObject=new JSONObject();
                     try {
                         jsonObject.put("setStatus","online");
