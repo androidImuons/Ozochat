@@ -76,6 +76,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
     public boolean is_group_create;
+    private Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         dataBinding.llNewContact.setVisibility(View.VISIBLE);
         prefManager=new MyPreferenceManager(SelectContactActivity.this);
         actionModeCallback = new ActionModeCallback();
+
+        bundle=getIntent().getExtras();
+
         init();
 
     }
@@ -116,6 +120,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
             }
         });
+
     }
 
     private void showContacts() {
@@ -407,6 +412,15 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         dataBinding.rvContactsList.setAdapter(contactsAdapter);
         // white background notification bar
         whiteNotificationBar(dataBinding.rvContactsList);
+        if (getIntent().hasExtra("action")){
+            if(contactsAdapter!=null){
+                is_group_create=true;
+                contactsAdapter.setGroupFlaf(true);
+                dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                dataBinding.llNewGroup.setVisibility(View.GONE);
+                dataBinding.llNewContact.setVisibility(View.GONE);
+            }
+        }
     }
 
 

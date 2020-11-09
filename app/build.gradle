@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.ozonetech.ozochat"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -92,4 +92,8 @@ dependencies {
     implementation 'com.devlomi.record-view:record-view:2.0.1'
     // Supernova Emoji
     implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
+    implementation 'com.github.freddyfang:android-video-trimmer:v1.0.0'
+    implementation 'com.github.danylovolokh:video-player-manager:0.2.0'
+    implementation 'com.github.danylovolokh:list-visibility-utils:0.2.0'
+    implementation 'com.sothree.slidinguppanel:library:3.4.0'
 }
