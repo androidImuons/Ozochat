@@ -12,8 +12,11 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.ozonetech.ozochat.MyApplication;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -22,7 +25,7 @@ import io.socket.emitter.Emitter;
 public class SoketService extends Service {
     private MyApplication signalApplication;
 
-
+MyPreferenceManager myPreferenceManager;
     public static SoketService instance = null;
     private String tag="SoketService";
 
@@ -46,6 +49,7 @@ public class SoketService extends Service {
         if(isInstanceCreated()){
             return;
         }
+        myPreferenceManager=new MyPreferenceManager(getApplicationContext());
         signalApplication=(MyApplication) getApplication();
         if (signalApplication.getSocket() == null)
             signalApplication.iSocket = signalApplication.getSocket();
@@ -97,7 +101,15 @@ public class SoketService extends Service {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    JSONObject jsonObject=new JSONObject();
+                    try {
+                        jsonObject.put("setStatus","online");
+                        jsonObject.put("user_id",myPreferenceManager.getUserId());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
+                    signalApplication.getSocket().emit("updateStatus", jsonObject);
                 }
             });
         }
@@ -108,7 +120,15 @@ public class SoketService extends Service {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    JSONObject jsonObject=new JSONObject();
+                    try {
+                        jsonObject.put("setStatus","offline");
+                        jsonObject.put("user_id",myPreferenceManager.getUserId());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
+                    signalApplication.getSocket().emit("updateStatus", jsonObject);
                 }
             });
         }
@@ -120,7 +140,15 @@ public class SoketService extends Service {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    JSONObject jsonObject=new JSONObject();
+                    try {
+                        jsonObject.put("setStatus","offline");
+                        jsonObject.put("user_id",myPreferenceManager.getUserId());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
+                    signalApplication.getSocket().emit("updateStatus", jsonObject);
                 }
             });
         }
