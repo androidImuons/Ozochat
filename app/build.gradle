@@ -88,6 +88,10 @@ dependencies {
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
     }
+
+    implementation 'com.devlomi.record-view:record-view:2.0.1'
+    // Supernova Emoji
+    implementation 'com.github.hani-momanii:SuperNova-Emoji:1.1'
     implementation 'com.github.freddyfang:android-video-trimmer:v1.0.0'
     implementation 'com.github.danylovolokh:video-player-manager:0.2.0'
     implementation 'com.github.danylovolokh:list-visibility-utils:0.2.0'
