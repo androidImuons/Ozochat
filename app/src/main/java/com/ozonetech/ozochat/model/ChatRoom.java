@@ -14,57 +14,40 @@ import java.io.Serializable;
 
 public class ChatRoom implements Serializable {
 
-    @SerializedName("group_id")
-    @Expose
-    private String groupId;
-    @SerializedName("mobile")
-    @Expose
-    private String mobile;
-    @SerializedName("username")
-    @Expose
-    private String username;
-    @SerializedName("image")
-    @Expose
-    private String profilePicture;
     @SerializedName("uid")
     @Expose
     private Integer uid;
-
-    public Integer getAdmin_id() {
-        return admin_id;
-    }
-
-    public void setAdmin_id(Integer admin_id) {
-        this.admin_id = admin_id;
-    }
-
     @SerializedName("admin_id")
     @Expose
-    private Integer admin_id;
+    private Integer adminId;
+    @SerializedName("group_id")
+    @Expose
+    private String groupId;
+    @SerializedName("oneToOne")
+    @Expose
+    private Integer oneToOne;
+    @SerializedName("username")
+    @Expose
+    private String username;
+    @SerializedName("profile_image")
+    @Expose
+    private String profilePicture;
+    @SerializedName("message")
+    @Expose
+    private String message;
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("mobile")
+    @Expose
+    private String mobile;
+    @SerializedName("group_name")
+    @Expose
+    private String groupName;
+    @SerializedName("group_image")
+    @Expose
+    private String groupImage;
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     @BindingAdapter({"profilePicture"})
     public static void loadImage(ImageView view, String imageUrl) {
@@ -74,19 +57,6 @@ public class ChatRoom implements Serializable {
                 .placeholder(R.drawable.profile_icon)
                 .into(view);
 
-    }
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-    public Integer getUid() {
-        return uid;
-    }
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
     }
 
 
@@ -106,6 +76,93 @@ public class ChatRoom implements Serializable {
         this.unreadCount = unreadCount;
     }
 
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(Integer adminId) {
+        this.adminId = adminId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public Integer getOneToOne() {
+        return oneToOne;
+    }
+
+    public void setOneToOne(Integer oneToOne) {
+        this.oneToOne = oneToOne;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getGroupImage() {
+        return groupImage;
+    }
+
+    public void setGroupImage(String groupImage) {
+        this.groupImage = groupImage;
+    }
 
     public String getLastMessage() {
         return lastMessage;

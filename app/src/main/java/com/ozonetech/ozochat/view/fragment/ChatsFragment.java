@@ -80,13 +80,66 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
 
+        //            "uid": 103,
+        //            "admin_id": 100,
+        //            "group_id": "GP1604989176399",
+        //            "oneToOne": 0,
+        //            "group_name": "teamgrp4",
+        //            "username": "rahul",
+        //            "message": "",
+        //            "profile_image": "http://3.0.49.131/api/uploads/null",
+        //            "title": "You Added 8669605501",
+        //            "mobile": "7507828337"
+
+        //            "uid": 103,
+        //            "admin_id": 100,
+        //            "group_id": "GP1604923790415",
+        //            "oneToOne": 1,
+        //            "group_name": "9922803527,8669605501",
+        //            "username": "Amol",
+        //            "profile_image": "http://3.0.49.131/api/uploads/null",
+        //            "message": "",
+        //            "title": "Hi there!",
+        //            "mobile": "8669605501"
+
+
         ArrayList<Contacts> myContactsArrayList=new ArrayList<>();
         myContactsArrayList=myPreferenceManager.getArrayListContact("Contacts");
         Log.d(tag,"---myContactsArrayList : "+ myContactsArrayList);
 
         for(int i=0;i<chatRoomList.size();i++){
 
+            if(chatRoomList.get(i).getOneToOne() == 1){
+                String contactMobileNo=chatRoomList.get(i).getMobile();
+
+                boolean flag=true;
+                for (int j=0;j<myContactsArrayList.size();j++){
+
+                    String myContactMobileNo=myContactsArrayList.get(j).getPhone();
+                    if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
+                        String myContactName=myContactsArrayList.get(j).getName();
+                        chatRoomList.get(i).setUsername(myContactName);
+                        flag=true;
+                        break;
+                    }else{
+                        flag=false;
+                    }
+                }
+                if(!flag){
+                    chatRoomList.get(i).setUsername(contactMobileNo);
+                }
+
+            }else if(chatRoomList.get(i).getOneToOne() == 0){
+                chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
+            }
+        }
+
+
+/*
+        for(int i=0;i<chatRoomList.size();i++){
+
             String contactMobileNo=chatRoomList.get(i).getMobile();
+
             boolean flag=true;
             for (int j=0;j<myContactsArrayList.size();j++){
 
@@ -105,6 +158,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             }
 
         }
+*/
 
         mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -120,7 +174,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 intent.putExtra("name", chatRoom.getUsername());
                 intent.putExtra("profilePic", chatRoom.getProfilePicture());
                 intent.putExtra("mobileNo",chatRoom.getMobile());
-                intent.putExtra("admin_id",chatRoom.getAdmin_id());
+                intent.putExtra("admin_id",chatRoom.getAdminId());
                 intent.putExtra("status","Online");
                 intent.putExtra("flag","user");
                 intent.putExtra("activityFrom","MainActivity");
