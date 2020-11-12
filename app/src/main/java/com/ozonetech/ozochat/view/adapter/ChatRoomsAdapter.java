@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.ozonetech.ozochat.R;
-import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

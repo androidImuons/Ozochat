@@ -20,7 +20,7 @@ import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
-import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import com.ozonetech.ozochat.view.adapter.ChatRoomsAdapter;
@@ -33,7 +33,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.socket.emitter.Emitter;
@@ -135,30 +134,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         }
 
 
-/*
-        for(int i=0;i<chatRoomList.size();i++){
-
-            String contactMobileNo=chatRoomList.get(i).getMobile();
-
-            boolean flag=true;
-            for (int j=0;j<myContactsArrayList.size();j++){
-
-                String myContactMobileNo=myContactsArrayList.get(j).getPhone();
-                if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
-                    String myContactName=myContactsArrayList.get(j).getName();
-                    chatRoomList.get(i).setUsername(myContactName);
-                    flag=true;
-                    break;
-                }else{
-                    flag=false;
-                }
-            }
-            if(!flag){
-                chatRoomList.get(i).setUsername(contactMobileNo);
-            }
-
-        }
-*/
 
         mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -244,7 +219,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         if (data.getInt("status") == 200 && data.getInt("success") == 1) {
             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
             JSONArray jsonArray = data.getJSONArray("data");
-            for (int i = 1; i < jsonArray.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 ChatRoom chatRoom = new ChatRoom();
                 chatRoom.setGroupId(jsonObject.getString("group_id"));

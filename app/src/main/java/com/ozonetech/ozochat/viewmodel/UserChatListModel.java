@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
-import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.repository.RecentChatList;
 
 import java.util.List;
