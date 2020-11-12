@@ -214,7 +214,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             MyApplication.getInstance().getSocket().emit("recentChatEvent", json).on("recentChatEvent", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.d(tag, "--getMessage -data-array-" + args[0]);
+                    Log.d(tag, "--recent list -data-array-" + args[0]);
                     JSONObject data = (JSONObject) args[0];
                     // final JSONArray result = (JSONArray) args[0];
                     new Handler(getMainLooper())
@@ -244,7 +244,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         if (data.getInt("status") == 200 && data.getInt("success") == 1) {
             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
             JSONArray jsonArray = data.getJSONArray("data");
-            for (int i = 1; i < jsonArray.length(); i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 ChatRoom chatRoom = new ChatRoom();
                 chatRoom.setGroupId(jsonObject.getString("group_id"));
