@@ -69,38 +69,12 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void renderUserChatList() {
         Map<String, String> chatMap = new HashMap<>();
-//        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
-        // chatMap.put("sender_id", "103");
-
         chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         showProgressDialog("Please wait...");
         userChatListModel.getUserResentChat(getActivity(), userChatListModel.userRecentChatListener = this, chatMap);
     }
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
-
-        //            "uid": 103,
-        //            "admin_id": 100,
-        //            "group_id": "GP1604989176399",
-        //            "oneToOne": 0,
-        //            "group_name": "teamgrp4",
-        //            "username": "rahul",
-        //            "message": "",
-        //            "profile_image": "http://3.0.49.131/api/uploads/null",
-        //            "title": "You Added 8669605501",
-        //            "mobile": "7507828337"
-
-        //            "uid": 103,
-        //            "admin_id": 100,
-        //            "group_id": "GP1604923790415",
-        //            "oneToOne": 1,
-        //            "group_name": "9922803527,8669605501",
-        //            "username": "Amol",
-        //            "profile_image": "http://3.0.49.131/api/uploads/null",
-        //            "message": "",
-        //            "title": "Hi there!",
-        //            "mobile": "8669605501"
-
 
         ArrayList<Contacts> myContactsArrayList = new ArrayList<>();
         myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
@@ -169,16 +143,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     @Override
     public void onResume() {
         super.onResume();
-       /* myPreferenceManager = new MyPreferenceManager(getContext());
-        Log.d(tag, "=====token--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
-        Log.d(tag, "=====id--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
-        if (MyApplication.getInstance().iSocket.connected()) {
-          //  getMessage();
-        } else {
-            Log.d(tag, "=====not connected--");
-        }
-        chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
-        //  renderUserChatList();
         getrecentChat();
     }
 
@@ -224,6 +188,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 ChatRoom chatRoom = new ChatRoom();
                 chatRoom.setGroupId(jsonObject.getString("group_id"));
                 Log.d(tag, "--group id-" + jsonObject.getString("group_id"));
+
                 if (jsonObject.has("profile_image")) {
                     chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
                 } else {
@@ -232,10 +197,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setGroupName(jsonObject.getString("group_name"));
                 chatRoom.setUsername(jsonObject.getString("group_name"));
                 chatRoom.setAdminId(jsonObject.getInt("admin_id"));
-
                 chatRoom.setMobile(jsonObject.getString("mobile"));
                 chatRoom.setOneToOne(jsonObject.getInt("oneToOne"));
-
                 chatRoom.setLastMessage("lastMessage ");
                 chatRoom.setTimestamp("12 : 00 pm");
                 chatRoom.setUnreadCount(i + 1);
@@ -266,16 +229,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                         if (userChatListModel.getChatRoom() != null) {
                             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
                             chatRoomList = (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
-//                            for (int i = 1; i < chatRoomList.size(); i++) {
-////                                ChatRoom chatRoom = new ChatRoom();
-////                                chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
-////                                chatRoom.setProfilePicture(chatRoom.getProfilePicture());
-////                                chatRoom.setUsername(chatRoomList.get(i).getUsername());
-////                                chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
-////                                chatRoom.setTimestamp("12 : 00 pm");
-////                                chatRoom.setUnreadCount(i + 1);
-////                                chatRoomList.add(chatRoom);
-////                            }
                             if (chatRoomList.size() != 0) {
                                 setRecyclerView(chatRoomList);
                                 dataBinding.llStartChat.setVisibility(View.GONE);
