@@ -189,7 +189,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             MyApplication.getInstance().getSocket().emit("recentChatEvent", json).on("recentChatEvent", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.d(tag, "--getMessage -data-array-" + args[0]);
+                    Log.d(tag, "--recent list -data-array-" + args[0]);
                     JSONObject data = (JSONObject) args[0];
                     // final JSONArray result = (JSONArray) args[0];
                     new Handler(getMainLooper())

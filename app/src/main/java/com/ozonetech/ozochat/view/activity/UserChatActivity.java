@@ -285,7 +285,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
     private void sendMessage() {
         if (MyApplication.getInstance().iSocket.connected()) {
-            Log.d(tag, "-----is connectttd"+MyApplication.getInstance().iSocket.id());
+            Log.d(tag, "-----is connectttd---->"+MyApplication.getInstance().iSocket.id());
         } else {
             Log.d(tag, "-----not connectttd");
         }

@@ -174,6 +174,21 @@ MyPreferenceManager myPreferenceManager;
                     );
         }
     };
+    Emitter.Listener chatList=new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            new Handler(getMainLooper())
+                    .post(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                     Log.d(tag, "---chatList--" + args[0]);
+                                }
+                            }
+
+                    );
+        }
+    };
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
