@@ -33,11 +33,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
-import com.ozonetech.ozochat.model.ChatRoom;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
@@ -90,7 +90,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         myPreferenceManager = new MyPreferenceManager(getActivity());
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
-        prefManager = new MyPreferenceManager(getContext());
+
         selectUsers = new ArrayList<Contacts>();
 
         return view;
@@ -108,131 +108,76 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
 
-        //            "uid": 103,
-        //            "admin_id": 100,
-        //            "group_id": "GP1604989176399",
-        //            "oneToOne": 0,
-        //            "group_name": "teamgrp4",
-        //            "username": "rahul",
-        //            "message": "",
-        //            "profile_image": "http://3.0.49.131/api/uploads/null",
-        //            "title": "You Added 8669605501",
-        //            "mobile": "7507828337"
-
-        //            "uid": 103,
-        //            "admin_id": 100,
-        //            "group_id": "GP1604923790415",
-        //            "oneToOne": 1,
-        //            "group_name": "9922803527,8669605501",
-        //            "username": "Amol",
-        //            "profile_image": "http://3.0.49.131/api/uploads/null",
-        //            "message": "",
-        //            "title": "Hi there!",
-        //            "mobile": "8669605501"
-
-
         ArrayList<Contacts> myContactsArrayList = new ArrayList<>();
         myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
         Log.d(tag, "---myContactsArrayList : " + myContactsArrayList);
 
-        for (int i = 0; i < chatRoomList.size(); i++) {
+            for (int i = 0; i < chatRoomList.size(); i++) {
 
-            if (chatRoomList.get(i).getOneToOne() == 1) {
-                String contactMobileNo = chatRoomList.get(i).getMobile();
+                if (chatRoomList.get(i).getOneToOne() == 1) {
+                    String contactMobileNo = chatRoomList.get(i).getMobile();
 
-                boolean flag = true;
-                for (int j = 0; j < myContactsArrayList.size(); j++) {
+                    boolean flag = true;
+                    for (int j = 0; j < myContactsArrayList.size(); j++) {
 
-                    String myContactMobileNo = myContactsArrayList.get(j).getPhone();
-                    if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
-                        String myContactName = myContactsArrayList.get(j).getName();
-                        chatRoomList.get(i).setUsername(myContactName);
-                        flag = true;
-                        break;
-                    } else {
-                        flag = false;
+                        String myContactMobileNo = myContactsArrayList.get(j).getPhone();
+                        if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
+                            String myContactName = myContactsArrayList.get(j).getName();
+                            chatRoomList.get(i).setUsername(myContactName);
+                            flag = true;
+                            break;
+                        } else {
+                            flag = false;
+                        }
                     }
-                }
-                if (!flag) {
-                    chatRoomList.get(i).setUsername(contactMobileNo);
-                }
+                    if (!flag) {
+                        chatRoomList.get(i).setUsername(contactMobileNo);
+                    }
 
-            } else if (chatRoomList.get(i).getOneToOne() == 0) {
-                chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
-            }
-        }
-
-
-/*
-        for(int i=0;i<chatRoomList.size();i++){
-
-            String contactMobileNo=chatRoomList.get(i).getMobile();
-
-            boolean flag=true;
-            for (int j=0;j<myContactsArrayList.size();j++){
-
-                String myContactMobileNo=myContactsArrayList.get(j).getPhone();
-                if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
-                    String myContactName=myContactsArrayList.get(j).getName();
-                    chatRoomList.get(i).setUsername(myContactName);
-                    flag=true;
-                    break;
-                }else{
-                    flag=false;
+                } else if (chatRoomList.get(i).getOneToOne() == 0) {
+                    chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
                 }
             }
-            if(!flag){
-                chatRoomList.get(i).setUsername(contactMobileNo);
-            }
+            mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
+            dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+            dataBinding.recyclerView.setAdapter(mAdapter);
+            dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
+                @Override
+                public void onClick(View view, int position) {
+                    // when chat is clicked, launch full chat thread activity
+                    Log.d(tag, "---chat user click--" + position);
+                    ChatRoom chatRoom = chatRoomList.get(position);
+                    Intent intent = new Intent(getActivity(), UserChatActivity.class);
+                    intent.putExtra("chat_room_id", chatRoom.getGroupId());
+                    intent.putExtra("name", chatRoom.getUsername());
+                    intent.putExtra("profilePic", chatRoom.getProfilePicture());
+                    intent.putExtra("mobileNo", chatRoom.getMobile());
+                    intent.putExtra("admin_id", chatRoom.getAdminId());
+                    intent.putExtra("status", "Online");
+                    intent.putExtra("flag", "user");
+                    intent.putExtra("activityFrom", "MainActivity");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    getActivity().startActivity(intent);
+                }
 
-        }
-*/
+                @Override
+                public void onLongClick(View view, int position) {
 
-        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
-        dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-        dataBinding.recyclerView.setAdapter(mAdapter);
-        dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                // when chat is clicked, launch full chat thread activity
-                Log.d(tag, "---chat user click--" + position);
-                ChatRoom chatRoom = chatRoomList.get(position);
-                Intent intent = new Intent(getActivity(), UserChatActivity.class);
-                intent.putExtra("chat_room_id", chatRoom.getGroupId());
-                intent.putExtra("name", chatRoom.getUsername());
-                intent.putExtra("profilePic", chatRoom.getProfilePicture());
-                intent.putExtra("mobileNo", chatRoom.getMobile());
-                intent.putExtra("admin_id", chatRoom.getAdminId());
-                intent.putExtra("status", "Online");
-                intent.putExtra("flag", "user");
-                intent.putExtra("activityFrom", "MainActivity");
-                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                getActivity().startActivity(intent);
-            }
+                }
 
-            @Override
-            public void onLongClick(View view, int position) {
+            }));
 
-            }
 
-        }));
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-       /* myPreferenceManager = new MyPreferenceManager(getContext());
-        Log.d(tag, "=====token--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
-        Log.d(tag, "=====id--"+myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
-        if (MyApplication.getInstance().iSocket.connected()) {
-          //  getMessage();
-        } else {
-            Log.d(tag, "=====not connected--");
-        }
-        chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
         //  renderUserChatList();
-        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+       // getrecentChat();
+
+        if(myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS)==null){
             requestContactPermission();
         }else{
             getrecentChat();
@@ -281,21 +226,28 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             JSONArray jsonArray = data.getJSONArray("data");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                //            "uid": 111,
+                //            "admin_id": 100,
+                //            "group_id": "GP1605155439153",
+                //            "oneToOne": 1,
+                //            "group_name": "9922803527,7023500608",
+                //            "usermobile": "7023500608",
+                //            "profile_image": "",
+                //            "message": "hello praveen sir",
+                //            "title": null,
+                //            "mobile": "7023500608"
                 ChatRoom chatRoom = new ChatRoom();
-                chatRoom.setGroupId(jsonObject.getString("group_id"));
-                Log.d(tag, "--group id-" + jsonObject.getString("group_id"));
-                if (jsonObject.has("profile_image")) {
-                    chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
-                } else {
-                    chatRoom.setProfilePicture("");
-                }
-                chatRoom.setGroupName(jsonObject.getString("group_name"));
-                chatRoom.setUsername(jsonObject.getString("group_name"));
+                chatRoom.setUid(jsonObject.getInt("uid"));
                 chatRoom.setAdminId(jsonObject.getInt("admin_id"));
-
-                chatRoom.setMobile(jsonObject.getString("mobile"));
+                chatRoom.setGroupId(jsonObject.getString("group_id"));
                 chatRoom.setOneToOne(jsonObject.getInt("oneToOne"));
-
+                chatRoom.setGroupName(jsonObject.getString("group_name"));
+                chatRoom.setUsername(jsonObject.getString("usermobile"));
+                chatRoom.setMessage(jsonObject.getString("message"));
+                chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
+                chatRoom.setTitle(jsonObject.getString("title"));
+                chatRoom.setMobile(jsonObject.getString("mobile"));
                 chatRoom.setLastMessage("lastMessage ");
                 chatRoom.setTimestamp("12 : 00 pm");
                 chatRoom.setUnreadCount(i + 1);
@@ -326,16 +278,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                         if (userChatListModel.getChatRoom() != null) {
                             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
                             chatRoomList = (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
-//                            for (int i = 1; i < chatRoomList.size(); i++) {
-////                                ChatRoom chatRoom = new ChatRoom();
-////                                chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
-////                                chatRoom.setProfilePicture(chatRoom.getProfilePicture());
-////                                chatRoom.setUsername(chatRoomList.get(i).getUsername());
-////                                chatRoom.setLastMessage("lastMessage " + String.valueOf(i));
-////                                chatRoom.setTimestamp("12 : 00 pm");
-////                                chatRoom.setUnreadCount(i + 1);
-////                                chatRoomList.add(chatRoom);
-////                            }
                             if (chatRoomList.size() != 0) {
                                 setRecyclerView(chatRoomList);
                                 dataBinding.llStartChat.setVisibility(View.GONE);
@@ -358,9 +300,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         });
     }
 
-    Cursor phones;
+Cursor phones;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
-    MyPreferenceManager prefManager;
     ArrayList<Contacts> selectUsers;
 
     public void requestContactPermission() {
@@ -448,7 +389,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                                 contacts.setStatus("Hii, I am using Ozochat");
                                 verifiedUsers.add(contacts);
                             }
-                            prefManager.saveArrayListContact(selectUsers, "Contacts");
+                            myPreferenceManager.saveArrayListContact(verifiedUsers, "Contacts");
                             getrecentChat();
 
                         }
@@ -510,7 +451,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
                     selectUser.setPhone(number);
                     selectUser.setStatus("I am a Naturalist");
-                    if (!prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE).equals(number)) {
+                    if (!myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE).equals(number)) {
                         selectUsers.add(selectUser);
                     }
 
@@ -595,7 +536,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void gotoFetchValidMembers(NumberListObject arrayListAge) {
         showProgressDialog("Please wait...");
-        arrayListAge.setSender_id(prefManager.getUserId());
+        arrayListAge.setSender_id(myPreferenceManager.getUserId());
         for (int i = 0; i < arrayListAge.getMobile().size(); i++) {
             Log.d(tag, "--contact-" + arrayListAge.getMobile().get(i).getMobiles());
         }

@@ -1,21 +1,35 @@
 package com.ozonetech.ozochat.view.activity;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,18 +38,28 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityMainBinding;
+import com.ozonetech.ozochat.listeners.ContactsListener;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.MobileObject;
+import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.AppCommon;
 import com.ozonetech.ozochat.utils.DeviceScreenUtil;
+import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.view.adapter.ContactsAdapter;
 import com.ozonetech.ozochat.view.fragment.CallsFragment;
 import com.ozonetech.ozochat.view.fragment.CameraFragment;
 import com.ozonetech.ozochat.view.fragment.ChatsFragment;
 import com.ozonetech.ozochat.view.fragment.StatusFragment;
+import com.ozonetech.ozochat.viewmodel.Contacts;
+import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +68,10 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -103,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         View view = inflater.inflate(R.layout.menu_item_view, null);
 
         TextView txt_setting = view.findViewById(R.id.txt_setting);
-TextView txt_new_group=view.findViewById(R.id.txt_new_group);
+        TextView txt_new_group = view.findViewById(R.id.txt_new_group);
 
         txt_setting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +146,7 @@ TextView txt_new_group=view.findViewById(R.id.txt_new_group);
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, SelectContactActivity.class);
-                intent.putExtra("action","group");
+                intent.putExtra("action", "group");
                 startActivity(intent);
             }
         });
@@ -128,7 +155,7 @@ TextView txt_new_group=view.findViewById(R.id.txt_new_group);
     }
 
     private void init() {
-       // setSupportActionBar(dataBinding.toolbar);
+        // setSupportActionBar(dataBinding.toolbar);
         setupViewPager(dataBinding.viewpager);
         dataBinding.tabs.setupWithViewPager(dataBinding.viewpager);
         setupTabIcons();
@@ -293,6 +320,3 @@ TextView txt_new_group=view.findViewById(R.id.txt_new_group);
 
     }
 }
-
-
-//https://www.wowza.com/blog/build-live-streaming-broadcast-app-android
