@@ -77,6 +77,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     private ActionMode actionMode;
     public boolean is_group_create;
     private Bundle bundle;
+    private String tag="SelectContactActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -447,14 +448,15 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                     String id = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
                     String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    String number=phoneNumber.replaceAll("\\s","");
 
 
                     Contacts selectUser = new Contacts();
                     selectUser.setName(name);
                     selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
-                    selectUser.setPhone(phoneNumber);
+                    selectUser.setPhone(number);
                     selectUser.setStatus("I am a Naturalist");
-                    if (!prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE).equals(phoneNumber)){
+                    if (!prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE).equals(number)){
                         selectUsers.add(selectUser);
                     }
 
@@ -495,7 +497,26 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         ArrayList<MobileObject> conList = new ArrayList();
         for(int i = 0; i< selectUserslist.size(); i++){
             String mobile = selectUserslist.get(i).getPhone().contains("+91")? selectUserslist.get(i).getPhone().replace("+91",""): selectUserslist.get(i).getPhone();
-            conList.add(new MobileObject(mobile));
+          String number=mobile.replaceAll("\\s","");
+
+          boolean flag=true;
+          for (int j=0;j<conList.size();j++){
+              if (conList.get(j).getMobiles().equals(number)){
+                  flag=false;
+                  break;
+              }else{
+                  flag=true;
+              }
+          }
+
+           if (flag){
+               conList.add(new MobileObject(number));
+               Log.d(tag,"--not--number--"+number);
+           }else{
+               Log.d(tag,"--already--number--"+number);
+           }
+
+
         }
         NumberListObject arrayListAge = new NumberListObject();
         arrayListAge.setMobile(conList);
@@ -504,6 +525,10 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
     private void gotoFetchValidMembers(NumberListObject arrayListAge) {
         showProgressDialog("Please wait...");
+
+        for (int i=0;i<arrayListAge.getMobile().size();i++){
+            Log.d(tag,"--contact-"+arrayListAge.getMobile().get(i).getMobiles());
+        }
         contactsViewModel.sendContacts(SelectContactActivity.this, contactsViewModel.contactsListener=this,arrayListAge);
     }
 

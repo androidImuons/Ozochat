@@ -25,6 +25,9 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+//import com.devlomi.record_view.OnBasketAnimationEnd;
+//import com.devlomi.record_view.OnRecordClickListener;
+//import com.devlomi.record_view.OnRecordListener;
 import com.devlomi.record_view.OnBasketAnimationEnd;
 import com.devlomi.record_view.OnRecordClickListener;
 import com.devlomi.record_view.OnRecordListener;
@@ -282,7 +285,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
     private void sendMessage() {
         if (MyApplication.getInstance().iSocket.connected()) {
-            Log.d(tag, "-----is connectttd");
+            Log.d(tag, "-----is connectttd"+MyApplication.getInstance().iSocket.id());
         } else {
             Log.d(tag, "-----not connectttd");
         }
@@ -291,7 +294,12 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         if (TextUtils.isEmpty(message)) {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
+        }else{
+           triggerSendMessage();
         }
+    }
+
+    private void triggerSendMessage() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("sender_id", MyApplication.getInstance().getPrefManager().getUserId());
@@ -317,7 +325,6 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             e.printStackTrace();
         }
         dataBinding.message.setText("");
-
 
     }
 
@@ -363,14 +370,17 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
 
             try {
                 JSONObject messageObj = data.getJSONObject(i);
-                Message message = new Message();
-                message.setId(messageObj.getInt("id"));
-                message.setUserId(messageObj.getInt("sender_id"));
-                message.setGroupId(messageObj.getString("group_id"));
-                message.setMessage(messageObj.getString("message"));
-                message.setCreated(messageObj.getString("created"));
+                if (!messageObj.getString("message").equals("")){
+                    Message message = new Message();
+                    message.setId(messageObj.getInt("id"));
+                    message.setUserId(messageObj.getInt("sender_id"));
+                    message.setGroupId(messageObj.getString("group_id"));
+                    message.setMessage(messageObj.getString("message"));
+                    message.setCreated(messageObj.getString("created"));
 
-                messageArrayList.add(message);
+                    messageArrayList.add(message);
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -430,6 +440,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                 if (gRoupREsponse.getSuccess()) {
                     group_id = gRoupREsponse.getData().get(0).getGroupId();
                     admin_id = gRoupREsponse.getData().get(0).getAdmin_user_id();
+                    //triggerSendMessage();
                     getMessage();
                 }
 

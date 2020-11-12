@@ -60,7 +60,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                              Bundle savedInstanceState) {
 
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chats, container, false);
-        userChatListModel= ViewModelProviders.of(ChatsFragment.this).get(UserChatListModel.class);
+        userChatListModel = ViewModelProviders.of(ChatsFragment.this).get(UserChatListModel.class);
         myPreferenceManager = new MyPreferenceManager(getActivity());
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
@@ -71,11 +71,11 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     private void renderUserChatList() {
         Map<String, String> chatMap = new HashMap<>();
 //        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
-       // chatMap.put("sender_id", "103");
+        // chatMap.put("sender_id", "103");
 
         chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         showProgressDialog("Please wait...");
-        userChatListModel.getUserResentChat(getActivity(),userChatListModel.userRecentChatListener=this,chatMap);
+        userChatListModel.getUserResentChat(getActivity(), userChatListModel.userRecentChatListener = this, chatMap);
     }
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
@@ -103,33 +103,33 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         //            "mobile": "8669605501"
 
 
-        ArrayList<Contacts> myContactsArrayList=new ArrayList<>();
-        myContactsArrayList=myPreferenceManager.getArrayListContact("Contacts");
-        Log.d(tag,"---myContactsArrayList : "+ myContactsArrayList);
+        ArrayList<Contacts> myContactsArrayList = new ArrayList<>();
+        myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
+        Log.d(tag, "---myContactsArrayList : " + myContactsArrayList);
 
-        for(int i=0;i<chatRoomList.size();i++){
+        for (int i = 0; i < chatRoomList.size(); i++) {
 
-            if(chatRoomList.get(i).getOneToOne() == 1){
-                String contactMobileNo=chatRoomList.get(i).getMobile();
+            if (chatRoomList.get(i).getOneToOne() == 1) {
+                String contactMobileNo = chatRoomList.get(i).getMobile();
 
-                boolean flag=true;
-                for (int j=0;j<myContactsArrayList.size();j++){
+                boolean flag = true;
+                for (int j = 0; j < myContactsArrayList.size(); j++) {
 
-                    String myContactMobileNo=myContactsArrayList.get(j).getPhone();
+                    String myContactMobileNo = myContactsArrayList.get(j).getPhone();
                     if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
-                        String myContactName=myContactsArrayList.get(j).getName();
+                        String myContactName = myContactsArrayList.get(j).getName();
                         chatRoomList.get(i).setUsername(myContactName);
-                        flag=true;
+                        flag = true;
                         break;
-                    }else{
-                        flag=false;
+                    } else {
+                        flag = false;
                     }
                 }
-                if(!flag){
+                if (!flag) {
                     chatRoomList.get(i).setUsername(contactMobileNo);
                 }
 
-            }else if(chatRoomList.get(i).getOneToOne() == 0){
+            } else if (chatRoomList.get(i).getOneToOne() == 0) {
                 chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
             }
         }
@@ -167,17 +167,17 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             @Override
             public void onClick(View view, int position) {
                 // when chat is clicked, launch full chat thread activity
-                Log.d(tag,"---chat user click--");
+                Log.d(tag, "---chat user click--");
                 ChatRoom chatRoom = chatRoomList.get(position);
                 Intent intent = new Intent(getActivity(), UserChatActivity.class);
                 intent.putExtra("chat_room_id", chatRoom.getGroupId());
                 intent.putExtra("name", chatRoom.getUsername());
                 intent.putExtra("profilePic", chatRoom.getProfilePicture());
-                intent.putExtra("mobileNo",chatRoom.getMobile());
-                intent.putExtra("admin_id",chatRoom.getAdminId());
-                intent.putExtra("status","Online");
-                intent.putExtra("flag","user");
-                intent.putExtra("activityFrom","MainActivity");
+                intent.putExtra("mobileNo", chatRoom.getMobile());
+                intent.putExtra("admin_id", chatRoom.getAdminId());
+                intent.putExtra("status", "Online");
+                intent.putExtra("flag", "user");
+                intent.putExtra("activityFrom", "MainActivity");
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 getActivity().startActivity(intent);
             }
@@ -203,27 +203,33 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             Log.d(tag, "=====not connected--");
         }
         chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
-        renderUserChatList();
+        //  renderUserChatList();
+        getrecentChat();
     }
 
-    private void getMessage() {
+    private void getrecentChat() {
         JSONObject json = new JSONObject();
         try {
-            json.put("user_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
-            MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
+            json.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+            MyApplication.getInstance().getSocket().emit("recentChatEvent", json).on("recentChatEvent", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    JSONArray data = (JSONArray) args[0];
-                    final JSONArray result = (JSONArray) args[0];
+                    Log.d(tag, "--getMessage -data-array-" + args[0]);
+                    JSONObject data = (JSONObject) args[0];
+                    // final JSONArray result = (JSONArray) args[0];
                     new Handler(getMainLooper())
                             .post(
                                     new Runnable() {
                                         @Override
                                         public void run() {
-                                            Log.d(tag, "--getMessage -data-array-" + data.toString());
+                                            Log.d(tag, "--recent  -data-array-" + data.toString());
+                                            try {
+                                                setList(data);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                     }
-
                             );
 
                 }
@@ -232,6 +238,44 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             e.printStackTrace();
         }
 
+    }
+
+    private void setList(JSONObject data) throws JSONException {
+        if (data.getInt("status") == 200 && data.getInt("success") == 1) {
+            ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
+            JSONArray jsonArray = data.getJSONArray("data");
+            for (int i = 1; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                ChatRoom chatRoom = new ChatRoom();
+                chatRoom.setGroupId(jsonObject.getString("group_id"));
+                Log.d(tag, "--group id-" + jsonObject.getString("group_id"));
+                if (jsonObject.has("profile_image")) {
+                    chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
+                } else {
+                    chatRoom.setProfilePicture("");
+                }
+                chatRoom.setGroupName(jsonObject.getString("group_name"));
+                chatRoom.setUsername(jsonObject.getString("group_name"));
+                chatRoom.setAdminId(jsonObject.getInt("admin_id"));
+
+                chatRoom.setMobile(jsonObject.getString("mobile"));
+                chatRoom.setOneToOne(jsonObject.getInt("oneToOne"));
+
+                chatRoom.setLastMessage("lastMessage ");
+                chatRoom.setTimestamp("12 : 00 pm");
+                chatRoom.setUnreadCount(i + 1);
+                chatRoomList.add(chatRoom);
+            }
+            if (chatRoomList.size() != 0) {
+                setRecyclerView(chatRoomList);
+                dataBinding.llStartChat.setVisibility(View.GONE);
+            } else {
+                dataBinding.llStartChat.setVisibility(View.VISIBLE);
+            }
+        } else {
+            dataBinding.llStartChat.setVisibility(View.VISIBLE);
+            Log.d(tag, "----no recent--");
+        }
     }
 
     @Override
@@ -244,9 +288,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     if (userChatListModel.getSuccess()) {
                         Log.d("ChatFragment", "--Response : Code" + userChatListModel.getChatRoom());
 
-                        if(userChatListModel.getChatRoom()!=null){
+                        if (userChatListModel.getChatRoom() != null) {
                             ArrayList<ChatRoom> chatRoomList = new ArrayList<>();
-                            chatRoomList= (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
+                            chatRoomList = (ArrayList<ChatRoom>) userChatListModel.getChatRoom();
 //                            for (int i = 1; i < chatRoomList.size(); i++) {
 ////                                ChatRoom chatRoom = new ChatRoom();
 ////                                chatRoom.setGroupId(chatRoomList.get(i).getGroupId());
@@ -263,7 +307,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                             } else {
                                 dataBinding.llStartChat.setVisibility(View.VISIBLE);
                             }
-                        }else{
+                        } else {
                             dataBinding.llStartChat.setVisibility(View.VISIBLE);
                         }
 
