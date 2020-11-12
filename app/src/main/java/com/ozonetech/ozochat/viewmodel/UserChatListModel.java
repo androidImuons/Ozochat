@@ -8,9 +8,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
 import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.repository.RecentChatList;
+import com.ozonetech.ozochat.repository.SelectContactRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -66,4 +69,23 @@ public class UserChatListModel extends ViewModel {
             userRecentChatListener.onUserRecentChatSuccess(userChatListResponse);
         }
     }
+
+    public LiveData<VerifiedContactsModel> commonResponse;
+
+    public ContactsListener contactsListener;
+
+
+    public void sendContacts(Context context, ContactsListener contactsListener, NumberListObject arrayListAge) {
+
+        if (commonResponse == null) {
+            commonResponse = new MutableLiveData<VerifiedContactsModel>();
+            //we will load it asynchronously from server in this method
+            commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
+            contactsListener.onGetContactsSuccess(commonResponse);
+        } else {
+            commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
+            contactsListener.onGetContactsSuccess(commonResponse);
+        }
+    }
+
 }

@@ -92,9 +92,9 @@ public class Contacts extends ViewModel {
         this.status = status;
     }
 
-
-    public LiveData<VerifiedContactsModel> commonResponse;
     public LiveData<CreateGRoupREsponse> createGroupResponse;
+    public LiveData<VerifiedContactsModel> commonResponse;
+
     public ContactsListener contactsListener;
 
 
