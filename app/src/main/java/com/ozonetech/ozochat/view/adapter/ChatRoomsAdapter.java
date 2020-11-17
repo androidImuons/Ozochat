@@ -79,7 +79,9 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
         //2020-11-05T05:21:41.000Z
 
 
-        holder.timestamp.setText(getTimeStamp(chatRoom.getTimestamp()));
+        //holder.timestamp.setText(getTimeStamp(chatRoom.getTimestamp()));
+        holder.timestamp.setText("12:00 pm");
+
     }
 
     @Override

@@ -37,7 +37,7 @@ import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
-import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
@@ -92,7 +92,11 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         dataBinding.setLifecycleOwner(this);
         prefManager = new MyPreferenceManager(getContext());
         selectUsers = new ArrayList<Contacts>();
-
+        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+            requestContactPermission();
+        }else{
+            getrecentChat();
+        }
         return view;
     }
 
@@ -232,11 +236,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         }
         chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
         //  renderUserChatList();
-        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
-            requestContactPermission();
-        }else{
-            getrecentChat();
-        }
+
 
 
 
@@ -438,7 +438,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                                 Contacts contacts = new Contacts();
                                 for (int j = 0; j < selectUsers.size(); j++) {
                                     String mobile = selectUsers.get(j).getPhone().contains("+91") ? selectUsers.get(j).getPhone().replace("+91", "") : selectUsers.get(j).getPhone();
-                                    if (verifiedContactsModel.getData().get(i).getPhone().equalsIgnoreCase(mobile)) {
+                                    String number = mobile.replaceAll("\\s", "");
+
+                                    if (verifiedContactsModel.getData().get(i).getPhone().equalsIgnoreCase(number)) {
                                         contacts.setName(selectUsers.get(j).getName());
                                     }
                                 }

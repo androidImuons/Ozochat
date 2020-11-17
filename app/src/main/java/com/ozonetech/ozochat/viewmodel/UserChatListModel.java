@@ -10,7 +10,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
-import com.ozonetech.ozochat.model.ChatRoom;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.repository.RecentChatList;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
