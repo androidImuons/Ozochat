@@ -90,20 +90,19 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         myPreferenceManager = new MyPreferenceManager(getActivity());
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
-
         selectUsers = new ArrayList<Contacts>();
-
         return view;
     }
 
     private void renderUserChatList() {
         Map<String, String> chatMap = new HashMap<>();
-//        chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+        //chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         // chatMap.put("sender_id", "103");
 
         chatMap.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
         showProgressDialog("Please wait...");
         userChatListModel.getUserResentChat(getActivity(), userChatListModel.userRecentChatListener = this, chatMap);
+
     }
 
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
@@ -112,62 +111,60 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
         Log.d(tag, "---myContactsArrayList : " + myContactsArrayList);
 
-            for (int i = 0; i < chatRoomList.size(); i++) {
+        for (int i = 0; i < chatRoomList.size(); i++) {
 
-                if (chatRoomList.get(i).getOneToOne() == 1) {
-                    String contactMobileNo = chatRoomList.get(i).getMobile();
+            if (chatRoomList.get(i).getOneToOne() == 1) {
+                String contactMobileNo = chatRoomList.get(i).getMobile();
 
-                    boolean flag = true;
-                    for (int j = 0; j < myContactsArrayList.size(); j++) {
+                boolean flag = true;
+                for (int j = 0; j < myContactsArrayList.size(); j++) {
 
-                        String myContactMobileNo = myContactsArrayList.get(j).getPhone();
-                        if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
-                            String myContactName = myContactsArrayList.get(j).getName();
-                            chatRoomList.get(i).setUsername(myContactName);
-                            flag = true;
-                            break;
-                        } else {
-                            flag = false;
-                        }
+                    String myContactMobileNo = myContactsArrayList.get(j).getPhone();
+                    if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
+                        String myContactName = myContactsArrayList.get(j).getName();
+                        chatRoomList.get(i).setUsername(myContactName);
+                        flag = true;
+                        break;
+                    } else {
+                        flag = false;
                     }
-                    if (!flag) {
-                        chatRoomList.get(i).setUsername(contactMobileNo);
-                    }
-
-                } else if (chatRoomList.get(i).getOneToOne() == 0) {
-                    chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
                 }
+                if (!flag) {
+                    chatRoomList.get(i).setUsername(contactMobileNo);
+                }
+
+            } else if (chatRoomList.get(i).getOneToOne() == 0) {
+                chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
             }
-            mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
-            dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-            dataBinding.recyclerView.setAdapter(mAdapter);
-            dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
-                @Override
-                public void onClick(View view, int position) {
-                    // when chat is clicked, launch full chat thread activity
-                    Log.d(tag, "---chat user click--" + position);
-                    ChatRoom chatRoom = chatRoomList.get(position);
-                    Intent intent = new Intent(getActivity(), UserChatActivity.class);
-                    intent.putExtra("chat_room_id", chatRoom.getGroupId());
-                    intent.putExtra("name", chatRoom.getUsername());
-                    intent.putExtra("profilePic", chatRoom.getProfilePicture());
-                    intent.putExtra("mobileNo", chatRoom.getMobile());
-                    intent.putExtra("admin_id", chatRoom.getAdminId());
-                    intent.putExtra("status", "Online");
-                    intent.putExtra("flag", "user");
-                    intent.putExtra("activityFrom", "MainActivity");
-                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    getActivity().startActivity(intent);
-                }
+        }
+        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
+        dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        dataBinding.recyclerView.setAdapter(mAdapter);
+        dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                // when chat is clicked, launch full chat thread activity
+                Log.d(tag, "---chat user click--" + position);
+                ChatRoom chatRoom = chatRoomList.get(position);
+                Intent intent = new Intent(getActivity(), UserChatActivity.class);
+                intent.putExtra("chat_room_id", chatRoom.getGroupId());
+                intent.putExtra("name", chatRoom.getUsername());
+                intent.putExtra("profilePic", chatRoom.getProfilePicture());
+                intent.putExtra("mobileNo", chatRoom.getMobile());
+                intent.putExtra("admin_id", chatRoom.getAdminId());
+                intent.putExtra("status", "Online");
+                intent.putExtra("flag", "user");
+                intent.putExtra("activityFrom", "MainActivity");
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                getActivity().startActivity(intent);
+            }
 
-                @Override
-                public void onLongClick(View view, int position) {
+            @Override
+            public void onLongClick(View view, int position) {
 
-                }
+            }
 
-            }));
-
-
+        }));
     }
 
 
@@ -175,14 +172,13 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     public void onResume() {
         super.onResume();
         //  renderUserChatList();
-       // getrecentChat();
+        // getrecentChat();
 
-        if(myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS)==null){
+        if (myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS) == null) {
             requestContactPermission();
-        }else{
+        } else {
             getrecentChat();
         }
-
 
 
     }
@@ -252,7 +248,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setTimestamp("12 : 00 pm");
                 chatRoom.setUnreadCount(i + 1);
                 chatRoomList.add(chatRoom);
+
             }
+
             if (chatRoomList.size() != 0) {
                 setRecyclerView(chatRoomList);
                 dataBinding.llStartChat.setVisibility(View.GONE);
@@ -300,7 +298,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         });
     }
 
-Cursor phones;
+    Cursor phones;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     ArrayList<Contacts> selectUsers;
 
@@ -394,7 +392,6 @@ Cursor phones;
 
                         }
 
-
                         Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
                                 "\n Data : " + verifiedContactsModel.getData());
                         //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
@@ -411,9 +408,7 @@ Cursor phones;
                 }
             }
         });
-
     }
-
 
 
     @Override
@@ -425,7 +420,6 @@ Cursor phones;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         @Override
@@ -444,8 +438,6 @@ Cursor phones;
                     String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     String number = phoneNumber.replaceAll("\\s", "");
-
-
                     Contacts selectUser = new Contacts();
                     selectUser.setName(name);
                     selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
@@ -454,8 +446,6 @@ Cursor phones;
                     if (!myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE).equals(number)) {
                         selectUsers.add(selectUser);
                     }
-
-
                 }
             } else {
                 Log.e("Cursor close 1", "----------------");
@@ -480,6 +470,7 @@ Cursor phones;
                 } else {
                     contacts.add(inviteFriendsProjo);
                 }
+
             }
             contacts.addAll(removed);
             selectUsers = removeDuplicates(contacts);
@@ -487,6 +478,7 @@ Cursor phones;
 
         }
     }
+
     public ArrayList<Contacts> removeDuplicates(ArrayList<Contacts> list) {
         Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
 
@@ -526,8 +518,6 @@ Cursor phones;
             } else {
                 Log.d(tag, "--already--number--" + number);
             }
-
-
         }
         NumberListObject arrayListAge = new NumberListObject();
         arrayListAge.setMobile(conList);
