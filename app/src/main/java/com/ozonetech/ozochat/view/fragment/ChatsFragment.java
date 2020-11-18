@@ -2,7 +2,6 @@ package com.ozonetech.ozochat.view.fragment;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,7 +32,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
-import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
@@ -42,7 +40,6 @@ import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
-import com.ozonetech.ozochat.view.activity.SelectContactActivity;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import com.ozonetech.ozochat.view.adapter.ChatRoomsAdapter;
 import com.ozonetech.ozochat.viewmodel.Contacts;
@@ -56,7 +53,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -66,7 +62,7 @@ import io.socket.emitter.Emitter;
 import static android.os.Looper.getMainLooper;
 
 
-public class ChatsFragment extends BaseFragment implements UserRecentChatListener, ContactsListener {
+public class ChatsFragment extends BaseFragment implements UserRecentChatListener, ContactsListener, ChatRoomsAdapter.ClickListener {
 
     FragmentChatsBinding dataBinding;
     private ChatRoomsAdapter mAdapter;
@@ -192,34 +188,34 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         }
 */
 
-        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList);
+        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);
-        dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                // when chat is clicked, launch full chat thread activity
-                Log.d(tag, "---chat user click--" + position);
-                ChatRoom chatRoom = chatRoomList.get(position);
-                Intent intent = new Intent(getActivity(), UserChatActivity.class);
-                intent.putExtra("chat_room_id", chatRoom.getGroupId());
-                intent.putExtra("name", chatRoom.getUsername());
-                intent.putExtra("profilePic", chatRoom.getProfilePicture());
-                intent.putExtra("mobileNo", chatRoom.getMobile());
-                intent.putExtra("admin_id", chatRoom.getAdminId());
-                intent.putExtra("status", "Online");
-                intent.putExtra("flag", "user");
-                intent.putExtra("activityFrom", "MainActivity");
-                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                getActivity().startActivity(intent);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-
-        }));
+//        dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//                // when chat is clicked, launch full chat thread activity
+//                Log.d(tag, "---chat user click--" + position);
+//                ChatRoom chatRoom = chatRoomList.get(position);
+//                Intent intent = new Intent(getActivity(), UserChatActivity.class);
+//                intent.putExtra("chat_room_id", chatRoom.getGroupId());
+//                intent.putExtra("name", chatRoom.getUsername());
+//                intent.putExtra("profilePic", chatRoom.getProfilePicture());
+//                intent.putExtra("mobileNo", chatRoom.getMobile());
+//                intent.putExtra("admin_id", chatRoom.getAdminId());
+//                intent.putExtra("status", "Online");
+//                intent.putExtra("flag", "user");
+//                intent.putExtra("activityFrom", "MainActivity");
+//                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                getActivity().startActivity(intent);
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position) {
+//
+//            }
+//
+//        }));
     }
 
 
@@ -479,6 +475,28 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     @Override
     public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
+
+    }
+
+    @Override
+    public void onClick(View view, int position, ChatRoom chatRoom) {
+        Log.d(tag, "---chat user click--" + position);
+       // ChatRoom chatRoom = chatRoomList.get(position);
+        Intent intent = new Intent(getActivity(), UserChatActivity.class);
+        intent.putExtra("chat_room_id", chatRoom.getGroupId());
+        intent.putExtra("name", chatRoom.getUsername());
+        intent.putExtra("profilePic", chatRoom.getProfilePicture());
+        intent.putExtra("mobileNo", chatRoom.getMobile());
+        intent.putExtra("admin_id", chatRoom.getAdminId());
+        intent.putExtra("status", "Online");
+        intent.putExtra("flag", "user");
+        intent.putExtra("activityFrom", "MainActivity");
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        getActivity().startActivity(intent);
+    }
+
+    @Override
+    public void onLongClick(View view, int position) {
 
     }
 

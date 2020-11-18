@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.database.entity.ChatRoom;
+import com.ozonetech.ozochat.view.fragment.ChatsFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     private Context mContext;
     private ArrayList<ChatRoom> chatRoomArrayList;
     private static String today;
-
+    private ChatRoomsAdapter.ClickListener clickListener;
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name, message, timestamp, count;
         CircleImageView thumbnail;
@@ -43,12 +44,13 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     }
 
 
-    public ChatRoomsAdapter(Context mContext, ArrayList<ChatRoom> chatRoomArrayList) {
+    public ChatRoomsAdapter(Context mContext, ArrayList<ChatRoom> chatRoomArrayList, ChatsFragment chatsFragment) {
         this.mContext = mContext;
         this.chatRoomArrayList = chatRoomArrayList;
 
         Calendar calendar = Calendar.getInstance();
         today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        clickListener=(ClickListener)chatsFragment;
     }
 
     @Override
@@ -82,6 +84,13 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
         //holder.timestamp.setText(getTimeStamp(chatRoom.getTimestamp()));
         holder.timestamp.setText("12:00 pm");
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickListener.onClick(view, position,chatRoomArrayList.get(position));
+            }
+        });
+
     }
 
     @Override
@@ -110,7 +119,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     }
 
     public interface ClickListener {
-        void onClick(View view, int position);
+        void onClick(View view, int position, ChatRoom chatRoom);
 
         void onLongClick(View view, int position);
     }
@@ -118,10 +127,10 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
         private GestureDetector gestureDetector;
-        private ChatRoomsAdapter.ClickListener clickListener;
+
 
         public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ChatRoomsAdapter.ClickListener clickListener) {
-            this.clickListener = clickListener;
+           // this.clickListener = clickListener;
             gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public boolean onSingleTapUp(MotionEvent e) {
@@ -142,9 +151,9 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
 
             View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child, rv.getChildPosition(child));
-            }
+//            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
+//                clickListener.onClick(child, rv.getChildPosition(child));
+//            }
             return false;
         }
 
