@@ -423,13 +423,14 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     message.setGroupId(messageObj.getString("group_id"));
                     message.setMessage(messageObj.getString("message"));
                     message.setCreated(messageObj.getString("created"));
+                    message.setSender_mobile(messageObj.getString("sender_mobile"));
+                    message.setSender_name(messageObj.getString("sender_name"));
                     messageArrayList.add(message);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
         String selfUserId = MyApplication.getInstance().getPrefManager().getUserId();
         mAdapter = new ChatRoomThreadAdapter(UserChatActivity.this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
@@ -539,8 +540,6 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 startActivityForResult(pickIntent, AUDIO_PICKER_SELECT);
             }
         });
-
-
         // show the popup window
         // which view you pass in doesn't matter, it is only used for the window tolken
         popupWindow.showAtLocation(dataBinding.rlUserChat, Gravity.BOTTOM, 0, 0);
@@ -577,4 +576,26 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         }
     }
 
+
+    @Override
+    public void onSocketConnect(boolean flag) {
+        super.onSocketConnect(flag);
+        if (flag){
+            Log.d(tag,"----- connect socket- yes-");
+            if (start_flag.equals("group")) {
+                getMessage();
+            } else {
+                Intent intent = getIntent();
+                if (intent.hasExtra("admin_id")) {
+                    getMessage();
+                } else {
+                    checkGroup();
+                }
+            }
+
+        }else{
+            Log.d(tag,"-----re connect socket--");
+            SoketService.instance.connectConnection();
+        }
+    }
 }
