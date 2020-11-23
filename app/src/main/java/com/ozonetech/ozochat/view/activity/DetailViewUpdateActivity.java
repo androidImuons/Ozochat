@@ -142,7 +142,7 @@ public class DetailViewUpdateActivity extends AppCompatActivity implements AppBa
         });
 
         ArrayList<Contacts> myContactsArrayList = new ArrayList<>();
-        myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
+        myContactsArrayList = myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS);
 
 
 

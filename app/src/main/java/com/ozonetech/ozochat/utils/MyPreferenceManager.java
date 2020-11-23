@@ -106,7 +106,7 @@ public class MyPreferenceManager {
         Gson gson = new Gson();
         String json = gson.toJson(list);
         editor.putString(KEY_CONTACTS, json);
-        editor.apply();     // This line is IMPORTANT !!!
+        editor.commit();     // This line is IMPORTANT !!!
     }
 
     public ArrayList<Contacts> getArrayListContact(String KEY_CONTACTS){

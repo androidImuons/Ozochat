@@ -46,6 +46,7 @@ import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.Message;
+import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
 import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
@@ -60,7 +61,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface, CreateGroupInterface {
+public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface {
     private static final String TAG = UserChatActivity.class.getName();
     private static final int IMAGE_PICKER_SELECT = 1;
     private static final int VIDEO_PICKER_SELECT = 2;
@@ -71,7 +72,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     MyPreferenceManager prefManager;
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
-    int groupChat;
+   public int groupChat;
     String contactName;
     String contactMobileNo;
     String contactStatus;
@@ -105,6 +106,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         activityFrom = intent.getStringExtra("activityFrom");
         start_flag = intent.getStringExtra("flag");
         contactName = intent.getStringExtra("name");
+
         if(activityFrom.equalsIgnoreCase("MainActivity")){
             admin_id = intent.getIntExtra("admin_id", 0);
             chatRoomId = intent.getStringExtra("chat_room_id");
@@ -414,6 +416,9 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                     message.setGroupId(messageObj.getString("group_id"));
                     message.setMessage(messageObj.getString("message"));
                     message.setCreated(messageObj.getString("created"));
+                    message.setSender_mobile(messageObj.getString("sender_mobile"));
+                    message.setSender_name(messageObj.getString("sender_name"));
+
                     messageArrayList.add(message);
                 }
             } catch (JSONException e) {
@@ -564,4 +569,26 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         }
     }
 
+
+    @Override
+    public void onSocketConnect(boolean flag) {
+        super.onSocketConnect(flag);
+        if (flag){
+            Log.d(tag,"----- connect socket--");
+            if (start_flag.equals("group")) {
+                getMessage();
+            } else {
+                Intent intent = getIntent();
+                if (intent.hasExtra("admin_id")) {
+                    getMessage();
+                } else {
+                    checkGroup();
+                }
+            }
+
+        }else{
+            Log.d(tag,"-----re connect socket--");
+            SoketService.instance.connectConnection();
+        }
+    }
 }
