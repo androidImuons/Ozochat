@@ -95,16 +95,15 @@ TextView txt_sender_name;
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Message message = messageArrayList.get(position);
         ((ViewHolder) holder).message.setText(message.getMessage());
-        Log.d("group","--is group-"+userChatActivity.groupChat);
+        Log.d("group","--is group yes-"+userChatActivity.groupChat);
         if (userChatActivity.groupChat == 0) {
            if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS)!=null){
-               Log.d("contact array","--is group-"+prefManager.getArrayListContact(prefManager.KEY_CONTACTS));
+               Log.d("contact array list","--is group-"+prefManager.getArrayListContact(prefManager.KEY_CONTACTS));
                 setName(((ViewHolder) holder).txt_sender_name,message);
             }else{
                ((ViewHolder) holder).txt_sender_name.setText(message.getSender_mobile()+"         "+message.getSender_name());
 
            }
-
           }else {
             ((ViewHolder) holder).txt_sender_name.setVisibility(View.GONE);
         }
