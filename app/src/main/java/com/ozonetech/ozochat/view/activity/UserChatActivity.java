@@ -54,7 +54,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class UserChatActivity extends AppCompatActivity implements CommonResponseInterface, CreateGroupInterface {
     private static final String TAG = UserChatActivity.class.getName();
@@ -63,23 +67,25 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private static final int AUDIO_PICKER_SELECT = 3;
     private static final int CAMERA_PIC_REQUEST = 4;
     private static final int REQUEST_RECORDING = 5;
+    private static String today;
     MyPreferenceManager prefManager;
-
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
+    int groupChat;
     String contactName;
     String contactMobileNo;
     String contactStatus;
     String contactProfilePic;
     String chatRoomId;
+    String last_seen;
     private ArrayList<Message> messageArrayList;
     private ChatRoomThreadAdapter mAdapter;
     private String tag = "UserChatActivity";
     private Socket mSocket;
     UserChatViewModel chatViewModel;
     MyPreferenceManager myPreferenceManager;
-    private String group_id;//="GP1604496777685";
-    private Integer admin_id;//=99;
+    private String group_id;
+    private int admin_id;
     private String start_flag;
     private String activityFrom;
 
@@ -91,47 +97,74 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
         prefManager = new MyPreferenceManager(UserChatActivity.this);
-
         chatViewModel = ViewModelProviders.of(UserChatActivity.this).get(UserChatViewModel.class);
         dataBinding.setUserChat(chatViewModel);
         chatViewModel.callback = (CommonResponseInterface) this;
         chatViewModel.groupInterface = (CreateGroupInterface) this;
-
         Intent intent = getIntent();
-        start_flag = intent.getStringExtra("flag");
         activityFrom = intent.getStringExtra("activityFrom");
-
+        start_flag = intent.getStringExtra("flag");
         contactName = intent.getStringExtra("name");
-        if (start_flag.equals("gp")) {
+        if(activityFrom.equalsIgnoreCase("MainActivity")){
             admin_id = intent.getIntExtra("admin_id", 0);
-            group_id = intent.getStringExtra("chat_room_id");
-            contactMobileNo = "";
-            contactStatus = "";
-            contactProfilePic = "";
-            chatRoomId = "";
-        } else {
             chatRoomId = intent.getStringExtra("chat_room_id");
             group_id = intent.getStringExtra("chat_room_id");
-
-            contactMobileNo = intent.getStringExtra("mobileNo");
-            contactStatus = intent.getStringExtra("status");
-            contactProfilePic = intent.getStringExtra("profilePic");
-            if (intent.hasExtra("admin_id")) {
+            groupChat= intent.getIntExtra("oneToOne",2);
+            if(groupChat==0){
+                contactProfilePic=intent.getStringExtra("group_image");
+            }else if(groupChat == 1){
+                contactProfilePic=intent.getStringExtra("profilePic");
+            }
+            String timeStamp=intent.getStringExtra("last_seen");
+            last_seen="last seen "+getTimeStampFormat(timeStamp);
+        }else {
+            last_seen="";
+            groupChat= intent.getIntExtra("oneToOne",2);
+            if (start_flag.equals("group")) {
                 admin_id = intent.getIntExtra("admin_id", 0);
+                group_id = intent.getStringExtra("chat_room_id");
+                contactMobileNo = "";
+                contactStatus = "";
+                contactProfilePic = "";
+                chatRoomId = "";
+            } else {
+                chatRoomId = intent.getStringExtra("chat_room_id");
+                group_id = intent.getStringExtra("chat_room_id");
+                contactMobileNo = intent.getStringExtra("mobileNo");
+                contactStatus = intent.getStringExtra("status");
+                contactProfilePic = intent.getStringExtra("profilePic");
+                if (intent.hasExtra("admin_id")) {
+                    admin_id = intent.getIntExtra("admin_id", 0);
+                }
             }
         }
-
         init();
+    }
 
+    public static String getTimeStampFormat(String dateStr) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String timestamp = "";
+        Calendar calendar = Calendar.getInstance();
+        today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        today = today.length() < 2 ? "0" + today : today;
+        try {
+            Date date = format.parse(dateStr);
+            SimpleDateFormat todayFormat = new SimpleDateFormat("dd");
+            String dateToday = todayFormat.format(date);
+            format = dateToday.equals(today) ? new SimpleDateFormat("hh:mm a") : new SimpleDateFormat("dd LLL, hh:mm a");
+            String date1 = format.format(date);
+            timestamp = date1.toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return timestamp;
     }
 
     private void checkGroup() {
         JsonArray jsonArray = new JsonArray();
         JsonObject admin = new JsonObject();
         JsonArray memerArray = new JsonArray();
-
         JsonObject member = new JsonObject();
-
         admin.addProperty("admin", prefManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
         member.addProperty("mobile", contactMobileNo);
         memerArray.add(member);
@@ -139,18 +172,15 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         memersObjeect.add("members", memerArray);
         JsonObject groupname = new JsonObject();
         groupname.addProperty("group_name", "");
-
         jsonArray.add(admin);
         jsonArray.add(memersObjeect);
         jsonArray.add(groupname);
         chatViewModel.createGroup(getApplicationContext(), jsonArray);
-
     }
 
     private void init() {
-
-
         toolbarDataBinding.actionBarTitle1.setText(contactName);
+        toolbarDataBinding.actionBarTitle2.setText(last_seen);
         Glide.with(this)
                 .load(contactProfilePic)
                 .placeholder(R.drawable.profile_icon)
@@ -159,6 +189,19 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        toolbarDataBinding.rlToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =new Intent(UserChatActivity.this,DetailViewUpdateActivity.class);
+                intent.putExtra("contactName",contactName);
+                intent.putExtra("last_seen",last_seen);
+                intent.putExtra("contactProfilePic",contactProfilePic);
+                intent.putExtra("groupChat",groupChat);
+                intent.putExtra("admin_id",admin_id);
+                startActivity(intent);
             }
         });
 
@@ -268,7 +311,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        if (start_flag.equals("gp")) {
+        if (start_flag.equals("group")) {
             getMessage();
         } else {
             Intent intent = getIntent();
@@ -277,10 +320,7 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             } else {
                 checkGroup();
             }
-
         }
-
-
     }
 
     private void sendMessage() {
@@ -307,13 +347,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             jsonObject.put("group_id", group_id);
             jsonObject.put("message", dataBinding.message.getText().toString());
             Log.d(tag, "---send message parameter-- user_id :" + jsonObject);
-
             if (MyApplication.getInstance().iSocket.connected()) {
                 Log.d(tag, "-----is connectttd");
             } else {
                 Log.d(tag, "-----not connectttd");
             }
-
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -367,7 +405,6 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
     private void setRecyclerView(JSONArray data) {
         messageArrayList = new ArrayList<>();
         for (int i = data.length() - 1; i >= 0; i--) {
-
             try {
                 JSONObject messageObj = data.getJSONObject(i);
                 if (!messageObj.getString("message").equals("")){
@@ -377,14 +414,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
                     message.setGroupId(messageObj.getString("group_id"));
                     message.setMessage(messageObj.getString("message"));
                     message.setCreated(messageObj.getString("created"));
-
                     messageArrayList.add(message);
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
 
         String selfUserId = MyApplication.getInstance().getPrefManager().getUserId();
@@ -448,6 +482,11 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
         });
     }
 
+    @Override
+    public void onSuccessLeftGroup(LiveData<CommonResponse> leftGroupResponse) {
+
+    }
+
 
     private void openDialog() {
         // inflate the layout of the popup window
@@ -470,14 +509,12 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             }
         });
 
-
         LinearLayout layoutVideo = popupView.findViewById(R.id.layoutVideo);
         layoutVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickIntent, VIDEO_PICKER_SELECT);
-
             }
         });
 
@@ -487,7 +524,6 @@ public class UserChatActivity extends AppCompatActivity implements CommonRespons
             public void onClick(View v) {
                 Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickIntent, AUDIO_PICKER_SELECT);
-
             }
         });
 

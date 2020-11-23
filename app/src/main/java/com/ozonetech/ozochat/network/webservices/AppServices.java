@@ -46,7 +46,6 @@ public interface AppServices {
             @PartMap Map<String, RequestBody> map,
             @Part MultipartBody.Part file);
 
-
     @POST("validMembers")
     Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
 
@@ -60,7 +59,17 @@ public interface AppServices {
     @POST("recentChat")
     Call<UserChatListModel> getUserResentChat(@FieldMap Map<String, String> arg);
 
+    @POST("leftMember")
+    Call<CommonResponse> leftGroup(@Body JsonArray  array);
 
+    @POST("addMember")
+    Call<CommonResponse> addMemberToGroup(@Body JsonArray array);
 
+    @POST("removeMember")
+    Call<CommonResponse> removeMemberFromGroup(@Body JsonArray array);
+
+    @POST("uploadFiles")
+    Call<UploadResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
+            @Part MultipartBody.Part file);
 
 }

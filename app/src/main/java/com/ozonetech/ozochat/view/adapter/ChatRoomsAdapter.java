@@ -81,16 +81,13 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
         //2020-11-05T05:21:41.000Z
 
 
-        //holder.timestamp.setText(getTimeStamp(chatRoom.getTimestamp()));
-        holder.timestamp.setText("12:00 pm");
-
+        holder.timestamp.setText(getTimeStampFormat(chatRoom.getTimestamp()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 clickListener.onClick(view, position,chatRoomArrayList.get(position));
             }
         });
-
     }
 
     @Override
@@ -98,8 +95,8 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
         return chatRoomArrayList.size();
     }
 
-    public static String getTimeStamp(String dateStr) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static String getTimeStampFormat(String dateStr) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String timestamp = "";
 
         today = today.length() < 2 ? "0" + today : today;
@@ -108,16 +105,14 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
             Date date = format.parse(dateStr);
             SimpleDateFormat todayFormat = new SimpleDateFormat("dd");
             String dateToday = todayFormat.format(date);
-            format = dateToday.equals(today) ? new SimpleDateFormat("hh:mm") : new SimpleDateFormat("dd LLL, hh:mm a");
+            format = dateToday.equals(today) ? new SimpleDateFormat("hh:mm a") : new SimpleDateFormat("dd LLL, hh:mm a");
             String date1 = format.format(date);
             timestamp = date1.toString();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return timestamp;
     }
-
     public interface ClickListener {
         void onClick(View view, int position, ChatRoom chatRoom);
 

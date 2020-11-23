@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingTop="5dp"
+    android:layout_margin="@dimen/dp2"
+    android:paddingTop="@dimen/dp2"
     android:paddingLeft="16dp"
     android:paddingRight="150dp">
 
@@ -25,7 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/message"
-        android:layout_marginBottom="25dp"
         android:layout_marginLeft="10dp"
         android:paddingLeft="10dp"
         android:paddingTop="6dp"
