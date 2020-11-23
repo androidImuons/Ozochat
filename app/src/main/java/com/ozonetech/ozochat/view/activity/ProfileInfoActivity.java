@@ -93,12 +93,10 @@ public class ProfileInfoActivity extends BaseActivity implements ConnectivityRec
         boolean isConnected = ConnectivityReceiver.isConnected();
         showSnack(isConnected);
     }
-
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         showSnack(isConnected);
     }
-
 
     public void showSnack(boolean isConnected) {
         String message;

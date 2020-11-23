@@ -15,8 +15,9 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.network.SoketService;
 
-public class BaseFragment extends Fragment {
+public class BaseFragment extends Fragment implements SoketService.SocketConnectionListner {
 
     private ProgressDialog progressDialog;
     @Nullable
@@ -32,6 +33,12 @@ public class BaseFragment extends Fragment {
             getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SoketService.setSocketConnectionListner(this);
     }
 
     protected void showProgressDialog(String msg) {
@@ -74,5 +81,10 @@ public class BaseFragment extends Fragment {
         snackbar.setActionTextColor(Color.WHITE);
         snackbar.setBackgroundTint(getResources().getColor(R.color.colorPrimaryDark));
         snackbar.show();
+    }
+
+    @Override
+    public void onSocketConnect(boolean flag) {
+
     }
 }

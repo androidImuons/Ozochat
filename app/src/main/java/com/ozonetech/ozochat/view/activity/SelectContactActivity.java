@@ -408,7 +408,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
 
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
-        prefManager.saveArrayListContact(selectUsers, "Contacts");
+        prefManager.saveArrayListContact(selectUsers, prefManager.KEY_CONTACTS);
         dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size()) + " contacts");
         contactsAdapter = new ContactsAdapter(SelectContactActivity.this, inflater, selectUsers, this, is_group_create);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));

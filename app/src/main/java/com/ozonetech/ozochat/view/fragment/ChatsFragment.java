@@ -41,6 +41,7 @@ import com.ozonetech.ozochat.listeners.UserRecentChatListener;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
@@ -108,7 +109,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     private void setRecyclerView(ArrayList<ChatRoom> chatRoomList) {
 
         ArrayList<Contacts> myContactsArrayList = new ArrayList<>();
-        myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
+        myContactsArrayList = myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS);
         Log.d(tag, "---myContactsArrayList : " + myContactsArrayList);
 
         for (int i = 0; i < chatRoomList.size(); i++) {
@@ -404,7 +405,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                                 contacts.setStatus("Hii, I am using Ozochat");
                                 verifiedUsers.add(contacts);
                             }
-                            prefManager.saveArrayListContact(verifiedUsers, "Contacts");
+                            prefManager.saveArrayListContact(verifiedUsers, prefManager.KEY_CONTACTS);
                             getrecentChat();
 
                         }
@@ -580,5 +581,21 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             Log.d(tag, "--contact-" + arrayListAge.getMobile().get(i).getMobiles());
         }
         userChatListModel.sendContacts(getContext(), userChatListModel.contactsListener = this, arrayListAge);
+    }
+
+    @Override
+    public void onSocketConnect(boolean flag) {
+        super.onSocketConnect(flag);
+        if (flag){
+            Log.d(tag,"----- connect socket--");
+            if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+                requestContactPermission();
+            }else{
+                getrecentChat();
+            }
+        }else{
+            Log.d(tag,"-----re connect socket--");
+           SoketService.instance.connectConnection();
+        }
     }
 }
