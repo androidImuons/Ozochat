@@ -35,7 +35,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.activity.DetailViewUpdateActivity"></activity>
+        <activity android:name=".view.activity.DetailViewUpdateActivity">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".view.activity.UserChatActivity"
             android:launchMode="singleTop"></activity>
@@ -49,6 +58,10 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
         </activity>
         <activity android:name=".view.activity.ProfileInfoActivity" />
         <activity android:name=".view.activity.SplashActivity">

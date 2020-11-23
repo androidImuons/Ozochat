@@ -20,7 +20,7 @@ import com.ozonetech.ozochat.viewmodel.Contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyViewHolder> implements Filterable{
+public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyViewHolder> implements Filterable {
 
     Context context;
     private LayoutInflater layoutInflater;
@@ -33,7 +33,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
     private SparseBooleanArray animationItemsIndex;
     private boolean reverseAllAnimations = false;
     private static int currentSelectedIndex = -1;
-private boolean isGroupCreate;
+    private boolean isGroupCreate;
 
     public ContactsAdapter(Context context, LayoutInflater inflater, List<Contacts> items, ContactsAdapterListener listener, boolean is_group_create) {
         this.context = context;
@@ -44,7 +44,7 @@ private boolean isGroupCreate;
         this.contactsArrayList.addAll(contacts);
         this.contactListFiltered.addAll(contacts);
         this.listener = listener;
-        this.isGroupCreate=is_group_create;
+        this.isGroupCreate = is_group_create;
         selectedItems = new SparseBooleanArray();
         animationItemsIndex = new SparseBooleanArray();
 
@@ -71,10 +71,10 @@ private boolean isGroupCreate;
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    if (isGroupCreate){
+                    if (isGroupCreate) {
                         listener.onRowLongClicked(position);
                         view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                    }else{
+                    } else {
                         listener.onContactSelected(contactListFiltered.get(position));
                     }
 
@@ -82,8 +82,9 @@ private boolean isGroupCreate;
             }
         });
     }
-    public void setGroupFlaf(boolean flag){
-        isGroupCreate=flag;
+
+    public void setGroupFlaf(boolean flag) {
+        isGroupCreate = flag;
     }
 
     @Override
@@ -101,8 +102,8 @@ private boolean isGroupCreate;
     }
 
     public String getData(int position) {
-       String mobile = contactListFiltered.get(position).getPhone();
-       return mobile;
+        String mobile = contactListFiltered.get(position).getPhone();
+        return mobile;
     }
 
 
@@ -128,9 +129,11 @@ private boolean isGroupCreate;
         reverseAllAnimations = false;
         animationItemsIndex.clear();
     }
+
     public int getSelectedItemCount() {
         return selectedItems.size();
     }
+
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         private final ContactlistRowLayoutBinding binding;
 
@@ -147,7 +150,6 @@ private boolean isGroupCreate;
             return true;
         }
     }
-
 
 
     @Override

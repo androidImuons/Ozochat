@@ -29,27 +29,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-
-                    <TextView
+                    <com.google.android.material.appbar.AppBarLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="@dimen/dp15"
-                        android:layout_marginTop="@dimen/dp5"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/urfa_medium"
-                        android:gravity="start|center"
-                        android:text="Add participants"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/sp12" />
+                        android:theme="@style/AppTheme.AppBarOverlay">
 
-                    <ImageView
-                        android:layout_width="@dimen/dp20"
-                        android:layout_height="@dimen/dp20"
-                        android:layout_gravity="center"
-                        android:layout_marginRight="@dimen/dp15"
-                        android:layout_marginTop="@dimen/dp5"
-                        android:src="@drawable/ic_search" />
+                        <androidx.appcompat.widget.Toolbar
+                            android:id="@+id/searchtoolbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="?attr/actionBarSize"
+                            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+                    </com.google.android.material.appbar.AppBarLayout>
 
                 </LinearLayout>
 

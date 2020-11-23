@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.devlomi.record_view.OnBasketAnimationEnd;
 import com.devlomi.record_view.OnRecordClickListener;
 import com.devlomi.record_view.OnRecordListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -40,6 +41,7 @@ import io.socket.emitter.Emitter;
 
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
 import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
@@ -47,9 +49,10 @@ import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.Message;
-import com.ozonetech.ozochat.network.SoketService;
+import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
+import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
 
 import org.json.JSONArray;
@@ -61,6 +64,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface,ChatRoomThreadAdapter.onMessageContactClick {
     private static final String TAG = UserChatActivity.class.getName();
@@ -73,7 +78,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     MyPreferenceManager prefManager;
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
-   public int groupChat;
+    int groupChat;
     String contactName;
     String contactMobileNo;
     String contactStatus;
@@ -107,22 +112,21 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         activityFrom = intent.getStringExtra("activityFrom");
         start_flag = intent.getStringExtra("flag");
         contactName = intent.getStringExtra("name");
-
-        if(activityFrom.equalsIgnoreCase("MainActivity")){
+        if (activityFrom.equalsIgnoreCase("MainActivity")) {
             admin_id = intent.getIntExtra("admin_id", 0);
             chatRoomId = intent.getStringExtra("chat_room_id");
             group_id = intent.getStringExtra("chat_room_id");
-            groupChat= intent.getIntExtra("oneToOne",2);
-            if(groupChat==0){
-                contactProfilePic=intent.getStringExtra("group_image");
-            }else if(groupChat == 1){
-                contactProfilePic=intent.getStringExtra("profilePic");
+            groupChat = intent.getIntExtra("oneToOne", 2);
+            if (groupChat == 0) {
+                contactProfilePic = intent.getStringExtra("group_image");
+            } else if (groupChat == 1) {
+                contactProfilePic = intent.getStringExtra("profilePic");
             }
-            String timeStamp=intent.getStringExtra("last_seen");
-            last_seen="last seen "+getTimeStampFormat(timeStamp);
-        }else {
-            last_seen="";
-            groupChat= intent.getIntExtra("oneToOne",2);
+            String timeStamp = intent.getStringExtra("last_seen");
+            last_seen = "last seen " + getTimeStampFormat(timeStamp);
+        } else {
+            last_seen = "";
+            groupChat = intent.getIntExtra("oneToOne", 2);
             if (start_flag.equals("group")) {
                 admin_id = intent.getIntExtra("admin_id", 0);
                 group_id = intent.getStringExtra("chat_room_id");
@@ -198,12 +202,14 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         toolbarDataBinding.rlToolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =new Intent(UserChatActivity.this,DetailViewUpdateActivity.class);
-                intent.putExtra("contactName",contactName);
-                intent.putExtra("last_seen",last_seen);
-                intent.putExtra("contactProfilePic",contactProfilePic);
-                intent.putExtra("groupChat",groupChat);
-                intent.putExtra("admin_id",admin_id);
+
+                Intent intent = new Intent(UserChatActivity.this, DetailViewUpdateActivity.class);
+                intent.putExtra("contactName", contactName);
+                intent.putExtra("last_seen", last_seen);
+                intent.putExtra("contactProfilePic", contactProfilePic);
+                intent.putExtra("groupChat", groupChat);
+                intent.putExtra("group_id",group_id);
+                intent.putExtra("admin_id", admin_id);
                 startActivity(intent);
             }
         });
@@ -257,7 +263,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onFinish(long recordTime) {
                 //Stop Recording..
-               // String time = getHumanTimeText(recordTime);
+                // String time = getHumanTimeText(recordTime);
                 Log.d("RecordView", "onFinish");
 
                 Log.d("RecordTime", String.valueOf(recordTime));
@@ -277,7 +283,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onClick(View v) {
                 Toast.makeText(UserChatActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
-                Log.d("RecordButton","RECORD BUTTON CLICKED");
+                Log.d("RecordButton", "RECORD BUTTON CLICKED");
             }
         });
 
@@ -301,7 +307,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
         //set Custom sounds onRecord
         //you can pass 0 if you don't want to play sound in certain state
-        dataBinding.recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished,0);
+        dataBinding.recordView.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
 
         //change slide To Cancel Text Color
         dataBinding.recordView.setSlideToCancelTextColor(Color.parseColor("#ff0000"));
@@ -326,9 +332,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         }
     }
 
+
     private void sendMessage() {
         if (MyApplication.getInstance().iSocket.connected()) {
-            Log.d(tag, "-----is connectttd---->"+MyApplication.getInstance().iSocket.id());
+            Log.d(tag, "-----is connectttd---->" + MyApplication.getInstance().iSocket.id());
         } else {
             Log.d(tag, "-----not connectttd");
         }
@@ -337,8 +344,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         if (TextUtils.isEmpty(message)) {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
-        }else{
-           triggerSendMessage();
+        } else {
+            triggerSendMessage();
         }
     }
 
@@ -410,7 +417,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         for (int i = data.length() - 1; i >= 0; i--) {
             try {
                 JSONObject messageObj = data.getJSONObject(i);
-                if (!messageObj.getString("message").equals("")){
+                if (!messageObj.getString("message").equals("")) {
                     Message message = new Message();
                     message.setId(messageObj.getInt("id"));
                     message.setUserId(messageObj.getInt("sender_id"));
@@ -489,6 +496,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     @Override
     public void onSuccessLeftGroup(LiveData<CommonResponse> leftGroupResponse) {
 
+    }
+
+    @Override
+    public void onSuccessGroupDetails(LiveData<GroupDetailModel> groupDetailResponase) {
     }
 
 

@@ -7,6 +7,7 @@ import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
+import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
@@ -71,5 +72,9 @@ public interface AppServices {
     @POST("uploadFiles")
     Call<UploadResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
             @Part MultipartBody.Part file);
+
+    @FormUrlEncoded
+    @POST("getGroupInfo")
+    Call<GroupDetailModel> getGroupInfo(@FieldMap Map<String, String> groupMap);
 
 }
