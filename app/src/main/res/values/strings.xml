@@ -31,4 +31,7 @@
     <string name="internal_storage">InternalStore</string>
     <string name="select">select group members</string>
     <string name="type_group_name">Type group subject here...</string>
+
+
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "873860601939",
+    "firebase_url": "https://ozochat-7ad44.firebaseio.com",
+    "project_id": "ozochat-7ad44",
+    "storage_bucket": "ozochat-7ad44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:873860601939:android:376c468ec0b0e9dfe78ea6",
+        "android_client_info": {
+          "package_name": "com.ozonetech.ozochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "873860601939-8qh899qnrt7k5lf1lkh4g9ga4k4qrq6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuVpo5lBO5un5BIdIyntNZKP53zZ8ZUJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "873860601939-8qh899qnrt7k5lf1lkh4g9ga4k4qrq6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,6 @@
 package com.ozonetech.ozochat.view.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -13,7 +14,11 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.hbb20.CountryCodePicker;
 import com.ozonetech.ozochat.R;
@@ -51,7 +56,7 @@ public class EnterPhoneNumberActivity extends AppCompatActivity {
 
     List<String> countries;
     HashMap<String, String> countryMap = new HashMap<>();
-
+    String fireBase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,19 +66,35 @@ public class EnterPhoneNumberActivity extends AppCompatActivity {
         countries = new ArrayList<>();
         countries.add("**Select Country**");
 
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.i("getInstanceId failed::", task.getException().toString());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        fireBase = task.getResult().getToken();
+
+                        // Log and toast
+                        // String msg = getString(R.string.msg_token_fmt, token);
+                        Log.i("token::", fireBase);
+                        //   Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
         for (String countryCode : locales) {
-
             Locale obj = new Locale("", countryCode);
-
             countries.add(obj.getDisplayCountry());
             countryMap.put(obj.getCountry(), obj.getDisplayCountry());
-
         }
         Collections.sort(countries);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, countries);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-
         country_category.setAdapter(adapter);
     }
 
