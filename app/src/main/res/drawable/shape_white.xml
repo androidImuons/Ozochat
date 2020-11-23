@@ -3,7 +3,7 @@
     android:shape="rectangle" >
 
     <!-- <solid android:color="#0054A5" /> -->
-    
+
     <stroke android:width="2dp"
         android:color="@android:color/white"/>
 
@@ -20,3 +20,14 @@
         android:topRightRadius="0dp" />
 
 </shape>
+
+<!--<vector xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--android:width="24dp"-->
+<!--android:height="24dp"-->
+<!--android:viewportWidth="24.0"-->
+<!--android:viewportHeight="24.0">-->
+
+<!--<path-->
+<!--    android:fillColor="#cfc"-->
+<!--    android:pathData="M8,5v14l11,-14z"/>-->
+<!--</vector>-->
