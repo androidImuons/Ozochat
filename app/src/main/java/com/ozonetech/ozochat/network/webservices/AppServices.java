@@ -7,6 +7,7 @@ import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
+import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
@@ -46,7 +47,6 @@ public interface AppServices {
             @PartMap Map<String, RequestBody> map,
             @Part MultipartBody.Part file);
 
-
     @POST("validMembers")
     Call<VerifiedContactsModel> getValidContacts(@Body NumberListObject ages);
 
@@ -60,7 +60,21 @@ public interface AppServices {
     @POST("recentChat")
     Call<UserChatListModel> getUserResentChat(@FieldMap Map<String, String> arg);
 
+    @POST("leftMember")
+    Call<CommonResponse> leftGroup(@Body JsonArray  array);
 
+    @POST("addMember")
+    Call<CommonResponse> addMemberToGroup(@Body JsonArray array);
 
+    @POST("removeMember")
+    Call<CommonResponse> removeMemberFromGroup(@Body JsonArray array);
+
+    @POST("uploadFiles")
+    Call<UploadResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
+            @Part MultipartBody.Part file);
+
+    @FormUrlEncoded
+    @POST("getGroupInfo")
+    Call<GroupDetailModel> getGroupInfo(@FieldMap Map<String, String> groupMap);
 
 }

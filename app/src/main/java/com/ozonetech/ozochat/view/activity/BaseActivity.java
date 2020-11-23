@@ -33,8 +33,9 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.network.SoketService;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements SoketService.SocketConnectionListner {
 
     ProgressDialog progressDialog;
     @Override
@@ -42,6 +43,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         progressDialog = new ProgressDialog(this);
         progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        SoketService.setSocketConnectionListner(this);
     }
 
     protected void showProgressDialog(String msg) {
@@ -184,4 +186,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onSocketConnect(boolean flag) {
+
+    }
 }

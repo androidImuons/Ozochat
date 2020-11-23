@@ -54,7 +54,7 @@ public class ChatRoom implements Serializable {
     @ColumnInfo(name = "message")
     @SerializedName("message")
     @Expose
-    private String message;
+    private String lastMessage;
 
     @ColumnInfo(name = "title")
     @SerializedName("title")
@@ -77,6 +77,7 @@ public class ChatRoom implements Serializable {
     private String groupImage;
 
 
+
     @BindingAdapter({"profilePicture"})
     public static void loadImage(ImageView view, String imageUrl) {
         Glide.with(view.getContext())
@@ -87,10 +88,23 @@ public class ChatRoom implements Serializable {
 
     }
 
+    @SerializedName("usermobile")
+    @Expose
+    private String usermobile;
+    @SerializedName("profile_image")
+    @Expose
+    private String profileImage;
+    @SerializedName("file")
+    @Expose
+    private String file;
+    @SerializedName("last_seen")
+    @Expose
+    private String timestamp;
 
-    String lastMessage = "last message";
-    String timestamp = "12:00 pm";
     int unreadCount = 5;
+
+
+
 
     public ChatRoom() {
     }
@@ -151,12 +165,37 @@ public class ChatRoom implements Serializable {
         this.profilePicture = profilePicture;
     }
 
-    public String getMessage() {
+    /*public String getMessage() {
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
+    }
+*/
+
+    public String getUsermobile() {
+        return usermobile;
+    }
+
+    public void setUsermobile(String usermobile) {
+        this.usermobile = usermobile;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
     }
 
     public String getTitle() {
@@ -214,4 +253,5 @@ public class ChatRoom implements Serializable {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+
 }

@@ -12,6 +12,7 @@ import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
@@ -26,6 +27,7 @@ public class RecentChatList {
 
     private MutableLiveData<UserChatListModel> userChatListResponse;
     UserChatListModel userChatListModel;
+
     public LiveData<UserChatListModel> getUserResentChat(Map<String,String> arrayListAge, Context context) {
 
         Log.d(tag,"-----row body--"+arrayListAge.toString());
@@ -57,4 +59,5 @@ public class RecentChatList {
         });
         return userChatListResponse;
     }
+
 }

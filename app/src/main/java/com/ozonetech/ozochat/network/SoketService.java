@@ -18,6 +18,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
@@ -25,13 +28,14 @@ import io.socket.emitter.Emitter;
 public class SoketService extends Service {
     private MyApplication signalApplication;
 
-MyPreferenceManager myPreferenceManager;
+    MyPreferenceManager myPreferenceManager;
     public static SoketService instance = null;
-    private String tag="SoketService";
+    private String tag = "SoketService";
 
     public static boolean isInstanceCreated() {
         return instance == null ? false : true;
     }
+
     private final IBinder myBinder = new LocalBinder();
 
     public class LocalBinder extends Binder {
@@ -42,15 +46,14 @@ MyPreferenceManager myPreferenceManager;
 
     public void IsBendable() {
     }
-
     @Override
     public void onCreate() {
         super.onCreate();
-        if(isInstanceCreated()){
+        if (isInstanceCreated()) {
             return;
         }
-        myPreferenceManager=new MyPreferenceManager(getApplicationContext());
-        signalApplication=(MyApplication) getApplication();
+        myPreferenceManager = new MyPreferenceManager(getApplicationContext());
+        signalApplication = (MyApplication) getApplication();
         if (signalApplication.getSocket() == null)
             signalApplication.iSocket = signalApplication.getSocket();
         signalApplication.iSocket.on(Socket.EVENT_CONNECT, connection);
@@ -66,6 +69,8 @@ MyPreferenceManager myPreferenceManager;
             return START_STICKY_COMPATIBILITY;
         }
         super.onStartCommand(intent, flags, startId);
+        socketConnectionListner = (SocketConnectionListner) instance;
+        timer.scheduleAtFixedRate(new ConnectionTimer(), 0, 5000);
         connectConnection();
         return START_STICKY;
     }
@@ -76,7 +81,7 @@ MyPreferenceManager myPreferenceManager;
         super.onDestroy();
 
         signalApplication.getSocket().off(Socket.EVENT_CONNECT, connection);
-        signalApplication.getSocket().off(Socket.EVENT_DISCONNECT,onDisconnect );
+        signalApplication.getSocket().off(Socket.EVENT_DISCONNECT, onDisconnect);
         signalApplication.getSocket().off(Socket.EVENT_CONNECT_ERROR, onConnectError);
         signalApplication.getSocket().off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         //@formatter:off
@@ -86,7 +91,7 @@ MyPreferenceManager myPreferenceManager;
         disconnectConnection();
     }
 
-    private void connectConnection() {
+    public void connectConnection() {
         instance = this;
         signalApplication.getSocket().connect();
     }
@@ -94,6 +99,7 @@ MyPreferenceManager myPreferenceManager;
     private void disconnectConnection() {
         instance = null;
         signalApplication.getSocket().disconnect();
+        timer.cancel();
     }
 
     Emitter.Listener connection = new Emitter.Listener() {
@@ -102,13 +108,16 @@ MyPreferenceManager myPreferenceManager;
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                   // Log.d("socketid","---"+args[0]);
-                    Log.d("socketid","---"+signalApplication.getSocket().id());
+                    // Log.d("socketid","---"+args[0]);
+                    Log.d("socketid", "---" + signalApplication.getSocket().id());
+                    if (socketConnectionListner != null) {
+                        socketConnectionListner.onSocketConnect(true);
+                    }
 
-                    JSONObject jsonObject=new JSONObject();
+                    JSONObject jsonObject = new JSONObject();
                     try {
-                        jsonObject.put("setStatus","online");
-                        jsonObject.put("user_id",myPreferenceManager.getUserId());
+                        jsonObject.put("setStatus", "online");
+                        jsonObject.put("user_id", myPreferenceManager.getUserId());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -124,10 +133,14 @@ MyPreferenceManager myPreferenceManager;
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    JSONObject jsonObject=new JSONObject();
+                    Log.d(tag, "----error socket---" + args[0]);
+                    if (socketConnectionListner != null) {
+                        socketConnectionListner.onSocketConnect(false);
+                    }
+                    JSONObject jsonObject = new JSONObject();
                     try {
-                        jsonObject.put("setStatus","offline");
-                        jsonObject.put("user_id",myPreferenceManager.getUserId());
+                        jsonObject.put("setStatus", "offline");
+                        jsonObject.put("user_id", myPreferenceManager.getUserId());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -144,10 +157,14 @@ MyPreferenceManager myPreferenceManager;
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    JSONObject jsonObject=new JSONObject();
+                    if (socketConnectionListner != null) {
+                        socketConnectionListner.onSocketConnect(false);
+                    }
+                    Log.d(tag, "----disconnect socket---");
+                    JSONObject jsonObject = new JSONObject();
                     try {
-                        jsonObject.put("setStatus","offline");
-                        jsonObject.put("user_id",myPreferenceManager.getUserId());
+                        jsonObject.put("setStatus", "offline");
+                        jsonObject.put("user_id", myPreferenceManager.getUserId());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -162,20 +179,20 @@ MyPreferenceManager myPreferenceManager;
     private Emitter.Listener message = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            final JSONArray result = (JSONArray) args[0];
+            //  final JSONArray result = (JSONArray) args[0];
             new Handler(getMainLooper())
                     .post(
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    // Log.d(tag, "---data--" + result.toString());
+                                    Log.d(tag, "--message -data--" + args[0]);
                                 }
                             }
 
                     );
         }
     };
-    Emitter.Listener chatList=new Emitter.Listener() {
+    Emitter.Listener chatList = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             new Handler(getMainLooper())
@@ -183,16 +200,42 @@ MyPreferenceManager myPreferenceManager;
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                     Log.d(tag, "---chatList--" + args[0]);
+                                    Log.d(tag, "---chatList--" + args[0]);
                                 }
                             }
 
                     );
         }
     };
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return myBinder;
+    }
+
+    static SocketConnectionListner socketConnectionListner;
+
+    public static void setSocketConnectionListner(SocketConnectionListner connectionListner) {
+        socketConnectionListner = connectionListner;
+    }
+
+    public interface SocketConnectionListner {
+        public void onSocketConnect(boolean flag);
+    }
+
+    private static Timer timer = new Timer();
+
+    public class ConnectionTimer extends TimerTask {
+
+        @Override
+        public void run() {
+            if (signalApplication.iSocket.connected()) {
+                Log.d(tag, "----connect");
+            } else {
+                Log.d(tag, "---reconetccet");
+                connectConnection();
+            }
+        }
     }
 }

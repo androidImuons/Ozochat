@@ -13,8 +13,12 @@ import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
+import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 
 import org.json.JSONArray;
+
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,6 +29,12 @@ public class CreateGroupRepository {
 
     private MutableLiveData<CreateGRoupREsponse> verifiedContactsResponse;
     CreateGRoupREsponse verifiedContactsModel;
+
+    private MutableLiveData<CommonResponse> leftGroupResponse;
+    CommonResponse leftGroupResponseModel;
+
+    private MutableLiveData<GroupDetailModel> groupDetailResponse;
+    GroupDetailModel groupDetailModel;
 
     public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
         Log.d(tag, "-----row body--" + arrayListAge.toString());
@@ -58,6 +68,66 @@ public class CreateGroupRepository {
             }
         });
         return verifiedContactsResponse;
+    }
+
+    public LiveData<CommonResponse> leftGroup(JsonArray jsonArray, Context context) {
+        Log.d(tag, "-----row body--" + jsonArray.toString());
+        leftGroupResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.leftGroup(jsonArray).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    leftGroupResponseModel = response.body();
+                    leftGroupResponse.setValue(leftGroupResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                    leftGroupResponseModel = response.body();
+                    leftGroupResponse.setValue(leftGroupResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return leftGroupResponse;
+    }
+
+    public LiveData<GroupDetailModel> getGroupDetails(Map<String,String> groupMap, Context context) {
+
+        groupDetailResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager=new MyPreferenceManager(context);
+
+        AppServices apiService = ServiceGenerator.createService(AppServices.class,myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.getGroupInfo(groupMap).enqueue(new Callback<GroupDetailModel>() {
+            @Override
+            public void onResponse(Call<GroupDetailModel> call, Response<GroupDetailModel> response) {
+                Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+
+                if (response.isSuccessful()) {
+                    groupDetailModel = response.body();
+                    groupDetailResponse.setValue(groupDetailModel);
+
+                } else {
+                    groupDetailModel = response.body();
+                    groupDetailResponse.setValue(groupDetailModel);
+                    Log.d(tag,"- unsuccess-"+new Gson().toJson(response.body()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GroupDetailModel> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return groupDetailResponse;
     }
 
 }

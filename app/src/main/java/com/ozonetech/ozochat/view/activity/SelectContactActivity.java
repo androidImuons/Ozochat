@@ -131,7 +131,8 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
             LoadContact loadContact = new LoadContact();
             loadContact.execute();
         }
@@ -190,8 +191,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("name", contact.getName());
         intent.putExtra("mobileNo", contact.getPhone());
         intent.putExtra("status", contact.getStatus());
+        intent.putExtra("oneToOne","1");
         intent.putExtra("profilePic", contact.getProfilePicture());
-        intent.putExtra("flag", "user");
+        intent.putExtra("flag", "contact_user");
         intent.putExtra("activityFrom", "SelectContactActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -397,7 +399,8 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("chat_room_id", groupCreateRecord.getGroupId());
         intent.putExtra("name", dataBinding.etGroupName.getText().toString().trim());
         intent.putExtra("admin_id", groupCreateRecord.getAdmin_user_id());
-        intent.putExtra("flag", "gp");
+        intent.putExtra("oneToOne","0");
+        intent.putExtra("flag", "group");
         intent.putExtra("activityFrom", "SelectContactActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -405,7 +408,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
 
 
     private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
-        prefManager.saveArrayListContact(selectUsers, "Contacts");
+        prefManager.saveArrayListContact(selectUsers, prefManager.KEY_CONTACTS);
         dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size()) + " contacts");
         contactsAdapter = new ContactsAdapter(SelectContactActivity.this, inflater, selectUsers, this, is_group_create);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
