@@ -26,6 +26,9 @@ public class CreateGroupRepository {
     private MutableLiveData<CreateGRoupREsponse> verifiedContactsResponse;
     CreateGRoupREsponse verifiedContactsModel;
 
+    private MutableLiveData<CommonResponse> leftGroupResponse;
+    CommonResponse leftGroupResponseModel;
+
     public LiveData<CreateGRoupREsponse> createGroup(JsonArray arrayListAge, Context context) {
         Log.d(tag, "-----row body--" + arrayListAge.toString());
         verifiedContactsResponse = new MutableLiveData<>();
@@ -60,4 +63,33 @@ public class CreateGroupRepository {
         return verifiedContactsResponse;
     }
 
+    public LiveData<CommonResponse> leftGroup(JsonArray jsonArray, Context context) {
+        Log.d(tag, "-----row body--" + jsonArray.toString());
+        leftGroupResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.leftGroup(jsonArray).enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    leftGroupResponseModel = response.body();
+                    leftGroupResponse.setValue(leftGroupResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                    leftGroupResponseModel = response.body();
+                    leftGroupResponse.setValue(leftGroupResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return leftGroupResponse;
+    }
 }

@@ -24,6 +24,8 @@ public class UserChatViewModel extends ViewModel {
     public CommonResponseInterface callback;
     public CreateGroupInterface groupInterface;
 
+    public LiveData<CommonResponse> leftGroupResponse;
+
     public void createGroup(Context context, JsonArray arrayListAge) {
 
         if (commonResponse == null) {
@@ -34,6 +36,20 @@ public class UserChatViewModel extends ViewModel {
         }else{
             commonResponse = new CreateGroupRepository().createGroup(arrayListAge,context);
             groupInterface.onSuccessCreateGroup(commonResponse);
+        }
+    }
+
+
+    public void leftGroup(Context context, JsonArray jsonArray) {
+
+        if (leftGroupResponse == null) {
+            leftGroupResponse = new MutableLiveData<CommonResponse>();
+            //we will load it asynchronously from server in this method
+            leftGroupResponse = new CreateGroupRepository().leftGroup(jsonArray,context);
+            groupInterface.onSuccessLeftGroup(leftGroupResponse);
+        }else{
+            leftGroupResponse = new CreateGroupRepository().leftGroup(jsonArray,context);
+            groupInterface.onSuccessLeftGroup(leftGroupResponse);
         }
     }
 
