@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.R;
@@ -33,26 +34,28 @@ import com.ozonetech.ozochat.databinding.WidgetHeaderViewTopBinding;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.utils.MyDividerItemDecoration;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.GroupMembersAdpater;
 import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
+
 import androidx.appcompat.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener , CreateGroupInterface ,GroupMembersAdpater.ContactsAdapterListener{
+public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener {
 
     private boolean isHideToolbarView = false;
     ActivityDetailViewUpdateBinding dataBinding;
     WidgetHeaderViewTopBinding widgetHeaderViewTopBinding;
     WidgetHeaderViewBinding widgetHeaderViewBinding;
     ContentMainBinding contentMainBinding;
-    String contactName, last_seen, contactProfilePic,group_id;
+    String contactName, last_seen, contactProfilePic, group_id;
     int groupChat, admin_id;
     MyPreferenceManager myPreferenceManager;
     UserChatViewModel chatViewModel;
@@ -86,7 +89,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         last_seen = intent.getStringExtra("last_seen");
         groupChat = intent.getIntExtra("groupChat", 2);
         admin_id = intent.getIntExtra("admin_id", 0);
-        group_id=intent.getStringExtra("group_id");
+        group_id = intent.getStringExtra("group_id");
         initUi();
     }
 
@@ -151,7 +154,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 memerArray.add(member);
 
                 JsonObject groupId = new JsonObject();
-                groupId.addProperty("groupId","GP1603952201631" );
+                groupId.addProperty("groupId", group_id);
 
                 JsonObject memersObjeect = new JsonObject();
                 memersObjeect.add("member", memerArray);
@@ -159,7 +162,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 jsonArray.add(memersObjeect);
                 jsonArray.add(groupId);
 
-                chatViewModel.leftGroup(getApplicationContext(), jsonArray);
+                gotoLeftGroup(jsonArray);
 
             }
         });
@@ -168,6 +171,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         gotoGroupDetails();
 
 
+    }
+
+    private void gotoLeftGroup(JsonArray jsonArray) {
+        showProgressDialog("Please wait...");
+        chatViewModel.leftGroup(DetailViewUpdateActivity.this, jsonArray,chatViewModel.groupInterface = this);
     }
 
     private void gotoGroupDetails() {
@@ -200,11 +208,27 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     }
 
     @Override
-    public void onSuccessLeftGroup(LiveData<CommonResponse> leftGroupResponse) {
-        leftGroupResponse.observe(DetailViewUpdateActivity.this, new Observer<CommonResponse>() {
+    public void onSuccessLeftGroup(LiveData<LeftResponseModel> leftGroupResponse) {
+        leftGroupResponse.observe(DetailViewUpdateActivity.this, new Observer<LeftResponseModel>() {
             @Override
-            public void onChanged(CommonResponse commonResponse) {
+            public void onChanged(LeftResponseModel leftResponseModel) {
+                //{
+                //    "success": true,
+                //    "message": "7507828337 left the group"
+                //}
+                Log.d("GroupDetailModel", "--leftGroupResponse : Code" + leftResponseModel.toString());
+                hideProgressDialog();
 
+                try {
+                    if(leftResponseModel.getSuccess()){
+                        showSnackbar(dataBinding.rlChatDetail,"You left the group successfully", Snackbar.LENGTH_SHORT);
+                    }else{
+                        showSnackbar(dataBinding.rlChatDetail,leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                    }
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
             }
         });
     }
@@ -226,13 +250,13 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                             myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
 
                             ArrayList<Contacts> groupMembers = new ArrayList<>();
-                            for(int i=0;i<groupDetailModel.getData().size();i++){
+                            for (int i = 0; i < groupDetailModel.getData().size(); i++) {
                                 Contacts contacts = new Contacts();
                                 for (int j = 0; j < myContactsArrayList.size(); j++) {
                                     String mobile = myContactsArrayList.get(j).getPhone();
                                     if (groupDetailModel.getData().get(i).getMobile().equalsIgnoreCase(mobile)) {
                                         contacts.setName(myContactsArrayList.get(j).getName());
-                                    }else{
+                                    } else {
                                         contacts.setName(groupDetailModel.getData().get(i).getUsername());
                                     }
                                 }
@@ -259,11 +283,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     }
 
     private void setRecyclerView(ArrayList<Contacts> groupMembers) {
-        contentMainBinding.searchtoolbar.setTitle(String.valueOf(groupMembers.size())+" participants");
+        contentMainBinding.searchtoolbar.setTitle(String.valueOf(groupMembers.size()) + " participants");
         // white background notification bar
         whiteNotificationBar(contentMainBinding.rvContactsList);
 
-        groupMembersAdpater= new GroupMembersAdpater(DetailViewUpdateActivity.this, groupMembers,this);
+        groupMembersAdpater = new GroupMembersAdpater(DetailViewUpdateActivity.this, groupMembers, this);
         contentMainBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         contentMainBinding.rvContactsList.setItemAnimator(new DefaultItemAnimator());
         contentMainBinding.rvContactsList.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
@@ -339,4 +363,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     @Override
     public void onContactSelected(Contacts contact) {
         Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
-    }}
+    }
+
+
+}

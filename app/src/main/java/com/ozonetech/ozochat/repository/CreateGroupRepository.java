@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
@@ -30,8 +31,8 @@ public class CreateGroupRepository {
     private MutableLiveData<CreateGRoupREsponse> verifiedContactsResponse;
     CreateGRoupREsponse verifiedContactsModel;
 
-    private MutableLiveData<CommonResponse> leftGroupResponse;
-    CommonResponse leftGroupResponseModel;
+    private MutableLiveData<LeftResponseModel> leftGroupResponse;
+    LeftResponseModel leftGroupResponseModel;
 
     private MutableLiveData<GroupDetailModel> groupDetailResponse;
     GroupDetailModel groupDetailModel;
@@ -70,14 +71,14 @@ public class CreateGroupRepository {
         return verifiedContactsResponse;
     }
 
-    public LiveData<CommonResponse> leftGroup(JsonArray jsonArray, Context context) {
+    public LiveData<LeftResponseModel> leftGroup(JsonArray jsonArray, Context context) {
         Log.d(tag, "-----row body--" + jsonArray.toString());
         leftGroupResponse = new MutableLiveData<>();
         MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
         AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
-        apiService.leftGroup(jsonArray).enqueue(new Callback<CommonResponse>() {
+        apiService.leftGroup(jsonArray).enqueue(new Callback<LeftResponseModel>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<LeftResponseModel> call, Response<LeftResponseModel> response) {
                 if (response.body() == null) {
                     return;
                 }
@@ -93,7 +94,7 @@ public class CreateGroupRepository {
                 }
             }
             @Override
-            public void onFailure(Call<CommonResponse> call, Throwable t) {
+            public void onFailure(Call<LeftResponseModel> call, Throwable t) {
                 Log.d(tag, "--------------" + t.getMessage());
             }
         });
