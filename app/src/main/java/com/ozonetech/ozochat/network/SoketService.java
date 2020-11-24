@@ -46,7 +46,6 @@ public class SoketService extends Service {
 
     public void IsBendable() {
     }
-
     @Override
     public void onCreate() {
         super.onCreate();

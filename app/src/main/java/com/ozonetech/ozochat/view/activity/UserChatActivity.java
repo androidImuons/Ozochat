@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -67,7 +68,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface {
+public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface,ChatRoomThreadAdapter.onMessageContactClick {
     private static final String TAG = UserChatActivity.class.getName();
     private static final int IMAGE_PICKER_SELECT = 1;
     private static final int VIDEO_PICKER_SELECT = 2;
@@ -598,5 +599,18 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             Log.d(tag,"-----re connect socket--");
             SoketService.instance.connectConnection();
         }
+    }
+
+
+    @Override
+    public void onContactClick(Message message) {
+        Intent contactIntent = new Intent(ContactsContract.Intents.Insert.ACTION);
+        contactIntent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
+
+        contactIntent
+                .putExtra(ContactsContract.Intents.Insert.NAME, "Contact Name")
+                .putExtra(ContactsContract.Intents.Insert.PHONE, "5555555555");
+
+        startActivityForResult(contactIntent, 1);
     }
 }

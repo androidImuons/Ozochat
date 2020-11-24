@@ -1,6 +1,8 @@
 package com.ozonetech.ozochat.view.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +51,7 @@ TextView txt_sender_name;
 
     public ChatRoomThreadAdapter(UserChatActivity mContext, ArrayList<Message> messageArrayList, String userId) {
         this.mContext = mContext.getApplicationContext();
+        onMessageContactClick=(onMessageContactClick) mContext;
         this.messageArrayList = messageArrayList;
         this.userId = Integer.parseInt(userId);
         userChatActivity = mContext;
@@ -102,8 +105,8 @@ TextView txt_sender_name;
                 setName(((ViewHolder) holder).txt_sender_name,message);
             }else{
                ((ViewHolder) holder).txt_sender_name.setText(message.getSender_mobile()+"         "+message.getSender_name());
-
            }
+           onMessageContactClick.onContactClick(message);
           }else {
             ((ViewHolder) holder).txt_sender_name.setVisibility(View.GONE);
         }
@@ -161,5 +164,11 @@ TextView txt_sender_name;
             e.printStackTrace();
         }
         return timestamp;
+    }
+    onMessageContactClick onMessageContactClick;
+    public interface onMessageContactClick{
+
+
+        void onContactClick(Message message);
     }
 }
