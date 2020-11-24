@@ -43,15 +43,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".view.activity.UserChatActivity"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop" />
         <activity android:name=".view.activity.ProfileInfoNew" />
         <activity
             android:name=".view.activity.SelectContactActivity"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop" />
         <activity
             android:name=".view.activity.MainActivity"
             android:launchMode="singleTop">
@@ -71,13 +70,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.PhotoVideoRedirectActivity" />
-        <activity android:name=".view.activity.UploadStatus"></activity>
+        <activity android:name=".view.activity.AllImageGrid"/>
         <activity android:name=".view.activity.OTPActivity" />
         <activity android:name=".view.activity.EnterPhoneNumberActivity" />
         <activity android:name=".view.activity.WelcomeScreen" />
-        <activity android:name=".view.activity.SettingActivity"></activity>
-        <activity android:name=".view.activity.ProfileUpdateActivity"></activity>
+        <activity android:name=".view.activity.SettingActivity" />
+        <activity android:name=".view.activity.ProfileUpdateActivity" />
 
         <receiver
             android:name=".network.ConnectivityReceiver"
