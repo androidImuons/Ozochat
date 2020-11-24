@@ -99,6 +99,7 @@ dependencies {
     implementation 'com.github.danylovolokh:list-visibility-utils:0.2.0'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.google.firebase:firebase-messaging:20.2.0'
+    implementation 'com.github.iamutkarshtiwari:Ananas:1.2.4'
 
         implementation 'com.android.support:multidex:1.0.3'
 }

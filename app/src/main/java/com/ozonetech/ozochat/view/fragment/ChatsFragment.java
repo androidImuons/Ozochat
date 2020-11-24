@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -39,6 +40,7 @@ import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
+import com.ozonetech.ozochat.listeners.ScrollListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
@@ -75,6 +77,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     UserChatListModel userChatListModel;
     MyPreferenceManager myPreferenceManager;
     private Contacts contactsViewModel;
+    private LinearLayoutManager linearLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,26 +99,36 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         }else{
             getrecentChat(0);
         }
-
+        linearLayout= new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycelScroll();
 
         return view;
     }
 
     private void recycelScroll() {
-        dataBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                Log.d(tag,"--on scrool state-"+newState);
-            }
 
+        ScrollListener scrollListener=new ScrollListener() {
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                Log.d(tag,"--on scrool -"+dx+"--"+dy);
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                Log.d(tag,"--page-"+page);
+                return true;
             }
-        });
+        };
+        dataBinding.recyclerView.addOnScrollListener(scrollListener);
+
+//        dataBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                Log.d(tag,"--on scrool state-"+newState);
+//            }
+//
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                Log.d(tag,"--on scrool -"+dx+"--"+dy);
+//            }
+//        });
     }
 
     private void renderUserChatList() {
@@ -160,7 +173,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 }
             }
             mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
-            dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+
+            dataBinding.recyclerView.setLayoutManager(linearLayout);
             dataBinding.recyclerView.setAdapter(mAdapter);
 /*
             dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {

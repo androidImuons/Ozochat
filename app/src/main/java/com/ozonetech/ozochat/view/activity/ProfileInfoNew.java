@@ -47,6 +47,8 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
+import iamutkarshtiwari.github.io.ananas.editimage.EditImageActivity;
+import iamutkarshtiwari.github.io.ananas.editimage.ImageEditorIntentBuilder;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -212,6 +214,14 @@ public class ProfileInfoNew extends AppCompatActivity {
                 }
                 isAttachment = "1";
                 sdvImage.setImageURI(outPutfileUri);
+                RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+                roundingParams.setRoundAsCircle(true);
+                sdvImage.getHierarchy().setRoundingParams(roundingParams);
+                try {
+                   // filterImage();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else if (requestCode == REQUEST_CAMERA) {
                 Bitmap bitmap = null;
 
@@ -222,14 +232,48 @@ public class ProfileInfoNew extends AppCompatActivity {
                 outPutfileUri = Uri.parse(url);
 
                 isAttachment = "1";
+
                 sdvImage.setImageURI(outPutfileUri);
 
+                RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+                roundingParams.setRoundAsCircle(true);
+                sdvImage.getHierarchy().setRoundingParams(roundingParams);
 
+                try {
+                  //  filterImage();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else if(requestCode==ACTION_REQUEST_EDITIMAGE){
+               outPutfileUri=Uri.parse(data.getStringExtra(ImageEditorIntentBuilder.SOURCE_PATH));
+                sdvImage.setImageURI(outPutfileUri);
+
+                RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+                roundingParams.setRoundAsCircle(true);
+                sdvImage.getHierarchy().setRoundingParams(roundingParams);
             }
-            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-            roundingParams.setRoundAsCircle(true);
-            sdvImage.getHierarchy().setRoundingParams(roundingParams);
+
+
+
         }
+    }
+    public static final int ACTION_REQUEST_EDITIMAGE = 9;
+    private void filterImage() throws Exception {
+        Intent intent = new ImageEditorIntentBuilder(this,outPutfileUri.getPath() ,outPutfileUri.getPath() )
+                .withAddText()
+                .withFilterFeature()
+                .withRotateFeature()
+                .withCropFeature()
+                .withBrightnessFeature()
+                .withSaturationFeature()
+                .withBeautyFeature()
+
+                .forcePortrait(true)
+                .setSupportActionBarVisibility(false)
+                .build();
+        // .withStickerFeature()
+        //  .withPaintFeature()
+        EditImageActivity.start(this, intent, ACTION_REQUEST_EDITIMAGE);
     }
 
 
