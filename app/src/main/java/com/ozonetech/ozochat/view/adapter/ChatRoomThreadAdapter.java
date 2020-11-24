@@ -126,7 +126,6 @@ TextView txt_sender_name;
 
         ((ViewHolder) holder).timestamp.setText(timestamp);
     }
-
     private void setName(TextView holder, Message message) {
         boolean flag = true;
         for (int j = 0; j < prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size(); j++) {
