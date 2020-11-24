@@ -54,6 +54,7 @@ import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
+import com.ozonetech.ozochat.view.dialog.MoreOptionDialog;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
 
@@ -80,7 +81,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     MyPreferenceManager prefManager;
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
-    public int groupChat;
+   public int groupChat;
     String contactName;
     String contactMobileNo;
     String contactStatus;
@@ -605,13 +606,16 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
     @Override
     public void onContactClick(Message message) {
-        Intent contactIntent = new Intent(ContactsContract.Intents.Insert.ACTION);
-        contactIntent.setType(ContactsContract.RawContacts.CONTENT_TYPE);
 
-        contactIntent
-                .putExtra(ContactsContract.Intents.Insert.NAME, "Contact Name")
-                .putExtra(ContactsContract.Intents.Insert.PHONE, "5555555555");
+        Bundle bundle = new Bundle();
+        bundle.putString("name", message.getSender_name());
+        bundle.putString("mobile",message.getSender_mobile());
+        bundle.putString("group",message.getGroupId());
+        bundle.putString("u_id",String.valueOf(message.getUserId()));
+        bundle.putBoolean("is_contact",message.isIs_contact());
+        MoreOptionDialog instance = MoreOptionDialog.getInstance(bundle);
 
-        startActivityForResult(contactIntent, 1);
+        instance.show(getSupportFragmentManager(), instance.getClass().getSimpleName());
+
     }
 }

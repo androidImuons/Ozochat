@@ -15,6 +15,7 @@ import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
@@ -71,11 +72,16 @@ public interface AppServices {
     Call<CommonResponse> removeMemberFromGroup(@Body JsonArray array);
 
     @POST("uploadFiles")
-    Call<UploadResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
-            @Part MultipartBody.Part file);
+    Call<CommonResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
+                                    @Part List<MultipartBody.Part> file);
+
+    @POST("uploadGroupImage")
+    Call<CommonResponse> uploadGroupImage(@PartMap Map<String, RequestBody> map,
+                                     @Part MultipartBody.Part file);
 
     @FormUrlEncoded
     @POST("getGroupInfo")
     Call<GroupDetailModel> getGroupInfo(@FieldMap Map<String, String> groupMap);
+
 
 }
