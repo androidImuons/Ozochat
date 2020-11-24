@@ -49,6 +49,7 @@ import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
@@ -77,7 +78,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     MyPreferenceManager prefManager;
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
-    int groupChat;
+    public int groupChat;
     String contactName;
     String contactMobileNo;
     String contactStatus;
