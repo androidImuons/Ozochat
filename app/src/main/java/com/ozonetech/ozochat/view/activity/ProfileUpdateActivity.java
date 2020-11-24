@@ -11,13 +11,16 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.drawee.generic.RoundingParams;
 import com.google.android.material.snackbar.Snackbar;
@@ -39,9 +42,12 @@ import com.ozonetech.ozochat.viewmodel.ProfileUpdateViewModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import iamutkarshtiwari.github.io.ananas.editimage.EditImageActivity;
+import iamutkarshtiwari.github.io.ananas.editimage.ImageEditorIntentBuilder;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -59,6 +65,7 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
     ActivityProfileBinding binding;
     ProfileUpdateViewModel viewModel;
     private MyPreferenceManager myPreferenceManager;
+    private String filter_image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +174,11 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
         galleryIntent.setType("image/*");
 //        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"), SELECT_FILE);
+       // startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"), SELECT_FILE);
+
+
+        Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, SELECT_FILE);
     }
 
     @Override
@@ -201,13 +212,33 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                     String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+                    filter_image=url;
                     outPutfileUri = Uri.parse(url);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+
+
+
+//                Uri selectedImage = data.getData();
+//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+//                cursor.moveToFirst();
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                String picturePath = cursor.getString(columnIndex);
+//                filter_image = picturePath;
+//                cursor.close();
+//
+
                 isAttachment = "1";
                 binding.image.setImageURI(outPutfileUri);
                 updateProfile();
+                try {
+            //        filterImage();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else if (requestCode == REQUEST_CAMERA) {
                 Bitmap bitmap = null;
 
@@ -215,18 +246,63 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                 String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+              filter_image=url;
                 outPutfileUri = Uri.parse(url);
-
                 isAttachment = "1";
                 binding.image.setImageURI(outPutfileUri);
-
                 updateProfile();
+                try {
+                   // filterImage();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else if (requestCode==ACTION_REQUEST_EDITIMAGE){
+
+                String newFilePath = data.getStringExtra(ImageEditorIntentBuilder.OUTPUT_PATH);
+                boolean isImageEdit = data.getBooleanExtra(EditImageActivity.IS_IMAGE_EDITED, false);
+                if (isImageEdit) {
+                   // Toast.makeText(this, getString(R.string.save_path, newFilePath), Toast.LENGTH_LONG).show();
+                } else {
+                    newFilePath = data.getStringExtra(ImageEditorIntentBuilder.SOURCE_PATH);
+                }
+
+                Log.d("edit","---");
+                //outPutfileUri=Uri.parse(data.getStringExtra(ImageEditorIntentBuilder.SOURCE_PATH));
+                outPutfileUri=Uri.parse("file:/"+newFilePath);
+                Log.d("edit","---"+outPutfileUri);
+                binding.image.setImageURI(newFilePath);
+
+                RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+                roundingParams.setRoundAsCircle(true);
+                binding.image.getHierarchy().setRoundingParams(roundingParams);
+              //  updateProfile();
             }
-            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-            roundingParams.setRoundAsCircle(true);
-            binding.image.getHierarchy().setRoundingParams(roundingParams);
+
         }
     }
+
+
+    public static final int ACTION_REQUEST_EDITIMAGE = 9;
+    private void filterImage() throws Exception {
+        Log.d("filterimage","-----image filter--"+ filter_image);
+
+        Intent intent = new ImageEditorIntentBuilder(this,filter_image,filter_image)
+                .withAddText()
+                .withFilterFeature()
+                .withRotateFeature()
+                .withCropFeature()
+                .withBrightnessFeature()
+                .withSaturationFeature()
+                .withBeautyFeature()
+                .forcePortrait(true)
+                .setSupportActionBarVisibility(false)
+                .build();
+        // .withStickerFeature()
+        //  .withPaintFeature()
+        EditImageActivity.start(this, intent, ACTION_REQUEST_EDITIMAGE);
+    }
+
+
 
     private void updateProfile() {
         if (AppCommon.getInstance(this).isConnectingToInternet(this)) {

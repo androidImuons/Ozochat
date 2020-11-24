@@ -1,17 +1,22 @@
 package com.ozonetech.ozochat.view.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -20,6 +25,7 @@ import android.hardware.SensorManager;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +33,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -47,6 +54,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Callback, View.OnClickListener {
@@ -58,6 +68,9 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
     private File tempFile = null;
     private Camera.PictureCallback jpegCallback;
     int MAX_VIDEO_SIZE_UPLOAD = 25; //MB
+    RecyclerView peekRecyclerView;
+    ArrayList<String> list;
+
 
     @Override
     protected void onResume() {
@@ -117,12 +130,41 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
                 }
             }
 
+
             @Override
             public void permissionDenied() {
             }
         });
+       list = getAllShownImagesPath(this);
+       if(list.size() == 0)
+        Collections.reverse(list);
+        peekRecyclerView.setLayoutManager(new LinearLayoutManager(UploadStatus.this, RecyclerView.HORIZONTAL, false));
+        peekRecyclerView.setAdapter(new HomeAdapter(UploadStatus.this ,list));
 
+    }
+    private ArrayList<String>   getAllShownImagesPath(Activity activity) {
+        Uri uri;
+        Cursor cursor;
+        int column_index_data, column_index_folder_name;
+        ArrayList<String> listOfAllImages = new ArrayList<String>();
+        String absolutePathOfImage = null;
+        uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
+        String[] projection = { MediaStore.MediaColumns.DATA,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
+
+        cursor = activity.getContentResolver().query(uri, projection, null,
+                null, null);
+
+        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        column_index_folder_name = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+        while (cursor.moveToNext()) {
+            absolutePathOfImage = cursor.getString(column_index_data);
+
+            listOfAllImages.add(absolutePathOfImage);
+        }
+        return listOfAllImages;
     }
 
     private void cancelSavePicTaskIfNeed() {
@@ -143,6 +185,18 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
 
     }
 
+    public void viewAll(View view) {
+        startActivityForResult(new Intent(this , AllImageGrid.class).putExtra("imageList" , list) , 98);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 98 && resultCode == 99){
+           // list.get(data.getIntExtra("pos" , 0));
+            Log.i("getImagePath::" , list.get(data.getIntExtra("pos" , 0)));
+        }
+    }
 
     private class SavePicTask extends AsyncTask<Void, Void, String> {
         private byte[] data;
@@ -394,7 +448,7 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
     private void initControls() {
 
         mediaRecorder = new MediaRecorder();
-
+        peekRecyclerView = findViewById(R.id.peekRecyclerView);
         imgSurface = (SurfaceView) findViewById(R.id.imgSurface);
         textCounter = (TextView) findViewById(R.id.textCounter);
         imgCapture = (ImageView) findViewById(R.id.imgCapture);

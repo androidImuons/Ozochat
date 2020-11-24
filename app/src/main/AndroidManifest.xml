@@ -82,6 +82,7 @@
         </activity>
         <activity android:name=".view.activity.PhotoVideoRedirectActivity" />
         <activity android:name=".view.activity.UploadStatus" />
+        <activity android:name=".view.activity.AllImageGrid"/>
         <activity android:name=".view.activity.OTPActivity" />
         <activity android:name=".view.activity.EnterPhoneNumberActivity" />
         <activity android:name=".view.activity.WelcomeScreen" />
