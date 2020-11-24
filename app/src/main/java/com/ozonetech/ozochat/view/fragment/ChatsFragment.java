@@ -94,6 +94,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         }else{
             getrecentChat();
         }
+
         return view;
     }
 

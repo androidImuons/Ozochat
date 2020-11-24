@@ -102,11 +102,18 @@ TextView txt_sender_name;
         if (userChatActivity.groupChat == 0) {
            if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS)!=null){
                Log.d("contact array list","--is group-"+prefManager.getArrayListContact(prefManager.KEY_CONTACTS));
+
                 setName(((ViewHolder) holder).txt_sender_name,message);
             }else{
+               message.setIs_contact(false);
                ((ViewHolder) holder).txt_sender_name.setText(message.getSender_mobile()+"         "+message.getSender_name());
            }
-           onMessageContactClick.onContactClick(message);
+         ((ViewHolder) holder).txt_sender_name.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 onMessageContactClick.onContactClick(message);
+             }
+         });
           }else {
             ((ViewHolder) holder).txt_sender_name.setVisibility(View.GONE);
         }
@@ -131,10 +138,10 @@ TextView txt_sender_name;
             if (myContactMobileNo.equalsIgnoreCase(message.getSender_mobile())) {
                 String myContactName = prefManager.getArrayListContact(prefManager.KEY_CONTACTS).get(j).getName();
               holder.setText(myContactName);
-                break;
+                message.setIs_contact(true);
+                return;
             } else {
                holder.setText(message.getSender_mobile()+"         "+message.getSender_name());
-
                 flag = false;
             }
         }

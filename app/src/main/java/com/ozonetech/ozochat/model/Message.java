@@ -30,6 +30,16 @@ public class Message implements Serializable {
     @Expose
     private String sender_name;
 
+    public boolean isIs_contact() {
+        return is_contact;
+    }
+
+    public void setIs_contact(boolean is_contact) {
+        this.is_contact = is_contact;
+    }
+
+    private boolean is_contact;
+
     public String getSender_mobile() {
         return sender_mobile;
     }
