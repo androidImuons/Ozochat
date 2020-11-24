@@ -12,6 +12,7 @@ import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
@@ -26,7 +27,7 @@ public class UserChatViewModel extends ViewModel {
     public CommonResponseInterface callback;
     public CreateGroupInterface groupInterface;
 
-    public LiveData<CommonResponse> leftGroupResponse;
+    public LiveData<LeftResponseModel> leftGroupResponse;
     public LiveData<GroupDetailModel> groupDetailResponse;
 
     public void createGroup(Context context, JsonArray arrayListAge) {
@@ -43,10 +44,10 @@ public class UserChatViewModel extends ViewModel {
     }
 
 
-    public void leftGroup(Context context, JsonArray jsonArray) {
+    public void leftGroup(Context context, JsonArray jsonArray,CreateGroupInterface groupInterface) {
 
         if (leftGroupResponse == null) {
-            leftGroupResponse = new MutableLiveData<CommonResponse>();
+            leftGroupResponse = new MutableLiveData<LeftResponseModel>();
             //we will load it asynchronously from server in this method
             leftGroupResponse = new CreateGroupRepository().leftGroup(jsonArray,context);
             groupInterface.onSuccessLeftGroup(leftGroupResponse);

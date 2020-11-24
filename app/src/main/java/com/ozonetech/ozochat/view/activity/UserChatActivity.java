@@ -48,6 +48,7 @@ import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.SoketService;
@@ -496,7 +497,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     }
 
     @Override
-    public void onSuccessLeftGroup(LiveData<CommonResponse> leftGroupResponse) {
+    public void onSuccessLeftGroup(LiveData<LeftResponseModel> leftGroupResponse) {
 
     }
 
