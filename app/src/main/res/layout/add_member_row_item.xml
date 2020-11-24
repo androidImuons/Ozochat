@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:id="@+id/ll_contact_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_list_row"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_margin="2dp"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="@dimen/dp50"
+                android:layout_height="@dimen/dp50"
+                android:layout_margin="@dimen/dp10"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile_icon"
+                app:civ_border_color="#7e3c62"
+                app:civ_border_width="0dp" />
+
+            <ImageView
+                android:id="@+id/iv_selected"
+                android:layout_width="@dimen/dp20"
+                android:layout_height="20dp"
+                android:layout_marginRight="@dimen/dp10"
+                android:layout_marginBottom="@dimen/dp10"
+                android:layout_gravity="right|bottom"
+                android:visibility="gone"
+                android:src="@drawable/selected_icon"/>
+
+        </FrameLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/dp5"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvContactName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp2"
+                android:fontFamily="@font/urfa_medium"
+                android:text="ContactName"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sp12" />
+
+
+            <TextView
+                android:id="@+id/tvContactStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/dp2"
+                android:fontFamily="@font/urfa_regular"
+                android:text="ContactStatus"
+                android:textColor="@color/colorHint"
+                android:textSize="@dimen/sp12" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

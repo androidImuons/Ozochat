@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <uses-feature android:name="android.hardware.camera.front" />
     <uses-feature android:name="android.hardware.microphone" />
@@ -36,6 +36,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".view.activity.AddMemberActivity">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
         <activity android:name=".view.activity.DetailViewUpdateActivity">
             <meta-data
                 android:name="android.app.searchable"
@@ -44,15 +53,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".view.activity.UserChatActivity"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop" />
         <activity android:name=".view.activity.ProfileInfoNew" />
         <activity
             android:name=".view.activity.SelectContactActivity"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop" />
         <activity
             android:name=".view.activity.MainActivity"
             android:launchMode="singleTop">
@@ -73,12 +81,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.activity.PhotoVideoRedirectActivity" />
-        <activity android:name=".view.activity.UploadStatus"></activity>
+        <activity android:name=".view.activity.UploadStatus" />
         <activity android:name=".view.activity.OTPActivity" />
         <activity android:name=".view.activity.EnterPhoneNumberActivity" />
         <activity android:name=".view.activity.WelcomeScreen" />
-        <activity android:name=".view.activity.SettingActivity"></activity>
-        <activity android:name=".view.activity.ProfileUpdateActivity"></activity>
+        <activity android:name=".view.activity.SettingActivity" />
+        <activity android:name=".view.activity.ProfileUpdateActivity" />
 
         <receiver
             android:name=".network.ConnectivityReceiver"
@@ -91,8 +99,6 @@
         <service
             android:name=".network.SoketService"
             android:exported="true" />
-
-
         <service
             android:name=".FirebaseClasses.MyFirebaseMessagingService"
             android:exported="false">
@@ -111,7 +117,6 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
-
     </application>
 
 </manifest>

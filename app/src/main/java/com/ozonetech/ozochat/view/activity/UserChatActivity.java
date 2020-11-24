@@ -206,14 +206,14 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(UserChatActivity.this, DetailViewUpdateActivity.class);
+              /*  Intent intent = new Intent(UserChatActivity.this, DetailViewUpdateActivity.class);
                 intent.putExtra("contactName", contactName);
                 intent.putExtra("last_seen", last_seen);
                 intent.putExtra("contactProfilePic", contactProfilePic);
                 intent.putExtra("groupChat", groupChat);
                 intent.putExtra("group_id",group_id);
                 intent.putExtra("admin_id", admin_id);
-                startActivity(intent);
+                startActivity(intent);*/
             }
         });
 
