@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -20,6 +21,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.provider.ContactsContract;
@@ -92,10 +94,28 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
             requestContactPermission();
         }else{
-            getrecentChat();
+            getrecentChat(0);
         }
 
+        recycelScroll();
+
         return view;
+    }
+
+    private void recycelScroll() {
+        dataBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                Log.d(tag,"--on scrool state-"+newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Log.d(tag,"--on scrool -"+dx+"--"+dy);
+            }
+        });
     }
 
     private void renderUserChatList() {
@@ -201,10 +221,11 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     }
 
-    private void getrecentChat() {
+    private void getrecentChat(int offset) {
         JSONObject json = new JSONObject();
         try {
             json.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+            json.put("offset",offset);
             MyApplication.getInstance().getSocket().emit("recentChatEvent", json).on("recentChatEvent", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -220,6 +241,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                                             try {
                                                 setList(data);
                                             } catch (JSONException e) {
+                                                Log.d(tag, "==error-" + e.getMessage());
                                                 e.printStackTrace();
                                             }
                                         }
@@ -230,6 +252,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             });
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.d(tag, "==try error-" + e.getMessage());
         }
 
     }
@@ -407,7 +430,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                                 verifiedUsers.add(contacts);
                             }
                             prefManager.saveArrayListContact(verifiedUsers, prefManager.KEY_CONTACTS);
-                            getrecentChat();
+                            getrecentChat(0);
 
                         }
 
@@ -592,7 +615,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
                 requestContactPermission();
             }else{
-                getrecentChat();
+                getrecentChat(0);
             }
         }else{
             Log.d(tag,"-----re connect socket--");
