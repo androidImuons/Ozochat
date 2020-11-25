@@ -253,8 +253,6 @@ public class ProfileInfoNew extends AppCompatActivity {
                 sdvImage.getHierarchy().setRoundingParams(roundingParams);
             }
 
-
-
         }
     }
     public static final int ACTION_REQUEST_EDITIMAGE = 9;

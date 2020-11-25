@@ -1,4 +1,4 @@
-package com.ozonetech.ozochat.network;
+package com.ozonetech.ozochat.repository;
 
 import android.content.Context;
 import android.util.Log;
