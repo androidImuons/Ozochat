@@ -1,6 +1,7 @@
 package com.ozonetech.ozochat.network.webservices;
 
 import com.google.gson.JsonArray;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
@@ -66,7 +67,7 @@ public interface AppServices {
     Call<LeftResponseModel> leftGroup(@Body JsonArray  array);
 
     @POST("addMember")
-    Call<CommonResponse> addMemberToGroup(@Body JsonArray array);
+    Call<AddMemberResponseModel> addMemberToGroup(@Body JsonArray array);
 
     @POST("removeMember")
     Call<CommonResponse> removeMemberFromGroup(@Body JsonArray array);

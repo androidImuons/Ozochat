@@ -2,6 +2,7 @@ package com.ozonetech.ozochat.listeners;
 
 import androidx.lifecycle.LiveData;
 
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
@@ -14,4 +15,5 @@ public interface CreateGroupInterface {
 
     void onSuccessGroupDetails(LiveData<GroupDetailModel> groupDetailResponase);
 
+    void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse);
 }

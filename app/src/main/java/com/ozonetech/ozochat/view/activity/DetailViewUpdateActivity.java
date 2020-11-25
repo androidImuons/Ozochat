@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonArray;
@@ -32,6 +33,7 @@ import com.ozonetech.ozochat.databinding.ContentMainBinding;
 import com.ozonetech.ozochat.databinding.WidgetHeaderViewBinding;
 import com.ozonetech.ozochat.databinding.WidgetHeaderViewTopBinding;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
@@ -44,6 +46,7 @@ import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
 
 import androidx.appcompat.widget.SearchView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +64,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     UserChatViewModel chatViewModel;
     GroupMembersAdpater groupMembersAdpater;
     private SearchView searchView;
+    ArrayList<Contacts> groupMembers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +89,13 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         Intent intent = getIntent();
 
         contactName = intent.getStringExtra("contactName");
+        group_id = intent.getStringExtra("group_id");
         contactProfilePic = intent.getStringExtra("contactProfilePic");
         last_seen = intent.getStringExtra("last_seen");
         groupChat = intent.getIntExtra("groupChat", 2);
         admin_id = intent.getIntExtra("admin_id", 0);
-        group_id = intent.getStringExtra("group_id");
+
+
         initUi();
     }
 
@@ -104,7 +110,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
         Glide.with(this)
                 .load(contactProfilePic)
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(dataBinding.image);
         widgetHeaderViewTopBinding.name.setText(contactName);
         if (groupChat == 0) {
@@ -138,9 +144,20 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         contentMainBinding.llAddPeople.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent= new Intent(DetailViewUpdateActivity.this)
+                Intent intent= new Intent(DetailViewUpdateActivity.this,AddMemberActivity.class);
+                Bundle args = new Bundle();
+                args.putSerializable("ARRAYLIST",(Serializable)groupMembers);
+                intent.putExtra("BUNDLE",args);
+                intent.putExtra("contactName",contactName);
+                intent.putExtra("group_id",group_id);
+                intent.putExtra("last_seen", last_seen);
+                intent.putExtra("contactProfilePic", contactProfilePic);
+                intent.putExtra("groupChat", groupChat);
+                intent.putExtra("admin_id", admin_id);
+                startActivity(intent);
             }
         });
+
 
         contentMainBinding.cvExitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,7 +192,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     private void gotoLeftGroup(JsonArray jsonArray) {
         showProgressDialog("Please wait...");
-        chatViewModel.leftGroup(DetailViewUpdateActivity.this, jsonArray,chatViewModel.groupInterface = this);
+        chatViewModel.leftGroup(DetailViewUpdateActivity.this, jsonArray, chatViewModel.groupInterface = this);
     }
 
     private void gotoGroupDetails() {
@@ -220,10 +237,10 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 hideProgressDialog();
 
                 try {
-                    if(leftResponseModel.getSuccess()){
-                        showSnackbar(dataBinding.rlChatDetail,"You left the group successfully", Snackbar.LENGTH_SHORT);
-                    }else{
-                        showSnackbar(dataBinding.rlChatDetail,leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                    if (leftResponseModel.getSuccess()) {
+                        showSnackbar(dataBinding.rlChatDetail, "You left the group successfully", Snackbar.LENGTH_SHORT);
+                    } else {
+                        showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
                     }
                 } catch (Exception e) {
                 } finally {
@@ -243,13 +260,18 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 try {
                     if (groupDetailModel.getSuccess()) {
                         Log.d("GroupDetailModel", "--GroupDetailModel : Code" + groupDetailModel.getData());
-
+//            "admin_id": 100,
+//            "user_id": 101,
+//            "isAdmin": false,
+//            "mobile": "7087741181",
+//            "username": "Azhar",
+//            "image": "http://3.0.49.131/api/uploads/null"
                         if (groupDetailModel.getData() != null) {
 
                             ArrayList<Contacts> myContactsArrayList = new ArrayList<>();
                             myContactsArrayList = myPreferenceManager.getArrayListContact("Contacts");
 
-                            ArrayList<Contacts> groupMembers = new ArrayList<>();
+                            groupMembers = new ArrayList<>();
                             for (int i = 0; i < groupDetailModel.getData().size(); i++) {
                                 Contacts contacts = new Contacts();
                                 for (int j = 0; j < myContactsArrayList.size(); j++) {
@@ -264,6 +286,8 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                                 contacts.setProfilePicture(groupDetailModel.getData().get(i).getImage());
                                 contacts.setUid(groupDetailModel.getData().get(i).getUserId());
                                 contacts.setStatus("Hii, I am using Ozochat");
+                                contacts.setAdmin(groupDetailModel.getData().get(i).getIsAdmin());
+
                                 groupMembers.add(contacts);
 
                             }
@@ -279,6 +303,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 }
             }
         });
+
+    }
+
+    @Override
+    public void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse) {
 
     }
 
@@ -362,7 +391,44 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     @Override
     public void onContactSelected(Contacts contact) {
-        Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+
+        final FlatDialog flatDialog = new FlatDialog(DetailViewUpdateActivity.this);
+        flatDialog
+                //.setTitle("Login")
+                // .setSubtitle("write your profile info here")
+                // .setFirstTextFieldHint("email")
+                // .setSecondTextFieldHint("password")
+                .setFirstButtonText("Remove " + contact.getName())
+                .setBackgroundColor(getResources().getColor(R.color.colorWhite))
+                .setFirstButtonColor(getResources().getColor(R.color.colorPrimary))
+                .setFirstButtonTextColor(getResources().getColor(R.color.colorWhite))
+                .setSecondButtonText("Message " + contact.getName())
+                .setSecondButtonColor(getResources().getColor(R.color.colorPrimary))
+                .setSecondButtonTextColor(getResources().getColor(R.color.colorWhite))
+                .setThirdButtonText("Cancel")
+                .setThirdButtonColor(getResources().getColor(R.color.colorPrimary))
+                .setThirdButtonTextColor(getResources().getColor(R.color.colorWhite))
+                .withFirstButtonListner(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(DetailViewUpdateActivity.this, "Remove " + contact.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .withSecondButtonListner(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(DetailViewUpdateActivity.this, "Message " + contact.getName(), Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+                .withThirdButtonListner(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        flatDialog.dismiss();
+                    }
+                })
+                .show();
     }
 
 

@@ -43,6 +43,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+    //FlatDialog
+    implementation 'com.github.mejdi14:Flat-Dialog-Android:1.0.5'
+
     //material design
   //  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.2.0'

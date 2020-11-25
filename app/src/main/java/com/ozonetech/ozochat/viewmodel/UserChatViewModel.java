@@ -10,6 +10,7 @@ import com.google.gson.JsonArray;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
@@ -28,6 +29,7 @@ public class UserChatViewModel extends ViewModel {
     public CreateGroupInterface groupInterface;
 
     public LiveData<LeftResponseModel> leftGroupResponse;
+    public LiveData<AddMemberResponseModel> addMemberResponse;
     public LiveData<GroupDetailModel> groupDetailResponse;
 
     public void createGroup(Context context, JsonArray arrayListAge) {
@@ -55,6 +57,21 @@ public class UserChatViewModel extends ViewModel {
         }else{
             leftGroupResponse = new CreateGroupRepository().leftGroup(jsonArray,context);
             groupInterface.onSuccessLeftGroup(leftGroupResponse);
+        }
+    }
+
+
+    //addMemberToGroup
+    public void addMemberToGroup(Context context, JsonArray jsonArray,CreateGroupInterface groupInterface) {
+
+        if (addMemberResponse == null) {
+            addMemberResponse = new MutableLiveData<AddMemberResponseModel>();
+            //we will load it asynchronously from server in this method
+            addMemberResponse = new CreateGroupRepository().addMemberToGroup(jsonArray,context);
+            groupInterface.onSuccessAddToGroup(addMemberResponse);
+        }else{
+            addMemberResponse = new CreateGroupRepository().addMemberToGroup(jsonArray,context);
+            groupInterface.onSuccessAddToGroup(addMemberResponse);
         }
     }
 

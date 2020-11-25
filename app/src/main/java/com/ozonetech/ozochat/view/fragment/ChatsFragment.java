@@ -266,7 +266,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             });
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.d(tag, "==try error-" + e.getMessage());
+            Log.d(tag, "--try error-" + e.getMessage());
         }
 
     }
@@ -282,6 +282,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 //            "admin_id": 100,
                 //            "group_id": "GP1605155439153",
                 //            "oneToOne": 1,
+                //            msg_counter: 1
                 //            "group_name": "9922803527,7023500608",
                 //            "usermobile": "7023500608",
                 //            "profile_image": "",
@@ -301,7 +302,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setMobile(jsonObject.getString("mobile"));
                 chatRoom.setFile(jsonObject.getString("file"));
                 chatRoom.setTimestamp(jsonObject.getString("last_seen"));
-                chatRoom.setUnreadCount(i + 1);
+                chatRoom.setUnreadCount(jsonObject.getInt("msg_counter"));
                 chatRoomList.add(chatRoom);
             }
             if (chatRoomList.size() != 0) {

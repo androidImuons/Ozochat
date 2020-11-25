@@ -24,11 +24,12 @@ import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Contacts extends ViewModel {
+public class Contacts extends ViewModel implements Serializable {
     @SerializedName("name")
     @Expose
     private String name;
@@ -42,6 +43,15 @@ public class Contacts extends ViewModel {
     @Expose
     private String phone;
     String status;
+    private Boolean isAdmin;
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
 
     public Integer getUid() {
         return uid;
@@ -72,7 +82,7 @@ public class Contacts extends ViewModel {
         Glide.with(view.getContext())
                 .load(imageUrl)
                 .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(view);
     }
 
