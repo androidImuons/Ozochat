@@ -83,7 +83,7 @@ public class GroupMembersAdpater extends RecyclerView.Adapter<GroupMembersAdpate
         Glide.with(context)
                 .load(contact.getProfilePicture())
                 .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(holder.thumbnail);
     }
 

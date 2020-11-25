@@ -82,7 +82,7 @@ public class Contacts extends ViewModel implements Serializable {
         Glide.with(view.getContext())
                 .load(imageUrl)
                 .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(view);
     }
 

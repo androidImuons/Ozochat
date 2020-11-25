@@ -46,11 +46,13 @@ import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
 import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
@@ -193,7 +195,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         toolbarDataBinding.actionBarTitle2.setText(last_seen);
         Glide.with(this)
                 .load(contactProfilePic)
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(toolbarDataBinding.conversationContactPhoto);
         toolbarDataBinding.ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,14 +208,14 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onClick(View v) {
 
-              /*  Intent intent = new Intent(UserChatActivity.this, DetailViewUpdateActivity.class);
+                Intent intent = new Intent(UserChatActivity.this, DetailViewUpdateActivity.class);
                 intent.putExtra("contactName", contactName);
                 intent.putExtra("last_seen", last_seen);
                 intent.putExtra("contactProfilePic", contactProfilePic);
                 intent.putExtra("groupChat", groupChat);
                 intent.putExtra("group_id",group_id);
                 intent.putExtra("admin_id", admin_id);
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
 
@@ -390,7 +392,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         JSONObject json = new JSONObject();
         try {
             json.put("group_id", group_id);
-            Log.d(tag, "---get message para  group_id : " + group_id);
+            json.put("user_id",prefManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+            Log.d(tag, "---getMessages " + json);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -503,6 +506,11 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
     @Override
     public void onSuccessGroupDetails(LiveData<GroupDetailModel> groupDetailResponase) {
+    }
+
+    @Override
+    public void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse) {
+
     }
 
 

@@ -1,5 +1,6 @@
 package com.ozonetech.ozochat.view.adapter;
 
+import android.content.Context;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.SelectedListItemBinding;
 import com.ozonetech.ozochat.viewmodel.Contacts;
@@ -16,14 +19,10 @@ import java.util.List;
 
 public class SelectedGrpMemberAdpter extends RecyclerView.Adapter<SelectedGrpMemberAdpter.MyViewHolder> {
 
+    Context context;
     private List<Contacts> selectedMembers;
     private LayoutInflater layoutInflater;
     private SelectedAdpterListener listener;
-    private SparseBooleanArray selectedItems;
-    // array used to perform multiple animation at once
-    private SparseBooleanArray animationItemsIndex;
-    private boolean reverseAllAnimations = false;
-    private static int currentSelectedIndex = -1;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,7 +34,8 @@ public class SelectedGrpMemberAdpter extends RecyclerView.Adapter<SelectedGrpMem
         }
     }
 
-    public SelectedGrpMemberAdpter(List<Contacts> selectedMembers, SelectedAdpterListener listener) {
+    public SelectedGrpMemberAdpter(Context context, List<Contacts> selectedMembers, SelectedAdpterListener listener) {
+        this.context=context;
         this.selectedMembers = selectedMembers;
         this.listener = listener;
     }
@@ -52,7 +52,11 @@ public class SelectedGrpMemberAdpter extends RecyclerView.Adapter<SelectedGrpMem
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
-        holder.binding.setContactProfilePic(selectedMembers.get(position));
+        Glide.with(context)
+                .load(selectedMembers.get(position).getProfilePicture())
+                .apply(RequestOptions.circleCropTransform())
+                .placeholder(R.drawable.person_icon)
+                .into(holder.binding.thumbnail);
         holder.binding.thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +65,13 @@ public class SelectedGrpMemberAdpter extends RecyclerView.Adapter<SelectedGrpMem
                 }
             }
         });
+
+       holder.binding.ivCancel.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               listener.onRemoveMember(selectedMembers.get(position));
+           }
+       });
     }
 
     @Override
@@ -70,5 +81,7 @@ public class SelectedGrpMemberAdpter extends RecyclerView.Adapter<SelectedGrpMem
 
     public interface SelectedAdpterListener {
         void onClickedMember(Contacts contacts);
+
+        void onRemoveMember(Contacts contacts);
     }
 }

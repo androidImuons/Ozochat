@@ -67,7 +67,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
 
         Glide.with(mContext)
                 .load(chatRoom.getProfilePicture())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(holder.thumbnail);
         holder.name.setText(chatRoom.getUsername());
         holder.message.setText(chatRoom.getLastMessage());

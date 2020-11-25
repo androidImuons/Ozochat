@@ -2,12 +2,14 @@ package com.ozonetech.ozochat.view.adapter;
 
 import android.content.Context;
 import android.util.SparseBooleanArray;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,9 +22,10 @@ import com.ozonetech.ozochat.viewmodel.Contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyViewHolder>
-        implements Filterable {
+public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyViewHolder> implements Filterable {
+
     private Context context;
+
     private List<Contacts> contactList;
     private List<Contacts> contactListFiltered;
     private ContactsAdapterListener listener;
@@ -32,28 +35,6 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyVi
     private boolean reverseAllAnimations = false;
     private static int currentSelectedIndex = -1;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvContactName, tvContactStatus;
-        public ImageView thumbnail,iv_selected;
-
-        public MyViewHolder(View view) {
-            super(view);
-            tvContactName = view.findViewById(R.id.tvContactName);
-            tvContactStatus = view.findViewById(R.id.tvContactStatus);
-            thumbnail = view.findViewById(R.id.thumbnail);
-            iv_selected=view.findViewById(R.id.iv_selected);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    iv_selected.setVisibility(View.VISIBLE);
-                    listener.onContactSelected(contactListFiltered.get(getAdapterPosition()));
-                }
-            });
-        }
-    }
-
 
     public AddMemberAdapter(Context context, List<Contacts> contactList, ContactsAdapterListener listener) {
         this.context = context;
@@ -62,7 +43,6 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyVi
         this.contactListFiltered = contactList;
         selectedItems = new SparseBooleanArray();
         animationItemsIndex = new SparseBooleanArray();
-
     }
 
     @Override
@@ -79,19 +59,103 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyVi
         holder.tvContactName.setText(contact.getName());
         holder.tvContactStatus.setText(contact.getStatus());
         // change the row state to activated
-        holder.iv_selected.setActivated(selectedItems.get(position, false));
+        holder.ll_contact_row.setActivated(selectedItems.get(position, false));
 
         Glide.with(context)
                 .load(contact.getProfilePicture())
                 .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(holder.thumbnail);
+
+        // handle icon animation
+        applyIconAnimation(holder, position);
+
+    }
+
+    private void applyIconAnimation(MyViewHolder holder, int position) {
+        if (selectedItems.get(position, false)) {
+            holder.iv_selected.setVisibility(View.VISIBLE);
+            listener.onAddMemeber(contactListFiltered.get(position));
+
+        } else {
+            holder.iv_selected.setVisibility(View.GONE);
+            listener.onRemoveMemeber(contactListFiltered.get(position));
+
+        }
     }
 
     @Override
     public int getItemCount() {
         return contactListFiltered.size();
     }
+
+    public List<Integer> getSelectedItems() {
+        List<Integer> items =
+                new ArrayList<>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+
+
+    public String getData(int position) {
+        String mobile = contactListFiltered.get(position).getPhone();
+        return mobile;
+    }
+
+    public void toggleSelection(int pos) {
+        currentSelectedIndex = pos;
+        if (selectedItems.get(pos, false)) {
+            selectedItems.delete(pos);
+            animationItemsIndex.delete(pos);
+
+        } else {
+            selectedItems.put(pos, true);
+            animationItemsIndex.put(pos, true);
+
+        }
+        notifyItemChanged(pos);
+    }
+
+    public void clearSelections() {
+        reverseAllAnimations = true;
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    public void resetAnimationIndex() {
+        reverseAllAnimations = false;
+        animationItemsIndex.clear();
+    }
+
+    public int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        public TextView tvContactName, tvContactStatus;
+        public ImageView thumbnail, iv_selected;
+        LinearLayout ll_contact_row;
+
+        public MyViewHolder(View view) {
+            super(view);
+            tvContactName = view.findViewById(R.id.tvContactName);
+            tvContactStatus = view.findViewById(R.id.tvContactStatus);
+            thumbnail = view.findViewById(R.id.thumbnail);
+            iv_selected = view.findViewById(R.id.iv_selected);
+            ll_contact_row = view.findViewById(R.id.ll_contact_row);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onContactSelected(contactListFiltered.get(getAdapterPosition()),getAdapterPosition());
+                }
+            });
+        }
+
+    }
+
 
     @Override
     public Filter getFilter() {
@@ -129,6 +193,11 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyVi
     }
 
     public interface ContactsAdapterListener {
-        void onContactSelected(Contacts contact);
+        void onContactSelected(Contacts contact,int adapterPosition);
+
+        void onAddMemeber(Contacts contacts);
+
+        void onRemoveMemeber(Contacts contacts);
     }
+
 }

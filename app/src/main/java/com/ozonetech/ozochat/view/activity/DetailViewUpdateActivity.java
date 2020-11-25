@@ -33,6 +33,7 @@ import com.ozonetech.ozochat.databinding.ContentMainBinding;
 import com.ozonetech.ozochat.databinding.WidgetHeaderViewBinding;
 import com.ozonetech.ozochat.databinding.WidgetHeaderViewTopBinding;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
@@ -88,11 +89,13 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         Intent intent = getIntent();
 
         contactName = intent.getStringExtra("contactName");
+        group_id = intent.getStringExtra("group_id");
         contactProfilePic = intent.getStringExtra("contactProfilePic");
         last_seen = intent.getStringExtra("last_seen");
         groupChat = intent.getIntExtra("groupChat", 2);
         admin_id = intent.getIntExtra("admin_id", 0);
-        group_id = intent.getStringExtra("group_id");
+
+
         initUi();
     }
 
@@ -107,7 +110,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
         Glide.with(this)
                 .load(contactProfilePic)
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(dataBinding.image);
         widgetHeaderViewTopBinding.name.setText(contactName);
         if (groupChat == 0) {
@@ -145,9 +148,16 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 Bundle args = new Bundle();
                 args.putSerializable("ARRAYLIST",(Serializable)groupMembers);
                 intent.putExtra("BUNDLE",args);
+                intent.putExtra("contactName",contactName);
+                intent.putExtra("group_id",group_id);
+                intent.putExtra("last_seen", last_seen);
+                intent.putExtra("contactProfilePic", contactProfilePic);
+                intent.putExtra("groupChat", groupChat);
+                intent.putExtra("admin_id", admin_id);
                 startActivity(intent);
             }
         });
+
 
         contentMainBinding.cvExitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -293,6 +303,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 }
             }
         });
+
+    }
+
+    @Override
+    public void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse) {
 
     }
 

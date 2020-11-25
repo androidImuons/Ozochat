@@ -1,9 +1,11 @@
 package com.ozonetech.ozochat.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.app.SearchManager;
@@ -12,6 +14,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,17 +24,26 @@ import androidx.appcompat.widget.SearchView;
 
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityAddMemberBinding;
-import com.ozonetech.ozochat.utils.MyDividerItemDecoration;
+import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
+import com.ozonetech.ozochat.model.CreateGRoupREsponse;
+import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.AddMemberAdapter;
 import com.ozonetech.ozochat.view.adapter.SelectedGrpMemberAdpter;
 import com.ozonetech.ozochat.viewmodel.Contacts;
+import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
+import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class AddMemberActivity extends AppCompatActivity implements AddMemberAdapter.ContactsAdapterListener,SelectedGrpMemberAdpter.SelectedAdpterListener {
+public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.ContactsAdapterListener, SelectedGrpMemberAdpter.SelectedAdpterListener, CreateGroupInterface {      //
 
     ActivityAddMemberBinding dataBinding;
     AddMemberAdapter addMemberAdapter;
@@ -40,11 +53,19 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberAda
     ArrayList<Contacts> addMemeberContactsArrayList;
     MyPreferenceManager myPreferenceManager;
     private SearchView searchView;
+    private ActionModeCallback actionModeCallback;
+    private ActionMode actionMode;
+    String group_name, group_id;
+    String last_seen, contactProfilePic;
+    int groupChat, admin_id;
+    UserChatViewModel chatViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataBinding = DataBindingUtil.setContentView(AddMemberActivity.this, R.layout.activity_add_member);
+        chatViewModel = ViewModelProviders.of(AddMemberActivity.this).get(UserChatViewModel.class);
+
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
 
@@ -53,7 +74,7 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberAda
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Add participants");
-
+        actionModeCallback = new ActionModeCallback();
 
         init();
 
@@ -67,12 +88,22 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberAda
 
     private void init() {
 
-
         Intent intent = getIntent();
         Bundle args = intent.getBundleExtra("BUNDLE");
         groupMembers = (ArrayList<Contacts>) args.getSerializable("ARRAYLIST");
+        group_name = intent.getStringExtra("contactName");
+        group_id = intent.getStringExtra("group_id");
+        contactProfilePic = intent.getStringExtra("contactProfilePic");
+        last_seen = intent.getStringExtra("last_seen");
+        groupChat = intent.getIntExtra("groupChat", 2);
+        admin_id = intent.getIntExtra("admin_id", 0);
+
 
         dataBinding.rvSelectedMember.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        dataBinding.rvSelectedMember.setVisibility(View.GONE);
+        addMemeberContactsArrayList = new ArrayList<>();
+        selectedGrpMemberAdpter = new SelectedGrpMemberAdpter(AddMemberActivity.this, addMemeberContactsArrayList, this);
+
 
         myPreferenceManager = new MyPreferenceManager(AddMemberActivity.this);
         myContactsArrayList = new ArrayList<>();
@@ -101,9 +132,7 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberAda
 
         }
 
-        addMemeberContactsArrayList=new ArrayList<>();
-        selectedGrpMemberAdpter = new SelectedGrpMemberAdpter(addMemeberContactsArrayList, this);
-        dataBinding.rvSelectedMember.setAdapter(selectedGrpMemberAdpter);
+
     }
 
     @Override
@@ -172,12 +201,213 @@ public class AddMemberActivity extends AppCompatActivity implements AddMemberAda
     }
 
     @Override
-    public void onContactSelected(Contacts contact) {
+    public void onContactSelected(Contacts contact, int adapterPosition) {
+        enableActionMode(contact, adapterPosition);
         Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
     }
 
     @Override
+    public void onAddMemeber(Contacts contacts) {
+        addMemeberContactsArrayList.add(contacts);
+        selectedGrpMemberAdpter = new SelectedGrpMemberAdpter(AddMemberActivity.this, addMemeberContactsArrayList, this);
+        dataBinding.rvSelectedMember.setAdapter(selectedGrpMemberAdpter);
+
+    }
+
+    @Override
+    public void onRemoveMemeber(Contacts contacts) {
+        addMemeberContactsArrayList.remove(contacts);
+        selectedGrpMemberAdpter = new SelectedGrpMemberAdpter(AddMemberActivity.this, addMemeberContactsArrayList, this);
+        dataBinding.rvSelectedMember.setAdapter(selectedGrpMemberAdpter);
+
+    }
+
+    private void enableActionMode(Contacts contact, int position) {
+        if (actionMode == null) {
+            actionMode = startSupportActionMode(actionModeCallback);
+        }
+        toggleSelection(position, contact);
+    }
+
+    private void toggleSelection(int position, Contacts contact) {
+        addMemberAdapter.toggleSelection(position);
+        int count = addMemberAdapter.getSelectedItemCount();
+        if (count == 0) {
+            dataBinding.rvSelectedMember.setVisibility(View.GONE);
+            actionMode.finish();
+        } else {
+            dataBinding.rvSelectedMember.setVisibility(View.VISIBLE);
+            actionMode.setTitle("Participants : " + String.valueOf(count));
+            actionMode.invalidate();
+        }
+    }
+
+    @Override
+    public void onSuccessCreateGroup(LiveData<CreateGRoupREsponse> gRoupREsponse) {
+
+    }
+
+    @Override
+    public void onSuccessLeftGroup(LiveData<LeftResponseModel> leftGroupResponse) {
+
+    }
+
+    @Override
+    public void onSuccessGroupDetails(LiveData<GroupDetailModel> groupDetailResponase) {
+
+    }
+
+    @Override
+    public void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse) {
+        addMemberResponse.observe(AddMemberActivity.this, new Observer<AddMemberResponseModel>() {
+            @Override
+            public void onChanged(AddMemberResponseModel addMemberResponseModel) {
+
+                Log.d("AddMember", "--addMemberResponseModel : Code" + addMemberResponseModel.toString());
+                hideProgressDialog();
+
+                try {
+                    if (addMemberResponseModel.getSuccess()) {
+                        Intent intent = new Intent(AddMemberActivity.this, DetailViewUpdateActivity.class);
+                        intent.putExtra("contactName", group_name);
+                        intent.putExtra("last_seen", last_seen);
+                        intent.putExtra("contactProfilePic", contactProfilePic);
+                        intent.putExtra("groupChat", groupChat);
+                        intent.putExtra("group_id", group_id);
+                        intent.putExtra("admin_id", admin_id);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        showSnackbar(dataBinding.rlAddMember, addMemberResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                    }
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
+
+            }
+        });
+
+    }
+
+    private class ActionModeCallback implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.menu_action_mode, menu);
+
+            // disable swipe refresh if action mode is enabled
+            // swipeRefreshLayout.setEnabled(false);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_create_group:
+                    addMemberToGroup();
+                    mode.finish();
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            addMemberAdapter.clearSelections();
+
+            actionMode = null;
+            dataBinding.rvContactsList.post(new Runnable() {
+                @Override
+                public void run() {
+                    addMemberAdapter.resetAnimationIndex();
+                    // mAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
+    private void addMemberToGroup() {
+
+        JsonArray jsonArray = new JsonArray();
+
+        JsonObject groupadmin = new JsonObject();
+        groupadmin.addProperty("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
+
+
+        JsonArray memerArray = new JsonArray();
+
+        for (int i = 0; i < addMemeberContactsArrayList.size(); i++) {
+            JsonObject member = new JsonObject();
+            member.addProperty("mobile", addMemeberContactsArrayList.get(i).getPhone());
+            memerArray.add(member);
+        }
+
+        JsonObject memersObjeect = new JsonObject();
+        memersObjeect.add("members", memerArray);
+
+        JsonObject groupName = new JsonObject();
+        groupName.addProperty("group_name", group_name);
+
+        JsonObject groupId = new JsonObject();
+        groupId.addProperty("groupId", group_id);
+
+        jsonArray.add(groupadmin);
+        jsonArray.add(memersObjeect);
+        jsonArray.add(groupName);
+        jsonArray.add(groupId);
+
+        //[ {"admin":7087741183}, {"members": [ {"mobile": "7488713414"} ]}, {"group_name":"ABC"}, {"groupId":"GP1603952201631"} ]"
+        Log.d("AddMember JsonArray", "-- add member" + jsonArray);
+        addMembersToGroup(jsonArray);
+
+    }
+
+    private void addMembersToGroup(JsonArray jsonArray) {
+        showProgressDialog("Please wait...");
+        chatViewModel.addMemberToGroup(AddMemberActivity.this, jsonArray, chatViewModel.groupInterface = this);
+
+    }
+
+    // deleting the messages from recycler view
+/*
+    private void deleteMessages() {
+        addMemberAdapter.resetAnimationIndex();
+        List<Integer> selectedItemPositions =
+                addMemberAdapter.getSelectedItems();
+        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
+           // addMemberAdapter.removeData(selectedItemPositions.get(i));
+        }
+        addMemberAdapter.notifyDataSetChanged();
+    }
+*/
+
+    @Override
     public void onClickedMember(Contacts contact) {
         Toast.makeText(getApplicationContext(), "Selected Member: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onRemoveMember(Contacts contacts) {
+        addMemeberContactsArrayList.remove(contacts);
+        selectedGrpMemberAdpter = new SelectedGrpMemberAdpter(AddMemberActivity.this, addMemeberContactsArrayList, this);
+        dataBinding.rvSelectedMember.setAdapter(selectedGrpMemberAdpter);
+
+        for (int i = 0; i < myContactsArrayList.size(); i++) {
+            Contacts myContact = myContactsArrayList.get(i);
+
+            if (contacts.equals(myContact)) {
+                int position = i;
+                enableActionMode(myContact, position);
+            }
+
+        }
+
     }
 }
