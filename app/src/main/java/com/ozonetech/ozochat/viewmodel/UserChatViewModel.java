@@ -17,6 +17,7 @@ import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
+import com.ozonetech.ozochat.view.activity.DetailViewUpdateActivity;
 
 import org.json.JSONArray;
 
@@ -29,6 +30,7 @@ public class UserChatViewModel extends ViewModel {
     public CreateGroupInterface groupInterface;
 
     public LiveData<LeftResponseModel> leftGroupResponse;
+    public LiveData<LeftResponseModel> removeMemberResponse;
     public LiveData<AddMemberResponseModel> addMemberResponse;
     public LiveData<GroupDetailModel> groupDetailResponse;
 
@@ -89,4 +91,15 @@ public class UserChatViewModel extends ViewModel {
     }
 
 
+    public void removeMember(Context context, JsonArray jsonArray, CreateGroupInterface groupInterface) {
+        if (removeMemberResponse == null) {
+            removeMemberResponse = new MutableLiveData<LeftResponseModel>();
+            //we will load it asynchronously from server in this method
+            removeMemberResponse = new CreateGroupRepository().removeMember(jsonArray,context);
+            groupInterface.onSuccessRemoveMember(removeMemberResponse);
+        }else{
+            removeMemberResponse = new CreateGroupRepository().removeMember(jsonArray,context);
+            groupInterface.onSuccessRemoveMember(removeMemberResponse);
+        }
+    }
 }

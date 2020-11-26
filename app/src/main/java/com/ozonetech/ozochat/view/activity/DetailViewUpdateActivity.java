@@ -15,10 +15,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -65,6 +72,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     GroupMembersAdpater groupMembersAdpater;
     private SearchView searchView;
     ArrayList<Contacts> groupMembers;
+    PopupWindow popupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -311,7 +319,43 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     }
 
+    @Override
+    public void onSuccessRemoveMember(LiveData<LeftResponseModel> removeMemberResponse) {
+        removeMemberResponse.observe(DetailViewUpdateActivity.this, new Observer<LeftResponseModel>() {
+            @Override
+            public void onChanged(LeftResponseModel leftResponseModel) {
+                Log.d("GroupDetailModel", "--removeMember : Code" + leftResponseModel.toString());
+                hideProgressDialog();
+
+                try {
+                    if (leftResponseModel.getSuccess()) {
+                        showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                        popupWindow.dismiss();
+                        gotoGroupDetails();
+                    } else {
+                        showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                    }
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
+            }
+        });
+    }
+
     private void setRecyclerView(ArrayList<Contacts> groupMembers) {
+
+        for(int i=0;i<groupMembers.size();i++){
+            String mobileNo = groupMembers.get(i).getPhone();
+            if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
+                if(groupMembers.get(i).getAdmin()){
+                    contentMainBinding.llAddPeople.setVisibility(View.VISIBLE);
+                }else{
+                    contentMainBinding.llAddPeople.setVisibility(View.GONE);
+                }
+            }
+        }
+
         contentMainBinding.searchtoolbar.setTitle(String.valueOf(groupMembers.size()) + " participants");
         // white background notification bar
         whiteNotificationBar(contentMainBinding.rvContactsList);
@@ -391,44 +435,82 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     @Override
     public void onContactSelected(Contacts contact) {
-        //Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+        for(int i=0;i<groupMembers.size();i++){
+            String mobileNo = groupMembers.get(i).getPhone();
+            if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
+                if(groupMembers.get(i).getAdmin()){
+                    openDialog(contact);
+                }
+            }
+        }
 
-        final FlatDialog flatDialog = new FlatDialog(DetailViewUpdateActivity.this);
-        flatDialog
-                //.setTitle("Login")
-                // .setSubtitle("write your profile info here")
-                // .setFirstTextFieldHint("email")
-                // .setSecondTextFieldHint("password")
-                .setFirstButtonText("Remove " + contact.getName())
-                .setBackgroundColor(getResources().getColor(R.color.colorWhite))
-                .setFirstButtonColor(getResources().getColor(R.color.colorPrimary))
-                .setFirstButtonTextColor(getResources().getColor(R.color.colorWhite))
-                .setSecondButtonText("Message " + contact.getName())
-                .setSecondButtonColor(getResources().getColor(R.color.colorPrimary))
-                .setSecondButtonTextColor(getResources().getColor(R.color.colorWhite))
-                .setThirdButtonText("Cancel")
-                .setThirdButtonColor(getResources().getColor(R.color.colorPrimary))
-                .setThirdButtonTextColor(getResources().getColor(R.color.colorWhite))
-                .withFirstButtonListner(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(DetailViewUpdateActivity.this, "Remove " + contact.getName(), Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .withSecondButtonListner(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(DetailViewUpdateActivity.this, "Message " + contact.getName(), Toast.LENGTH_SHORT).show();
+    }
 
-                    }
-                })
-                .withThirdButtonListner(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        flatDialog.dismiss();
-                    }
-                })
-                .show();
+    private void openDialog(Contacts contactPerson) {
+
+
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.group_action_menu, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        TextView tvRemove = popupView.findViewById(R.id.tvRemove);
+        tvRemove.setText("Remove " + contactPerson.getName());
+        tvRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //[ {"admin":9922803527}, {"member": [ {"mobile": "7087741181"} ]}, {"groupId":"GP1606199463412"} ]
+
+                JsonArray jsonArray = new JsonArray();
+
+                JsonObject group_admin = new JsonObject();
+                group_admin.addProperty("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
+
+
+                JsonArray memerArray = new JsonArray();
+                JsonObject member = new JsonObject();
+                member.addProperty("mobile", contactPerson.getPhone());
+                memerArray.add(member);
+                JsonObject memersObjeect = new JsonObject();
+                memersObjeect.add("member", memerArray);
+
+                JsonObject groupId = new JsonObject();
+                groupId.addProperty("groupId", group_id);
+
+                jsonArray.add(group_admin);
+                jsonArray.add(memersObjeect);
+                jsonArray.add(groupId);
+
+                gotoRemoveMember(jsonArray);
+
+            }
+        });
+
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(dataBinding.rlChatDetail, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+
+    }
+
+    private void gotoRemoveMember(JsonArray jsonArray) {
+        showProgressDialog("Please wait...");
+        chatViewModel.removeMember(DetailViewUpdateActivity.this, jsonArray, chatViewModel.groupInterface = this);
     }
 
 
