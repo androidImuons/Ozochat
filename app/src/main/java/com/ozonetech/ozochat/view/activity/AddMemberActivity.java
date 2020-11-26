@@ -80,7 +80,6 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
     int groupChat, admin_id;
     UserChatViewModel chatViewModel;
     Contacts contactsViewModel;
-
     Cursor phones;
     ArrayList<Contacts> selectUsers;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -354,6 +353,12 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
         for(int i=0;i<myContactsArrayList.size();i++){
             Log.d("remain contacts", "--\n--Before myContactsArrayList : " + myContactsArrayList.get(i).getPhone() + "  " +myContactsArrayList.get(i).getName());
         }
+
+        for(int i=0;i<groupMembers.size();i++){
+            Log.d("remain contacts", "--\n--groupMembers : " + groupMembers.get(i).getPhone() + "  " +groupMembers.get(i).getName());
+        }
+
+
         addMemeberContactsArrayList = new ArrayList<>();
         if (myContactsArrayList.size() != 0) {
 

@@ -84,5 +84,4 @@ public interface AppServices {
     @POST("getGroupInfo")
     Call<GroupDetailModel> getGroupInfo(@FieldMap Map<String, String> groupMap);
 
-
 }
