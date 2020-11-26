@@ -16,4 +16,6 @@ public interface CreateGroupInterface {
     void onSuccessGroupDetails(LiveData<GroupDetailModel> groupDetailResponase);
 
     void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse);
+
+    void onSuccessRemoveMember(LiveData<LeftResponseModel> removeMemberResponse);
 }

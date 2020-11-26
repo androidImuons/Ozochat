@@ -70,7 +70,7 @@ public interface AppServices {
     Call<AddMemberResponseModel> addMemberToGroup(@Body JsonArray array);
 
     @POST("removeMember")
-    Call<CommonResponse> removeMemberFromGroup(@Body JsonArray array);
+    Call<LeftResponseModel> removeMemberFromGroup(@Body JsonArray array);
 
     @POST("uploadFiles")
     Call<CommonResponse> uploadFiles(@PartMap Map<String, RequestBody> map,

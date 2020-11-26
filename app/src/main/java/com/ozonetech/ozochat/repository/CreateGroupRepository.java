@@ -35,6 +35,9 @@ public class CreateGroupRepository {
     private MutableLiveData<LeftResponseModel> leftGroupResponse;
     LeftResponseModel leftGroupResponseModel;
 
+    private MutableLiveData<LeftResponseModel> removeMemberResponse;
+    LeftResponseModel removeMemberResponseModel;
+
     private MutableLiveData<AddMemberResponseModel> addMemberResponse;
     AddMemberResponseModel addMemberResponseModel;
 
@@ -168,4 +171,33 @@ public class CreateGroupRepository {
         return groupDetailResponse;
     }
 
+    public LiveData<LeftResponseModel> removeMember(JsonArray jsonArray, Context context) {
+        Log.d(tag, "-----row body--" + jsonArray.toString());
+        removeMemberResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.removeMemberFromGroup(jsonArray).enqueue(new Callback<LeftResponseModel>() {
+            @Override
+            public void onResponse(Call<LeftResponseModel> call, Response<LeftResponseModel> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    removeMemberResponseModel = response.body();
+                    removeMemberResponse.setValue(removeMemberResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                    removeMemberResponseModel = response.body();
+                    removeMemberResponse.setValue(removeMemberResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(Call<LeftResponseModel> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return removeMemberResponse;
+    }
 }

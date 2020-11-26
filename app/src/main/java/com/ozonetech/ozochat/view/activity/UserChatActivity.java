@@ -514,6 +514,11 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
     }
 
+    @Override
+    public void onSuccessRemoveMember(LiveData<LeftResponseModel> removeMemberResponse) {
+
+    }
+
 
     private void openDialog() {
         // inflate the layout of the popup window

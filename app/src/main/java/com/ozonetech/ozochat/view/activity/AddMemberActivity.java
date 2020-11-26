@@ -290,6 +290,11 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
 
     }
 
+    @Override
+    public void onSuccessRemoveMember(LiveData<LeftResponseModel> removeMemberResponse) {
+
+    }
+
     private class ActionModeCallback implements ActionMode.Callback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
