@@ -237,6 +237,11 @@ public class MoreOptionDialog extends AppBaseFragment implements ContactsListene
         });
     }
 
+    @Override
+    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
+
+    }
+
     public interface UnfollowUser {
         public void onSuccessUnFollow(LiveData<CommonResponse> data);
     }

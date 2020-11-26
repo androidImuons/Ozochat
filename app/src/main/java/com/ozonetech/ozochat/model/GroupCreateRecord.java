@@ -7,27 +7,18 @@ public class GroupCreateRecord {
     @SerializedName("uid")
     @Expose
     private Integer uid;
-    @SerializedName("g_id")
+    @SerializedName("admin_user_id")
     @Expose
-    private Integer gId;
+    private Integer adminUserId;
     @SerializedName("group_id")
     @Expose
     private String groupId;
-
-    public Integer getAdmin_user_id() {
-        return admin_user_id;
-    }
-
-    public void setAdmin_user_id(Integer admin_user_id) {
-        this.admin_user_id = admin_user_id;
-    }
-
-    @SerializedName("admin_user_id")
+    @SerializedName("title")
     @Expose
-    private Integer admin_user_id;
-
-
-    private final static long serialVersionUID = -8103292797437305922L;
+    private String title;
+    @SerializedName("group_name")
+    @Expose
+    private String groupName;
 
     public Integer getUid() {
         return uid;
@@ -37,12 +28,12 @@ public class GroupCreateRecord {
         this.uid = uid;
     }
 
-    public Integer getGId() {
-        return gId;
+    public Integer getAdminUserId() {
+        return adminUserId;
     }
 
-    public void setGId(Integer gId) {
-        this.gId = gId;
+    public void setAdminUserId(Integer adminUserId) {
+        this.adminUserId = adminUserId;
     }
 
     public String getGroupId() {
@@ -51,6 +42,22 @@ public class GroupCreateRecord {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
 }

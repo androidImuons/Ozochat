@@ -135,11 +135,11 @@ public class UploadFiless {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                 if (response.isSuccessful()) {
-                    Log.d("response 200", "--2-" + new Gson().toJson(response.body()));
+                    Log.d("response 200", "--Upload Img -" + new Gson().toJson(response.body()));
                     commonResponse = response.body();
                     commonResponseMutableLiveData.setValue(commonResponse);
                 } else {
-                    Log.d("response not 200", "--3-" + response.message());
+                    Log.d("response not 200", "--Upload Img-" + response.message());
                     commonResponse = response.body();
                     commonResponseMutableLiveData.setValue(commonResponse);
                 }

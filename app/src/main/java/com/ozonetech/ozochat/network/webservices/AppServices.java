@@ -72,10 +72,11 @@ public interface AppServices {
     @POST("removeMember")
     Call<LeftResponseModel> removeMemberFromGroup(@Body JsonArray array);
 
+    @Multipart
     @POST("uploadFiles")
     Call<CommonResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
                                     @Part List<MultipartBody.Part> file);
-
+    @Multipart
     @POST("uploadGroupImage")
     Call<CommonResponse> uploadGroupImage(@PartMap Map<String, RequestBody> map,
                                      @Part MultipartBody.Part file);
@@ -83,6 +84,5 @@ public interface AppServices {
     @FormUrlEncoded
     @POST("getGroupInfo")
     Call<GroupDetailModel> getGroupInfo(@FieldMap Map<String, String> groupMap);
-
 
 }
