@@ -45,6 +45,7 @@ import com.ozonetech.ozochat.databinding.ActivityAddMemberBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.AddMemberResponseModel;
+import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.MobileObject;
@@ -391,6 +392,11 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
 
     @Override
     public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
+
+    }
+
+    @Override
+    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
 
     }
 

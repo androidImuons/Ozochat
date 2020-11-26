@@ -490,7 +490,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 }
                 if (gRoupREsponse.getSuccess()) {
                     group_id = gRoupREsponse.getData().get(0).getGroupId();
-                    admin_id = gRoupREsponse.getData().get(0).getAdmin_user_id();
+                    admin_id = gRoupREsponse.getData().get(0).getAdminUserId();
                     //triggerSendMessage();
                     getMessage();
                 }

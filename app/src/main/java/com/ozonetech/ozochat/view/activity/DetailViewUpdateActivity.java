@@ -657,6 +657,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     }
 
+    @Override
+    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
+
+    }
+
     class LoadContact extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
