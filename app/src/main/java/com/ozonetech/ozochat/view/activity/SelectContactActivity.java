@@ -87,7 +87,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         contactsViewModel = ViewModelProviders.of(SelectContactActivity.this).get(Contacts.class);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
-        dataBinding.etGroupName.setVisibility(View.GONE);
+        dataBinding.llEditGroup.setVisibility(View.GONE);
         dataBinding.llNewGroup.setVisibility(View.VISIBLE);
         dataBinding.llNewContact.setVisibility(View.VISIBLE);
         prefManager = new MyPreferenceManager(SelectContactActivity.this);
@@ -113,7 +113,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                 if (contactsAdapter != null) {
                     is_group_create = true;
                     contactsAdapter.setGroupFlaf(true);
-                    dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                    dataBinding.llEditGroup.setVisibility(View.VISIBLE);
                     dataBinding.llNewGroup.setVisibility(View.GONE);
                     dataBinding.llNewContact.setVisibility(View.GONE);
                 }
@@ -203,7 +203,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     @Override
     public void onRowLongClicked(int position) {
 // long press is performed, enable action mode
-        dataBinding.etGroupName.setVisibility(View.VISIBLE);
+        dataBinding.llEditGroup.setVisibility(View.VISIBLE);
         enableActionMode(position);
     }
 
@@ -219,7 +219,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         int count = contactsAdapter.getSelectedItemCount();
 
         if (count == 0) {
-            dataBinding.etGroupName.setVisibility(View.GONE);
+            dataBinding.llEditGroup.setVisibility(View.GONE);
             actionMode.finish();
         } else {
             actionMode.setTitle("Participants : " + String.valueOf(count));
@@ -267,7 +267,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             contactsAdapter.clearSelections();
             // swipeRefreshLayout.setEnabled(true);
             actionMode = null;
-            dataBinding.etGroupName.setVisibility(View.GONE);
+            dataBinding.llEditGroup.setVisibility(View.GONE);
             dataBinding.llNewGroup.setVisibility(View.VISIBLE);
             dataBinding.llNewContact.setVisibility(View.VISIBLE);
             dataBinding.rvContactsList.post(new Runnable() {
@@ -419,7 +419,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             if (contactsAdapter != null) {
                 is_group_create = true;
                 contactsAdapter.setGroupFlaf(true);
-                dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                dataBinding.llEditGroup.setVisibility(View.VISIBLE);
                 dataBinding.llNewGroup.setVisibility(View.GONE);
                 dataBinding.llNewContact.setVisibility(View.GONE);
             }
