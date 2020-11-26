@@ -80,12 +80,12 @@ public class SelectContactRepository {
                 if (response.isSuccessful()) {
                     createGroupModel = response.body();
                     createGeoupResponse.setValue(createGroupModel);
-                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+                    Log.d(tag,"-  create true 200---"+new Gson().toJson(response.body()));
 
                 } else {
                     createGroupModel = response.body();
                     createGeoupResponse.setValue(createGroupModel);
-                    Log.d(tag,"- 200---"+new Gson().toJson(response.body()));
+                    Log.d(tag,"- create response false 200---"+new Gson().toJson(response.body()));
 
                 }
             }

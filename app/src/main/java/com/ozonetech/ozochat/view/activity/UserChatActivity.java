@@ -489,6 +489,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     finish();
                 }
                 if (gRoupREsponse.getSuccess()) {
+                    Log.d(tag,"-----on success create group"+gRoupREsponse.getData().get(0));
                     group_id = gRoupREsponse.getData().get(0).getGroupId();
                     admin_id = gRoupREsponse.getData().get(0).getAdmin_user_id();
                     //triggerSendMessage();
