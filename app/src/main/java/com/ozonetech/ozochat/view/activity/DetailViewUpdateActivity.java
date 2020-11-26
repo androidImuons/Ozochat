@@ -26,7 +26,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
@@ -163,6 +162,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 intent.putExtra("groupChat", groupChat);
                 intent.putExtra("admin_id", admin_id);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -246,7 +246,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
                 try {
                     if (leftResponseModel.getSuccess()) {
-                        showSnackbar(dataBinding.rlChatDetail, "You left the group successfully", Snackbar.LENGTH_SHORT);
+                        showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
                     } else {
                         showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
                     }
