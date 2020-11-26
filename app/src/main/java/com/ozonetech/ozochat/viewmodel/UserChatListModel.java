@@ -82,6 +82,7 @@ public class UserChatListModel extends ViewModel {
             //we will load it asynchronously from server in this method
             commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
             contactsListener.onGetContactsSuccess(commonResponse);
+
         } else {
             commonResponse = new SelectContactRepository().sendValidContacts(arrayListAge);
             contactsListener.onGetContactsSuccess(commonResponse);

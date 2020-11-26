@@ -232,7 +232,9 @@ public class MoreOptionDialog extends AppBaseFragment implements ContactsListene
 
     @Override
     public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
+        createGroupResponse.observe(MoreOptionDialog.this, gRoupREsponse -> {
 
+        });
     }
 
     public interface UnfollowUser {

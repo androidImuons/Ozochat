@@ -99,17 +99,7 @@ public class UploadFiless {
         body = MultipartBody.Part.createFormData("files[]", file.getName().replace(" ", "_"), requestFile);
         return body;
     }
-    private MultipartBody.Part prepareImageFilePart(String fileUri) {
 
-        File file = new File(fileUri);
-        MultipartBody.Part body = null;
-        long length = file.length();
-        length = length / 1024;
-        file_size = file_size + length;
-        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        body = MultipartBody.Part.createFormData("image", file.getName().replace(" ", "_"), requestFile);
-        return body;
-    }
 
     public MutableLiveData<CommonResponse> uploadGroupImage(Context context, String user_id, String group_id, String admin_id, String filepath) {
         commonResponseMutableLiveData = new MutableLiveData<>();
@@ -164,4 +154,16 @@ public class UploadFiless {
         return commonResponseMutableLiveData;
     }
 
+
+    private MultipartBody.Part prepareImageFilePart(String fileUri) {
+
+        File file = new File(fileUri);
+        MultipartBody.Part body = null;
+        long length = file.length();
+        length = length / 1024;
+        file_size = file_size + length;
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        body = MultipartBody.Part.createFormData("image", file.getName().replace(" ", "_"), requestFile);
+        return body;
+    }
 }
