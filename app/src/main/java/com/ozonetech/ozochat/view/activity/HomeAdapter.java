@@ -23,7 +23,7 @@ import butterknife.OnClick;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeHolder> {
     Activity mActivity;
     ArrayList<String> list;
-    public HomeAdapter(Activity statusTest, ArrayList<String> list) {
+    public  HomeAdapter(Activity statusTest, ArrayList<String> list) {
         this.mActivity = statusTest;
         this.list = list;
     }

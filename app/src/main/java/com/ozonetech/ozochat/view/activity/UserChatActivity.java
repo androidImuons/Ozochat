@@ -68,6 +68,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -246,8 +247,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         dataBinding.ivCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+//                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+                Intent intent=new Intent(UserChatActivity.this,UploadStatus.class);
+                startActivity(intent);
             }
         });
 
@@ -548,8 +551,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         layoutGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickIntent, IMAGE_PICKER_SELECT);
+//                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(pickIntent, IMAGE_PICKER_SELECT);
+                Intent intent=new Intent(UserChatActivity.this,UploadStatus.class);
+                startActivity(intent);
             }
         });
 
@@ -605,7 +610,22 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             }
         }
     }
+    public String getRealPathFromURI(Uri uri) {
 
+        Log.d(tag, "---" + uri);
+        Bitmap bitmap = null;
+        Uri outPutfileUri = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+            outPutfileUri = Uri.parse(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outPutfileUri.toString();
+    }
 
     @Override
     public void onSocketConnect(boolean flag) {
