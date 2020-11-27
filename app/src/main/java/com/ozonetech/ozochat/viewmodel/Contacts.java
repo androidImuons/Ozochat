@@ -17,10 +17,12 @@ import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.listeners.UploadFilsListner;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 
+import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
@@ -108,8 +110,12 @@ public class Contacts extends ViewModel implements Serializable {
     public LiveData<CreateGRoupREsponse> createGroupResponse;
     public LiveData<VerifiedContactsModel> commonResponse;
     public LiveData<UploadResponse> uploadGroupImgResponse;
-
     public ContactsListener contactsListener;
+
+
+
+    public LiveData<UploadFilesResponse> uploadFilesResponseLiveData;
+
 
 
     public void sendContacts(Context context, ContactsListener contactsListener, NumberListObject arrayListAge) {
@@ -146,6 +152,20 @@ public class Contacts extends ViewModel implements Serializable {
         }else{
             uploadGroupImgResponse = new UploadFiless().uploadGroupImage(context, user_id, group_id, admin_id, groupImgPath);
             contactsListener.onGroupImgUploadSuccess(uploadGroupImgResponse);
+        }
+
+
+
+    }
+    public UploadFilsListner uploadFilsListner;
+    public void uploadfiles(Context context, ContactsListener contactsListener, String user_id, String group_id, String admin_id, ArrayList<String> groupImgPath) {
+        if(uploadFilesResponseLiveData == null){
+            uploadFilesResponseLiveData = new MutableLiveData<UploadFilesResponse>();
+            uploadFilesResponseLiveData = new UploadFiless().sendFiles(context, user_id, group_id, admin_id, groupImgPath);
+            uploadFilsListner.onSuccessResponse(uploadFilesResponseLiveData);
+        }else{
+            uploadFilesResponseLiveData = new UploadFiless().sendFiles(context, user_id, group_id, admin_id, groupImgPath);
+            uploadFilsListner.onSuccessResponse(uploadFilesResponseLiveData);
         }
 
 

@@ -47,11 +47,13 @@ import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.listeners.UploadFilsListner;
 import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.Message;
+import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.MyPreference;
@@ -68,6 +70,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,7 +79,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface, ChatRoomThreadAdapter.onMessageContactClick, ContactsListener {
+public class UserChatActivity extends BaseActivity implements CommonResponseInterface,
+        CreateGroupInterface, ChatRoomThreadAdapter.onMessageContactClick, ContactsListener,UploadFilsListner {
     private static final String TAG = UserChatActivity.class.getName();
     private static final int IMAGE_PICKER_SELECT = 1;
     private static final int VIDEO_PICKER_SELECT = 2;
@@ -221,10 +225,6 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         });
 
 
-//        Contacts contactsViewModel=new Contacts();
-//        contactsViewModel.uploadCreatedGroupPic(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this,"","GP1606396705869",String.valueOf(100),"content://media/external/images/media/55980");
-
-
         toolbarDataBinding.rlToolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -259,6 +259,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             public void onClick(View v) {
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+//                Intent intent=new Intent(UserChatActivity.this,UploadStatus.class);
+//                startActivity(intent);
             }
         });
 
@@ -566,6 +568,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             public void onClick(View v) {
                 Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickIntent, IMAGE_PICKER_SELECT);
+//                Intent intent=new Intent(UserChatActivity.this,UploadStatus.class);
+//                startActivity(intent);
             }
         });
 
@@ -573,7 +577,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         layoutVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                Intent pickIntent = new Intent(Intent.ACTION_PICK,MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickIntent, VIDEO_PICKER_SELECT);
             }
         });
@@ -605,10 +609,25 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             Uri selectedMediaUri = data.getData();
+            Log.d(tag,"-selectedMediaUri  tostring--"+selectedMediaUri.getPath());
+            Log.d(tag,"-selectedMediaUri --"+selectedMediaUri);
             if (requestCode == IMAGE_PICKER_SELECT) {
-                Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+                // Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+                Contacts contactsViewModel = new Contacts();
+                contactsViewModel.uploadFilsListner=(UploadFilsListner)UserChatActivity.this;
+                ArrayList<String> list = new ArrayList<>();
+                list.add(getRealPathFromURI(selectedMediaUri));
+                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
+
+
             } else if (requestCode == VIDEO_PICKER_SELECT) {
-                Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+              //  Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
+                Contacts contactsViewModel = new Contacts();
+                contactsViewModel.uploadFilsListner=(UploadFilsListner)UserChatActivity.this;
+                ArrayList<String> list = new ArrayList<>();
+                list.add(selectedMediaUri.getPath());
+                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
+
             } else if (requestCode == AUDIO_PICKER_SELECT) {
                 Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
             } else if (requestCode == CAMERA_PIC_REQUEST) {
@@ -622,6 +641,22 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         }
     }
 
+    public String getRealPathFromURI(Uri uri) {
+
+        Log.d(tag, "---" + uri);
+        Bitmap bitmap = null;
+        Uri outPutfileUri = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+            outPutfileUri = Uri.parse(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outPutfileUri.toString();
+    }
 
     @Override
     public void onSocketConnect(boolean flag) {
@@ -674,5 +709,17 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     @Override
     public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
+    }
+
+    @Override
+    public void onSuccessResponse(LiveData<UploadFilesResponse> uploadGroupImgResponse) {
+        uploadGroupImgResponse.observe(UserChatActivity.this, new Observer<UploadFilesResponse>() {
+            @Override
+            public void onChanged(UploadFilesResponse uploadFilesResponse) {
+                if (uploadFilesResponse.getSuccess()){
+                    getMessage();
+                }
+            }
+        });
     }
 }
