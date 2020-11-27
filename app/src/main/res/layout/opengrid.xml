@@ -22,7 +22,17 @@
             android:fontFamily="@font/urfa_medium"
             android:textColor="@color/black"
             android:textSize="20sp"
+
             android:layout_centerInParent="true"/>
+        <ImageView
+            android:id="@+id/save"
+            android:visibility="gone"
+            android:layout_width="@dimen/dp40"
+            android:layout_height="@dimen/dp40"
+            android:tint="@color/black"
+            android:layout_marginRight="@dimen/dp10"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_baseline_check_24"/>
 
     </RelativeLayout>
 
