@@ -105,7 +105,9 @@ public class ChatRoom implements Serializable {
     @Expose
     private Integer unreadCount;
 
-
+    @SerializedName("status")
+    @Expose
+    private String status;
 
 
     public ChatRoom() {
@@ -256,4 +258,11 @@ public class ChatRoom implements Serializable {
         this.timestamp = timestamp;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
