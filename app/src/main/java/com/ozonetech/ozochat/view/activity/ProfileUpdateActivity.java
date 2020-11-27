@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -35,6 +36,7 @@ import com.ozonetech.ozochat.network.FileUtils;
 import com.ozonetech.ozochat.network.ViewUtils;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
+import com.ozonetech.ozochat.utils.FileUtil;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.dialog.EditDialog;
 import com.ozonetech.ozochat.viewmodel.ProfileInfoViewModel;
@@ -66,6 +68,7 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
     ProfileUpdateViewModel viewModel;
     private MyPreferenceManager myPreferenceManager;
     private String filter_image;
+    private String tag="ProfileUpdateActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,6 +209,7 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE) {
                 outPutfileUri = data.getData();
+                Log.d(tag,"---"+outPutfileUri);
                 Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outPutfileUri);
@@ -221,21 +225,21 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
 
 
 
-//                Uri selectedImage = data.getData();
-//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
-//                cursor.moveToFirst();
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String picturePath = cursor.getString(columnIndex);
-//                filter_image = picturePath;
-//                cursor.close();
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                filter_image = picturePath;
+                cursor.close();
 //
 
                 isAttachment = "1";
                 binding.image.setImageURI(outPutfileUri);
                 updateProfile();
                 try {
-            //        filterImage();
+                   // filterImage();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -252,12 +256,11 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                 binding.image.setImageURI(outPutfileUri);
                 updateProfile();
                 try {
-                   // filterImage();
+                //    filterImage();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }else if (requestCode==ACTION_REQUEST_EDITIMAGE){
-
                 String newFilePath = data.getStringExtra(ImageEditorIntentBuilder.OUTPUT_PATH);
                 boolean isImageEdit = data.getBooleanExtra(EditImageActivity.IS_IMAGE_EDITED, false);
                 if (isImageEdit) {
@@ -266,16 +269,16 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                     newFilePath = data.getStringExtra(ImageEditorIntentBuilder.SOURCE_PATH);
                 }
 
-                Log.d("edit","---");
-                //outPutfileUri=Uri.parse(data.getStringExtra(ImageEditorIntentBuilder.SOURCE_PATH));
-                outPutfileUri=Uri.parse("file:/"+newFilePath);
-                Log.d("edit","---"+outPutfileUri);
-                binding.image.setImageURI(newFilePath);
+                outPutfileUri= Uri.fromFile(outputFile);
+
+                filter_image=newFilePath;
+                Log.d("edit","---"+outPutfileUri.getPath());
+                binding.image.setImageURI(outPutfileUri);
 
                 RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
                 roundingParams.setRoundAsCircle(true);
                 binding.image.getHierarchy().setRoundingParams(roundingParams);
-              //  updateProfile();
+                updateProfile();
             }
 
         }
@@ -283,10 +286,11 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
 
 
     public static final int ACTION_REQUEST_EDITIMAGE = 9;
+    File outputFile ;
     private void filterImage() throws Exception {
         Log.d("filterimage","-----image filter--"+ filter_image);
-
-        Intent intent = new ImageEditorIntentBuilder(this,filter_image,filter_image)
+        outputFile= FileUtil.genEditFile();
+        Intent intent = new ImageEditorIntentBuilder(this,filter_image,outputFile.getAbsolutePath())
                 .withAddText()
                 .withFilterFeature()
                 .withRotateFeature()
@@ -309,13 +313,14 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
             final Dialog dialog = ViewUtils.getProgressBar(this);
             AppCommon.getInstance(this).setNonTouchableFlags(this);
             AppServices apiService = ServiceGenerator.createService(AppServices.class);
-            RequestBody uid = RequestBody.create(okhttp3.MultipartBody.FORM, String.valueOf(myPreferenceManager.getUserId()));
+            RequestBody uid = RequestBody.create(MultipartBody.FORM, String.valueOf(myPreferenceManager.getUserId()));
 
             MultipartBody.Part imageUrl = null;
             RequestBody requestFile = null;
             if (isAttachment.equals("1")) {
                 File file = FileUtils.getFile(this, outPutfileUri);
-                imageUrl = prepareFilePart("image", outPutfileUri);
+               imageUrl = prepareFilePart("image", outPutfileUri);
+              //  imageUrl=preparefile("image",outPutfileUri.toString());
             }
             Map<String, RequestBody> map = new HashMap<>();
             map.put("uid", uid);
@@ -333,6 +338,11 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                         if (authResponse.getSuccess() == true) {
                             showSnackbar(binding.rrLayer, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                             myPreferenceManager.setProfilePic(authResponse.getDataObject().getImage_url());
+                            binding.image.setImageURI(authResponse.getDataObject().getImage_url());
+
+                            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+                            roundingParams.setRoundAsCircle(true);
+                            binding.image.getHierarchy().setRoundingParams(roundingParams);
                             Log.d("image set", "---" + myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC));
 
                         } else {
@@ -356,20 +366,30 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
 
     @NonNull
     private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
-        File file = FileUtils.getFile(this, fileUri);
 
-        // create RequestBody instance from file
+        File file = FileUtils.getFile(this, fileUri);
         RequestBody requestFile =
                 RequestBody.create(
                         MediaType.parse(getContentResolver().getType(fileUri)),
                         file
                 );
 
-        // MultipartBody.Part is used to send also the actual file name
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
+
+    private MultipartBody.Part preparefile(String param,String fileUri) {
+
+        File file = new File(fileUri);
+        MultipartBody.Part body = null;
+        long length = file.length();
+        length = length / 1024;
+        Log.d("file size","----"+length);
+        Log.d("file size","----"+file.getAbsolutePath());
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        body = MultipartBody.Part.createFormData(param, file.getName().replace(" ", "_"), requestFile);
+        return body;
+    }
+
     public void updatename(View view){
         Bundle bundle = new Bundle();
         bundle.putString("name", String.valueOf(binding.txtName.getText().toString()));
