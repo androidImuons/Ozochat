@@ -8,6 +8,7 @@ import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
+import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
@@ -74,8 +75,8 @@ public interface AppServices {
 
     @Multipart
     @POST("uploadFiles")
-    Call<UploadResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
-                                    @Part List<MultipartBody.Part> file);
+    Call<UploadFilesResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
+                                          @Part List<MultipartBody.Part> file);
     @Multipart
     @POST("uploadGroupImage")
     Call<UploadResponse> uploadGroupImage(@PartMap Map<String, RequestBody> map,

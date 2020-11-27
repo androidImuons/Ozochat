@@ -50,7 +50,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeHolder> {
 
     @Override
     public int getItemCount() {
-        return list.size();
+        if(list.size()>300){
+            return 100;
+        }else{
+            return list.size();
+        }
+
     }
 
 

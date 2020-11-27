@@ -5,25 +5,23 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class UploadResponse {
+public class UploadFilesResponse {
     @SerializedName("success")
     @Expose
     private Boolean success;
-    @SerializedName("data")
-    @Expose
-    private DataObject dataObject;
+
 
     public List<DataObject> getDataList() {
-        return dataList;
+        return dataObject;
     }
 
     public void setDataList(List<DataObject> dataList) {
-        this.dataList = dataList;
+        this.dataObject = dataList;
     }
 
     @SerializedName("data")
     @Expose
-    private List<DataObject> dataList;
+    private List<DataObject> dataObject;
 
     @SerializedName("message")
     @Expose
@@ -41,13 +39,13 @@ public class UploadResponse {
         this.success = success;
     }
 
-    public DataObject getDataObject() {
-        return dataObject;
-    }
-
-    public void setDataObject(DataObject dataObject) {
-        this.dataObject = dataObject;
-    }
+//    public DataObject getDataObject() {
+//        return dataObject;
+//    }
+//
+//    public void setDataObject(DataObject dataObject) {
+//        this.dataObject = dataObject;
+//    }
 
     public String getMessage() {
         return message;
