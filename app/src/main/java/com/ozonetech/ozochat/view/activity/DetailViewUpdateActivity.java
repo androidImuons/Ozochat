@@ -113,7 +113,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
         dataBinding.toolbar.setTitle("");
-
+        dataBinding.image.setEnabled(false);
 
         contentMainBinding.searchtoolbar.setTitle("");
         setSupportActionBar(contentMainBinding.searchtoolbar);
@@ -176,6 +176,12 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
             contentMainBinding.rlContentMain.setVisibility(View.GONE);
         }
 
+        dataBinding.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSnackbar(dataBinding.rlChatDetail, "Clicked Image", Snackbar.LENGTH_SHORT);
+            }
+        });
 
         contentMainBinding.llAddPeople.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -379,7 +385,9 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
             if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
                 if(groupMembers.get(i).getAdmin()){
                     contentMainBinding.llAddPeople.setVisibility(View.VISIBLE);
+                    dataBinding.image.setEnabled(true);
                 }else{
+                    dataBinding.image.setEnabled(false);
                     contentMainBinding.llAddPeople.setVisibility(View.GONE);
                 }
             }

@@ -91,9 +91,7 @@ public class ChatRoom implements Serializable {
     @SerializedName("usermobile")
     @Expose
     private String usermobile;
-    @SerializedName("profile_image")
-    @Expose
-    private String profileImage;
+
     @SerializedName("file")
     @Expose
     private String file;
@@ -184,14 +182,6 @@ public class ChatRoom implements Serializable {
 
     public void setUsermobile(String usermobile) {
         this.usermobile = usermobile;
-    }
-
-    public String getProfileImage() {
-        return profileImage;
-    }
-
-    public void setProfileImage(String profileImage) {
-        this.profileImage = profileImage;
     }
 
     public String getFile() {

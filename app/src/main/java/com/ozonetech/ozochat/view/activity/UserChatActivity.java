@@ -108,6 +108,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     private int admin_id;
     private String start_flag;
     private String activityFrom;
+    private String userStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +126,16 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         activityFrom = intent.getStringExtra("activityFrom");
         start_flag = intent.getStringExtra("flag");
         contactName = intent.getStringExtra("name");
+        userStatus = intent.getStringExtra("userStatus");
+        //userStatus = "left";
+        if (userStatus.equalsIgnoreCase("Active")) {
+            dataBinding.llBottom.setVisibility(View.VISIBLE);
+            dataBinding.txtLeft.setVisibility(View.GONE);
+        } else {
+            dataBinding.llBottom.setVisibility(View.GONE);
+            dataBinding.txtLeft.setVisibility(View.VISIBLE);
+        }
+
         if (activityFrom.equalsIgnoreCase("MainActivity")) {
             admin_id = intent.getIntExtra("admin_id", 0);
             chatRoomId = intent.getStringExtra("chat_room_id");
