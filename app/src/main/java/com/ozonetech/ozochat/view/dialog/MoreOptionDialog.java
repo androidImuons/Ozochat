@@ -35,6 +35,7 @@ import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.utils.DeviceScreenUtil;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
@@ -232,6 +233,13 @@ public class MoreOptionDialog extends AppBaseFragment implements ContactsListene
 
     @Override
     public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
+        createGroupResponse.observe(MoreOptionDialog.this, gRoupREsponse -> {
+
+        });
+    }
+
+    @Override
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
     }
 

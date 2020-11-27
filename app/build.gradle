@@ -43,6 +43,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+    //FlatDialog
+    implementation 'com.github.mejdi14:Flat-Dialog-Android:1.0.5'
+
     //material design
   //  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.2.0'
@@ -99,6 +102,7 @@ dependencies {
     implementation 'com.github.danylovolokh:list-visibility-utils:0.2.0'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.google.firebase:firebase-messaging:20.2.0'
+    implementation 'com.github.iamutkarshtiwari:Ananas:1.2.4'
 
         implementation 'com.android.support:multidex:1.0.3'
 }

@@ -15,7 +15,6 @@ public class CreateGRoupREsponse {
     @SerializedName("data")
     @Expose
     private List<GroupCreateRecord> data = null;
-    private final static long serialVersionUID = 7695901777729164776L;
 
     public Boolean getSuccess() {
         return success;

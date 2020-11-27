@@ -20,15 +20,19 @@ import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.NumberListObject;
+
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
+import com.ozonetech.ozochat.repository.UploadFiless;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Contacts extends ViewModel {
+public class Contacts extends ViewModel implements Serializable {
     @SerializedName("name")
     @Expose
     private String name;
@@ -42,6 +46,15 @@ public class Contacts extends ViewModel {
     @Expose
     private String phone;
     String status;
+    private Boolean isAdmin;
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
 
     public Integer getUid() {
         return uid;
@@ -72,7 +85,7 @@ public class Contacts extends ViewModel {
         Glide.with(view.getContext())
                 .load(imageUrl)
                 .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(view);
     }
 
@@ -94,6 +107,7 @@ public class Contacts extends ViewModel {
 
     public LiveData<CreateGRoupREsponse> createGroupResponse;
     public LiveData<VerifiedContactsModel> commonResponse;
+    public LiveData<UploadResponse> uploadGroupImgResponse;
 
     public ContactsListener contactsListener;
 
@@ -116,11 +130,25 @@ public class Contacts extends ViewModel {
         if (createGroupResponse == null) {
             createGroupResponse = new MutableLiveData<CreateGRoupREsponse>();
             //we will load it asynchronously from server in this method
-            createGroupResponse = new SelectContactRepository().createGroup(jsonArray,context);
+            createGroupResponse = new SelectContactRepository().createGroup(jsonArray, context);
             contactsListener.onCreateGroupSuccess(createGroupResponse);
         } else {
-            createGroupResponse = new SelectContactRepository().createGroup(jsonArray,context);
+            createGroupResponse = new SelectContactRepository().createGroup(jsonArray, context);
             contactsListener.onCreateGroupSuccess(createGroupResponse);
         }
+    }
+
+    public void uploadCreatedGroupPic(Context context, ContactsListener contactsListener, String user_id, String group_id, String admin_id, String groupImgPath) {
+        if(uploadGroupImgResponse == null){
+            uploadGroupImgResponse = new MutableLiveData<UploadResponse>();
+            uploadGroupImgResponse = new UploadFiless().uploadGroupImage(context, user_id, group_id, admin_id, groupImgPath);
+            contactsListener.onGroupImgUploadSuccess(uploadGroupImgResponse);
+        }else{
+            uploadGroupImgResponse = new UploadFiless().uploadGroupImage(context, user_id, group_id, admin_id, groupImgPath);
+            contactsListener.onGroupImgUploadSuccess(uploadGroupImgResponse);
+        }
+
+
+
     }
 }

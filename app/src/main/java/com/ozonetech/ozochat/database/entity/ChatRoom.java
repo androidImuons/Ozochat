@@ -101,9 +101,13 @@ public class ChatRoom implements Serializable {
     @Expose
     private String timestamp;
 
-    int unreadCount = 5;
+    @SerializedName("msg_counter")
+    @Expose
+    private Integer unreadCount;
 
-
+    @SerializedName("status")
+    @Expose
+    private String status;
 
 
     public ChatRoom() {
@@ -238,20 +242,27 @@ public class ChatRoom implements Serializable {
         this.lastMessage = lastMessage;
     }
 
-    public int getUnreadCount() {
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public Integer getUnreadCount() {
         return unreadCount;
     }
 
-    public void setUnreadCount(int unreadCount) {
+    public void setUnreadCount(Integer unreadCount) {
         this.unreadCount = unreadCount;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
     }
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

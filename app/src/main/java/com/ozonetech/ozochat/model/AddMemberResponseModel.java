@@ -3,20 +3,18 @@ package com.ozonetech.ozochat.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class UploadResponse {
+import java.util.List;
+
+public class AddMemberResponseModel {
     @SerializedName("success")
     @Expose
     private Boolean success;
-    @SerializedName("data")
-    @Expose
-    private DataObject dataObject;
     @SerializedName("message")
     @Expose
     private String message;
-
-    @SerializedName("code")
+    @SerializedName("data")
     @Expose
-    private int code;
+    private List<AddedMember> data = null;
 
     public Boolean getSuccess() {
         return success;
@@ -24,14 +22,6 @@ public class UploadResponse {
 
     public void setSuccess(Boolean success) {
         this.success = success;
-    }
-
-    public DataObject getDataObject() {
-        return dataObject;
-    }
-
-    public void setDataObject(DataObject dataObject) {
-        this.dataObject = dataObject;
     }
 
     public String getMessage() {
@@ -42,11 +32,12 @@ public class UploadResponse {
         this.message = message;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public List<AddedMember> getData() {
+        return data;
     }
 
-    public int getCode() {
-        return code;
+    public void setData(List<AddedMember> data) {
+        this.data = data;
     }
+
 }

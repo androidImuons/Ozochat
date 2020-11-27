@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -39,10 +40,13 @@ import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
+import com.ozonetech.ozochat.listeners.ScrollListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
+import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
@@ -75,6 +79,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     UserChatListModel userChatListModel;
     MyPreferenceManager myPreferenceManager;
     private Contacts contactsViewModel;
+    private LinearLayoutManager linearLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,26 +101,36 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         }else{
             getrecentChat(0);
         }
-
+        linearLayout= new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycelScroll();
 
         return view;
     }
 
     private void recycelScroll() {
-        dataBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                Log.d(tag,"--on scrool state-"+newState);
-            }
 
+        ScrollListener scrollListener=new ScrollListener() {
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                Log.d(tag,"--on scrool -"+dx+"--"+dy);
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                Log.d(tag,"--page-"+page);
+                return true;
             }
-        });
+        };
+        dataBinding.recyclerView.addOnScrollListener(scrollListener);
+
+//        dataBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                Log.d(tag,"--on scrool state-"+newState);
+//            }
+//
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                Log.d(tag,"--on scrool -"+dx+"--"+dy);
+//            }
+//        });
     }
 
     private void renderUserChatList() {
@@ -160,7 +175,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 }
             }
             mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
-            dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+
+            dataBinding.recyclerView.setLayoutManager(linearLayout);
             dataBinding.recyclerView.setAdapter(mAdapter);
 /*
             dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
@@ -252,7 +268,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             });
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.d(tag, "==try error-" + e.getMessage());
+            Log.d(tag, "--try error-" + e.getMessage());
         }
 
     }
@@ -264,16 +280,22 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                //            "uid": 111,
-                //            "admin_id": 100,
-                //            "group_id": "GP1605155439153",
-                //            "oneToOne": 1,
-                //            "group_name": "9922803527,7023500608",
-                //            "usermobile": "7023500608",
-                //            "profile_image": "",
-                //            "message": "hello praveen sir",
-                //            "title": null,
-                //            "mobile": "7023500608"
+                //      "uid":102
+                //      "admin_id":100
+                //      "group_id":"GP1606392148281"
+                //      "oneToOne":0
+                //      "group_name":"GroupTest"
+                //      "group_image":""
+                //      "usermobile":""
+                //      "profile_image":""
+                //      "message":""
+                //      "title":"You Added 7507828337"
+                //      "file":"http:\/\/3.0.49.131\/api\/uploads\/null"
+                //      "mobile":""
+                //      "last_seen":""
+                //      "status":"Active"
+                //      "msg_counter":0
+
                 ChatRoom chatRoom = new ChatRoom();
                 chatRoom.setUid(jsonObject.getInt("uid"));
                 chatRoom.setAdminId(jsonObject.getInt("admin_id"));
@@ -287,7 +309,19 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setMobile(jsonObject.getString("mobile"));
                 chatRoom.setFile(jsonObject.getString("file"));
                 chatRoom.setTimestamp(jsonObject.getString("last_seen"));
-                chatRoom.setUnreadCount(i + 1);
+                if(chatRoom.getOneToOne() == 0){
+                    chatRoom.setUnreadCount(jsonObject.getInt("msg_counter"));
+                    chatRoom.setStatus("Active");
+                    //chatRoom.setStatus(jsonObject.getString("status"));
+                }else{
+                    chatRoom.setUnreadCount(1);
+                    chatRoom.setStatus("Active");
+                   // chatRoom.setStatus("Active");
+
+                    //chatRoom.setUnreadCount(jsonObject.getInt("msg_counter"));
+                    //chatRoom.setStatus(jsonObject.getString("status"));
+                }
+
                 chatRoomList.add(chatRoom);
             }
             if (chatRoomList.size() != 0) {
@@ -462,6 +496,11 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     }
 
     @Override
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
+
+    }
+
+    @Override
     public void onClick(View view, int position, ChatRoom chatRoom) {
         Log.d(tag, "---chat user click--" + position);
        // ChatRoom chatRoom = chatRoomList.get(position);
@@ -477,7 +516,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         intent.putExtra("uid",chatRoom.getUid());
         intent.putExtra("usermobile",chatRoom.getUsermobile());
         intent.putExtra("name", chatRoom.getUsername());
-        intent.putExtra("status", "Online");
+        intent.putExtra("status", chatRoom.getStatus());
         intent.putExtra("flag", "user_chat");
         intent.putExtra("activityFrom", "MainActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);

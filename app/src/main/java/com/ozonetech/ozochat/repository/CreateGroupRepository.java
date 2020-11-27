@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
@@ -33,6 +34,12 @@ public class CreateGroupRepository {
 
     private MutableLiveData<LeftResponseModel> leftGroupResponse;
     LeftResponseModel leftGroupResponseModel;
+
+    private MutableLiveData<LeftResponseModel> removeMemberResponse;
+    LeftResponseModel removeMemberResponseModel;
+
+    private MutableLiveData<AddMemberResponseModel> addMemberResponse;
+    AddMemberResponseModel addMemberResponseModel;
 
     private MutableLiveData<GroupDetailModel> groupDetailResponse;
     GroupDetailModel groupDetailModel;
@@ -101,6 +108,39 @@ public class CreateGroupRepository {
         return leftGroupResponse;
     }
 
+
+    public LiveData<AddMemberResponseModel> addMemberToGroup(JsonArray jsonArray, Context context) {
+        Log.d(tag, "-----row body--" + jsonArray.toString());
+        addMemberResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.addMemberToGroup(jsonArray).enqueue(new Callback<AddMemberResponseModel>() {
+            @Override
+            public void onResponse(Call<AddMemberResponseModel> call, Response<AddMemberResponseModel> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    addMemberResponseModel = response.body();
+                    addMemberResponse.setValue(addMemberResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                    addMemberResponseModel = response.body();
+                    addMemberResponse.setValue(addMemberResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(Call<AddMemberResponseModel> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return addMemberResponse;
+    }
+
+
+
     public LiveData<GroupDetailModel> getGroupDetails(Map<String,String> groupMap, Context context) {
 
         groupDetailResponse = new MutableLiveData<>();
@@ -131,4 +171,33 @@ public class CreateGroupRepository {
         return groupDetailResponse;
     }
 
+    public LiveData<LeftResponseModel> removeMember(JsonArray jsonArray, Context context) {
+        Log.d(tag, "-----row body--" + jsonArray.toString());
+        removeMemberResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.removeMemberFromGroup(jsonArray).enqueue(new Callback<LeftResponseModel>() {
+            @Override
+            public void onResponse(Call<LeftResponseModel> call, Response<LeftResponseModel> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    removeMemberResponseModel = response.body();
+                    removeMemberResponse.setValue(removeMemberResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                    removeMemberResponseModel = response.body();
+                    removeMemberResponse.setValue(removeMemberResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(Call<LeftResponseModel> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return removeMemberResponse;
+    }
 }

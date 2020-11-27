@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="@dimen/dp50"
+            android:layout_height="@dimen/dp50"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="15dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile_icon"
+            app:civ_border_color="#7e3c62"
+            app:civ_border_width="0dp"
+            />
+
+        <ImageView
+            android:id="@+id/iv_cancel"
+            android:layout_width="@dimen/dp20"
+            android:layout_height="20dp"
+            android:layout_gravity="right|bottom"
+            android:layout_marginRight="@dimen/dp10"
+            android:layout_marginBottom="@dimen/dp10"
+            android:src="@drawable/select_cancel"
+            android:visibility="visible" />
+
+    </FrameLayout>
+
+
+</layout>

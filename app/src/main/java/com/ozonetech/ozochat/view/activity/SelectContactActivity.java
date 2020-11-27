@@ -6,16 +6,16 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,23 +41,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
-import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
-import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.GroupCreateRecord;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ContactsAdapter;
 import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -78,6 +77,10 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     public boolean is_group_create;
     private Bundle bundle;
     private String tag = "SelectContactActivity";
+    private static final int IMAGE_PICKER_SELECT = 1;
+    String groupImgPath = "";
+    private GroupCreateRecord creategroupReqord;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +90,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         contactsViewModel = ViewModelProviders.of(SelectContactActivity.this).get(Contacts.class);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
-        dataBinding.etGroupName.setVisibility(View.GONE);
+        dataBinding.llEditGroup.setVisibility(View.GONE);
         dataBinding.llNewGroup.setVisibility(View.VISIBLE);
-        dataBinding.llNewContact.setVisibility(View.VISIBLE);
+       // dataBinding.llNewContact.setVisibility(View.VISIBLE);
         prefManager = new MyPreferenceManager(SelectContactActivity.this);
         actionModeCallback = new ActionModeCallback();
 
@@ -106,6 +109,14 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         selectUsers = new ArrayList<Contacts>();
         requestContactPermission();
 
+        dataBinding.flUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickIntent, IMAGE_PICKER_SELECT);
+            }
+        });
+
         dataBinding.llNewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,9 +124,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                 if (contactsAdapter != null) {
                     is_group_create = true;
                     contactsAdapter.setGroupFlaf(true);
-                    dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                    dataBinding.llEditGroup.setVisibility(View.VISIBLE);
                     dataBinding.llNewGroup.setVisibility(View.GONE);
-                    dataBinding.llNewContact.setVisibility(View.GONE);
+                   // dataBinding.llNewContact.setVisibility(View.GONE);
                 }
 
 
@@ -203,7 +214,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     @Override
     public void onRowLongClicked(int position) {
 // long press is performed, enable action mode
-        dataBinding.etGroupName.setVisibility(View.VISIBLE);
+        dataBinding.llEditGroup.setVisibility(View.VISIBLE);
         enableActionMode(position);
     }
 
@@ -219,7 +230,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         int count = contactsAdapter.getSelectedItemCount();
 
         if (count == 0) {
-            dataBinding.etGroupName.setVisibility(View.GONE);
+            dataBinding.llEditGroup.setVisibility(View.GONE);
             actionMode.finish();
         } else {
             actionMode.setTitle("Participants : " + String.valueOf(count));
@@ -267,9 +278,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             contactsAdapter.clearSelections();
             // swipeRefreshLayout.setEnabled(true);
             actionMode = null;
-            dataBinding.etGroupName.setVisibility(View.GONE);
+            dataBinding.llEditGroup.setVisibility(View.GONE);
             dataBinding.llNewGroup.setVisibility(View.VISIBLE);
-            dataBinding.llNewContact.setVisibility(View.VISIBLE);
+           // dataBinding.llNewContact.setVisibility(View.VISIBLE);
             dataBinding.rvContactsList.post(new Runnable() {
                 @Override
                 public void run() {
@@ -370,15 +381,34 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                 //save access token
                 hideProgressDialog();
                 Log.d("SelectContactActivity", "----\n Message : " + createGRoupREsponse.getMessage() +
-                        "\n Data : " + createGRoupREsponse.getData());
+                        "\n Data : " + createGRoupREsponse.getData().get(0));
 
                 try {
                     if (createGRoupREsponse.getSuccess()) {
-
+                       creategroupReqord =createGRoupREsponse.getData().get(0);
                         Log.d("SelectContactActivity", "----\n Message : " + createGRoupREsponse.getMessage() +
                                 "\n Data : " + createGRoupREsponse.getData());
-                        //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
-                        callChatActivity(createGRoupREsponse.getData().get(0));
+                        if(!groupImgPath.equalsIgnoreCase("")){
+                            if(createGRoupREsponse.getData()!=null){
+                                GroupCreateRecord groupCreateRecord=new GroupCreateRecord();
+                                groupCreateRecord=createGRoupREsponse.getData().get(0);
+                                String user_id = prefManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID) ;
+                                String group_id = groupCreateRecord.getGroupId();
+                                String admin_id = String.valueOf(groupCreateRecord.getAdminUserId());
+
+                                gotoUploadGroupPic(user_id,group_id,admin_id,groupImgPath);
+
+                               // callChatActivity(creategroupReqord);
+
+
+                            }
+
+                        }else{
+                            callChatActivity(createGRoupREsponse.getData().get(0), "");
+                        }
+
+
+
                     } else {
                         Toast.makeText(SelectContactActivity.this, createGRoupREsponse.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.d("SelectContactActivity", "----\n Message : " + createGRoupREsponse.getMessage() +
@@ -386,6 +416,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                     }
 
                 } catch (Exception e) {
+                    Log.d("SelectContactActivity", "--Exception : "+e.getMessage());
                 } finally {
                     hideProgressDialog();
                 }
@@ -394,11 +425,40 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         });
     }
 
-    private void callChatActivity(GroupCreateRecord groupCreateRecord) {
+    @Override
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
+        uploadGroupImgResponse.observe(SelectContactActivity.this, new Observer<UploadResponse>() {
+            @Override
+            public void onChanged(UploadResponse commonResponse) {
+                hideProgressDialog();
+                Log.d("SelectContactActivity", "----\n Message : " + commonResponse.getMessage() +
+                        "\n Data : " + commonResponse.getDataObject());
+
+                try{
+
+                    callChatActivity(creategroupReqord,commonResponse.getDataObject().getImage_url());
+                }catch (Exception e) {
+                    Log.d(tag,"----exception on group"+e.getMessage());
+                } finally {
+                    hideProgressDialog();
+                }
+
+            }
+        });
+    }
+
+    private void gotoUploadGroupPic(String user_id, String group_id, String admin_id, String groupImgPath) {
+        showProgressDialog("Please wait...");
+        contactsViewModel.uploadCreatedGroupPic(SelectContactActivity.this, contactsViewModel.contactsListener = this,user_id,group_id,admin_id,groupImgPath);
+
+    }
+
+    private void callChatActivity(GroupCreateRecord groupCreateRecord, String image_url) {
         Intent intent = new Intent(SelectContactActivity.this, UserChatActivity.class);
         intent.putExtra("chat_room_id", groupCreateRecord.getGroupId());
         intent.putExtra("name", dataBinding.etGroupName.getText().toString().trim());
-        intent.putExtra("admin_id", groupCreateRecord.getAdmin_user_id());
+        intent.putExtra("admin_id", groupCreateRecord.getAdminUserId());
+        intent.putExtra("group_image",image_url);
         intent.putExtra("oneToOne","0");
         intent.putExtra("flag", "group");
         intent.putExtra("activityFrom", "SelectContactActivity");
@@ -407,10 +467,10 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     }
 
 
-    private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> selectUsers) {
-        prefManager.saveArrayListContact(selectUsers, prefManager.KEY_CONTACTS);
-        dataBinding.toolbar.setSubtitle(String.valueOf(selectUsers.size()) + " contacts");
-        contactsAdapter = new ContactsAdapter(SelectContactActivity.this, inflater, selectUsers, this, is_group_create);
+    private void setRecyclerView(LayoutInflater inflater, ArrayList<Contacts> verifiedUsers) {
+        prefManager.saveArrayListContact(verifiedUsers, prefManager.KEY_CONTACTS);
+        dataBinding.toolbar.setSubtitle(String.valueOf(verifiedUsers.size()) + " contacts");
+        contactsAdapter = new ContactsAdapter(SelectContactActivity.this, inflater, verifiedUsers, this, is_group_create);
         dataBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         dataBinding.rvContactsList.setAdapter(contactsAdapter);
         // white background notification bar
@@ -419,9 +479,9 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             if (contactsAdapter != null) {
                 is_group_create = true;
                 contactsAdapter.setGroupFlaf(true);
-                dataBinding.etGroupName.setVisibility(View.VISIBLE);
+                dataBinding.llEditGroup.setVisibility(View.VISIBLE);
                 dataBinding.llNewGroup.setVisibility(View.GONE);
-                dataBinding.llNewContact.setVisibility(View.GONE);
+              //  dataBinding.llNewContact.setVisibility(View.GONE);
             }
         }
     }
@@ -620,5 +680,50 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Uri selectedMediaUri = data.getData();
+            if (requestCode == IMAGE_PICKER_SELECT) {
+
+                groupImgPath = getRealPathFromURI(selectedMediaUri);
+                Log.d("SelectContactActiivty", "---group image path : " + groupImgPath);
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedMediaUri);
+                    dataBinding.thumbnail.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public String getRealPathFromURI(Uri uri) {
+
+        Log.d(tag,"---"+uri);
+        Bitmap bitmap = null;
+        Uri outPutfileUri = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+           outPutfileUri = Uri.parse(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outPutfileUri.toString();
+
+
+//        String[] projection = { MediaStore.Images.Media.DATA };
+//        @SuppressWarnings("deprecation")
+//        Cursor cursor = managedQuery(uri, projection, null, null, null);
+//        int column_index = cursor
+//                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//        cursor.moveToFirst();
+//        return cursor.getString(column_index);
     }
 }

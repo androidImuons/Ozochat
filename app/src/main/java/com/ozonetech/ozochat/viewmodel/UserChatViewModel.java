@@ -10,12 +10,14 @@ import com.google.gson.JsonArray;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
+import com.ozonetech.ozochat.view.activity.DetailViewUpdateActivity;
 
 import org.json.JSONArray;
 
@@ -28,6 +30,8 @@ public class UserChatViewModel extends ViewModel {
     public CreateGroupInterface groupInterface;
 
     public LiveData<LeftResponseModel> leftGroupResponse;
+    public LiveData<LeftResponseModel> removeMemberResponse;
+    public LiveData<AddMemberResponseModel> addMemberResponse;
     public LiveData<GroupDetailModel> groupDetailResponse;
 
     public void createGroup(Context context, JsonArray arrayListAge) {
@@ -36,6 +40,7 @@ public class UserChatViewModel extends ViewModel {
             commonResponse = new MutableLiveData<CreateGRoupREsponse>();
             //we will load it asynchronously from server in this method
             commonResponse = new CreateGroupRepository().createGroup(arrayListAge,context);
+
             groupInterface.onSuccessCreateGroup(commonResponse);
         }else{
             commonResponse = new CreateGroupRepository().createGroup(arrayListAge,context);
@@ -58,6 +63,21 @@ public class UserChatViewModel extends ViewModel {
     }
 
 
+    //addMemberToGroup
+    public void addMemberToGroup(Context context, JsonArray jsonArray,CreateGroupInterface groupInterface) {
+
+        if (addMemberResponse == null) {
+            addMemberResponse = new MutableLiveData<AddMemberResponseModel>();
+            //we will load it asynchronously from server in this method
+            addMemberResponse = new CreateGroupRepository().addMemberToGroup(jsonArray,context);
+            groupInterface.onSuccessAddToGroup(addMemberResponse);
+        }else{
+            addMemberResponse = new CreateGroupRepository().addMemberToGroup(jsonArray,context);
+            groupInterface.onSuccessAddToGroup(addMemberResponse);
+        }
+    }
+
+
     public void getGroupDetails(Context context, Map<String,String> groupMap,CreateGroupInterface groupInterface) {
 
         if (groupDetailResponse == null) {
@@ -72,4 +92,15 @@ public class UserChatViewModel extends ViewModel {
     }
 
 
+    public void removeMember(Context context, JsonArray jsonArray, CreateGroupInterface groupInterface) {
+        if (removeMemberResponse == null) {
+            removeMemberResponse = new MutableLiveData<LeftResponseModel>();
+            //we will load it asynchronously from server in this method
+            removeMemberResponse = new CreateGroupRepository().removeMember(jsonArray,context);
+            groupInterface.onSuccessRemoveMember(removeMemberResponse);
+        }else{
+            removeMemberResponse = new CreateGroupRepository().removeMember(jsonArray,context);
+            groupInterface.onSuccessRemoveMember(removeMemberResponse);
+        }
+    }
 }

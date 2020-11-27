@@ -32,13 +32,14 @@ public class GroupMembersAdpater extends RecyclerView.Adapter<GroupMembersAdpate
     private ContactsAdapterListener listener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvContactName, tvContactStatus;
+        public TextView tvContactName, tvContactStatus,tvAdmin;
         public CircleImageView thumbnail;
 
         public MyViewHolder(View view) {
             super(view);
             tvContactName = view.findViewById(R.id.tvContactName);
             tvContactStatus = view.findViewById(R.id.tvContactStatus);
+            tvAdmin=view.findViewById(R.id.tvAdmin);
             thumbnail = view.findViewById(R.id.thumbnail);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -71,12 +72,18 @@ public class GroupMembersAdpater extends RecyclerView.Adapter<GroupMembersAdpate
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         final Contacts contact = contactListFiltered.get(position);
         holder.tvContactName.setText(contact.getName());
+
+        if(contact.getAdmin()){
+            holder.tvAdmin.setText("Group Admin");
+        }else{
+            holder.tvAdmin.setText("");
+        }
         holder.tvContactStatus.setText(contact.getStatus());
 
         Glide.with(context)
                 .load(contact.getProfilePicture())
                 .apply(RequestOptions.circleCropTransform())
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(holder.thumbnail);
     }
 

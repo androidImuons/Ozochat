@@ -51,6 +51,9 @@
                 android:textColor="#888888"
                 android:fontFamily="@font/urfa_regular"
                 android:layout_marginTop="5dp"
+                android:maxLength="12"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Seems gcm will take some time"/>
         </LinearLayout>
 

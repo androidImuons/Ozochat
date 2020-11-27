@@ -45,18 +45,24 @@ import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
 import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
+import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.Message;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.ChatRoomThreadAdapter;
 import com.ozonetech.ozochat.view.dialog.MoreOptionDialog;
+import com.ozonetech.ozochat.viewmodel.Contacts;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatViewModel;
+import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +76,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface,ChatRoomThreadAdapter.onMessageContactClick {
+public class UserChatActivity extends BaseActivity implements CommonResponseInterface, CreateGroupInterface, ChatRoomThreadAdapter.onMessageContactClick, ContactsListener {
     private static final String TAG = UserChatActivity.class.getName();
     private static final int IMAGE_PICKER_SELECT = 1;
     private static final int VIDEO_PICKER_SELECT = 2;
@@ -133,10 +139,11 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             if (start_flag.equals("group")) {
                 admin_id = intent.getIntExtra("admin_id", 0);
                 group_id = intent.getStringExtra("chat_room_id");
+                contactProfilePic = intent.getStringExtra("group_image");
                 contactMobileNo = "";
                 contactStatus = "";
-                contactProfilePic = "";
                 chatRoomId = "";
+
             } else {
                 chatRoomId = intent.getStringExtra("chat_room_id");
                 group_id = intent.getStringExtra("chat_room_id");
@@ -193,7 +200,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         toolbarDataBinding.actionBarTitle2.setText(last_seen);
         Glide.with(this)
                 .load(contactProfilePic)
-                .placeholder(R.drawable.profile_icon)
+                .placeholder(R.drawable.person_icon)
                 .into(toolbarDataBinding.conversationContactPhoto);
         toolbarDataBinding.ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,6 +208,11 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 finish();
             }
         });
+
+
+//        Contacts contactsViewModel=new Contacts();
+//        contactsViewModel.uploadCreatedGroupPic(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this,"","GP1606396705869",String.valueOf(100),"content://media/external/images/media/55980");
+
 
         toolbarDataBinding.rlToolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -390,7 +402,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         JSONObject json = new JSONObject();
         try {
             json.put("group_id", group_id);
-            Log.d(tag, "---get message para  group_id : " + group_id);
+            json.put("user_id",prefManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+            Log.d(tag, "---getMessages " + json);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -486,9 +499,12 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     finish();
                 }
                 if (gRoupREsponse.getSuccess()) {
+                    Log.d(tag,"-----on success create group"+gRoupREsponse.getData().get(0));
                     group_id = gRoupREsponse.getData().get(0).getGroupId();
-                    admin_id = gRoupREsponse.getData().get(0).getAdmin_user_id();
+                    admin_id = gRoupREsponse.getData().get(0).getAdminUserId();
                     //triggerSendMessage();
+
+
                     getMessage();
                 }
 
@@ -503,6 +519,16 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
     @Override
     public void onSuccessGroupDetails(LiveData<GroupDetailModel> groupDetailResponase) {
+    }
+
+    @Override
+    public void onSuccessAddToGroup(LiveData<AddMemberResponseModel> addMemberResponse) {
+
+    }
+
+    @Override
+    public void onSuccessRemoveMember(LiveData<LeftResponseModel> removeMemberResponse) {
+
     }
 
 
@@ -616,6 +642,21 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         MoreOptionDialog instance = MoreOptionDialog.getInstance(bundle);
 
         instance.show(getSupportFragmentManager(), instance.getClass().getSimpleName());
+
+    }
+
+    @Override
+    public void onGetContactsSuccess(LiveData<VerifiedContactsModel> verifiedContactsResponse) {
+
+    }
+
+    @Override
+    public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
+
+    }
+
+    @Override
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
     }
 }

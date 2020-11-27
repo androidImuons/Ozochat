@@ -185,7 +185,7 @@ public class SoketService extends Service {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    Log.d(tag, "--message -data--" + args[0]);
+                                    Log.d(tag, "--message -data--" + args);
                                 }
                             }
 
