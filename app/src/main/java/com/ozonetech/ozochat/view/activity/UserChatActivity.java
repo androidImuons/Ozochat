@@ -87,7 +87,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     MyPreferenceManager prefManager;
     ActivityUserChatBinding dataBinding;
     ToolbarConversationBinding toolbarDataBinding;
-   public int groupChat;
+    public int groupChat;
     String contactName;
     String contactMobileNo;
     String contactStatus;
@@ -104,6 +104,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     private int admin_id;
     private String start_flag;
     private String activityFrom;
+    private String userStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +122,16 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         activityFrom = intent.getStringExtra("activityFrom");
         start_flag = intent.getStringExtra("flag");
         contactName = intent.getStringExtra("name");
+        userStatus = intent.getStringExtra("userStatus");
+        //userStatus = "left";
+        if (userStatus.equalsIgnoreCase("Active")) {
+            dataBinding.llBottom.setVisibility(View.VISIBLE);
+            dataBinding.txtLeft.setVisibility(View.GONE);
+        } else {
+            dataBinding.llBottom.setVisibility(View.GONE);
+            dataBinding.txtLeft.setVisibility(View.VISIBLE);
+        }
+
         if (activityFrom.equalsIgnoreCase("MainActivity")) {
             admin_id = intent.getIntExtra("admin_id", 0);
             chatRoomId = intent.getStringExtra("chat_room_id");
@@ -223,7 +234,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 intent.putExtra("last_seen", last_seen);
                 intent.putExtra("contactProfilePic", contactProfilePic);
                 intent.putExtra("groupChat", groupChat);
-                intent.putExtra("group_id",group_id);
+                intent.putExtra("group_id", group_id);
                 intent.putExtra("admin_id", admin_id);
                 startActivity(intent);
             }
@@ -402,7 +413,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         JSONObject json = new JSONObject();
         try {
             json.put("group_id", group_id);
-            json.put("user_id",prefManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
+            json.put("user_id", prefManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
             Log.d(tag, "---getMessages " + json);
             MyApplication.getInstance().getSocket().emit("getMessages", json).on("getMessages", new Emitter.Listener() {
                 @Override
@@ -499,7 +510,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     finish();
                 }
                 if (gRoupREsponse.getSuccess()) {
-                    Log.d(tag,"-----on success create group"+gRoupREsponse.getData().get(0));
+                    Log.d(tag, "-----on success create group" + gRoupREsponse.getData().get(0));
                     group_id = gRoupREsponse.getData().get(0).getGroupId();
                     admin_id = gRoupREsponse.getData().get(0).getAdminUserId();
                     //triggerSendMessage();
@@ -610,8 +621,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     @Override
     public void onSocketConnect(boolean flag) {
         super.onSocketConnect(flag);
-        if (flag){
-            Log.d(tag,"----- connect socket- yes-");
+        if (flag) {
+            Log.d(tag, "----- connect socket- yes-");
             if (start_flag.equals("group")) {
                 getMessage();
             } else {
@@ -623,8 +634,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 }
             }
 
-        }else{
-            Log.d(tag,"-----re connect socket--");
+        } else {
+            Log.d(tag, "-----re connect socket--");
             SoketService.instance.connectConnection();
         }
     }
@@ -635,10 +646,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
         Bundle bundle = new Bundle();
         bundle.putString("name", message.getSender_name());
-        bundle.putString("mobile",message.getSender_mobile());
-        bundle.putString("group",message.getGroupId());
-        bundle.putString("u_id",String.valueOf(message.getUserId()));
-        bundle.putBoolean("is_contact",message.isIs_contact());
+        bundle.putString("mobile", message.getSender_mobile());
+        bundle.putString("group", message.getGroupId());
+        bundle.putString("u_id", String.valueOf(message.getUserId()));
+        bundle.putBoolean("is_contact", message.isIs_contact());
         MoreOptionDialog instance = MoreOptionDialog.getInstance(bundle);
 
         instance.show(getSupportFragmentManager(), instance.getClass().getSimpleName());

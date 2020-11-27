@@ -304,22 +304,21 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setGroupName(jsonObject.getString("group_name"));
                 chatRoom.setUsername(jsonObject.getString("usermobile"));
                 chatRoom.setLastMessage(jsonObject.getString("message"));
-                chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
+                if(chatRoom.getOneToOne() == 0){
+                    chatRoom.setProfilePicture(jsonObject.getString("group_image"));
+                }else{
+                    chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
+                }
                 chatRoom.setTitle(jsonObject.getString("title"));
                 chatRoom.setMobile(jsonObject.getString("mobile"));
                 chatRoom.setFile(jsonObject.getString("file"));
                 chatRoom.setTimestamp(jsonObject.getString("last_seen"));
-                if(chatRoom.getOneToOne() == 0){
-                    chatRoom.setUnreadCount(jsonObject.getInt("msg_counter"));
-                    chatRoom.setStatus("Active");
-                    //chatRoom.setStatus(jsonObject.getString("status"));
-                }else{
-                    chatRoom.setUnreadCount(1);
-                    chatRoom.setStatus("Active");
-                   // chatRoom.setStatus("Active");
+                chatRoom.setUnreadCount(jsonObject.getInt("msg_counter"));
 
-                    //chatRoom.setUnreadCount(jsonObject.getInt("msg_counter"));
-                    //chatRoom.setStatus(jsonObject.getString("status"));
+                if(chatRoom.getOneToOne() == 0){
+                    chatRoom.setStatus("Active");
+                }else{
+                    chatRoom.setStatus("Active");
                 }
 
                 chatRoomList.add(chatRoom);
@@ -507,7 +506,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         Intent intent = new Intent(getActivity(), UserChatActivity.class);
         intent.putExtra("admin_id", chatRoom.getAdminId());
         intent.putExtra("chat_room_id", chatRoom.getGroupId());
-        intent.putExtra("group_image",chatRoom.getGroupImage());
+        intent.putExtra("group_image",chatRoom.getProfilePicture());
         intent.putExtra("group_name",chatRoom.getGroupName());
         intent.putExtra("last_seen",chatRoom.getTimestamp());
         intent.putExtra("mobileNo", chatRoom.getMobile());
@@ -516,7 +515,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         intent.putExtra("uid",chatRoom.getUid());
         intent.putExtra("usermobile",chatRoom.getUsermobile());
         intent.putExtra("name", chatRoom.getUsername());
-        intent.putExtra("status", chatRoom.getStatus());
+        intent.putExtra("status","online");
+        intent.putExtra("userStatus",chatRoom.getStatus());      //Active
         intent.putExtra("flag", "user_chat");
         intent.putExtra("activityFrom", "MainActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);

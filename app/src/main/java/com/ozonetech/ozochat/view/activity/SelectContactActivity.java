@@ -206,6 +206,8 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("profilePic", contact.getProfilePicture());
         intent.putExtra("flag", "contact_user");
         intent.putExtra("activityFrom", "SelectContactActivity");
+        intent.putExtra("userStatus","Active");      //Active
+
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         //  Toast.makeText(getApplicationContext(), "Selected: " + contact.getUid() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
@@ -462,6 +464,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
         intent.putExtra("oneToOne","0");
         intent.putExtra("flag", "group");
         intent.putExtra("activityFrom", "SelectContactActivity");
+        intent.putExtra("userStatus","Active");      //Active
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

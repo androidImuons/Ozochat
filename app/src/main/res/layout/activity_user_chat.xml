@@ -165,6 +165,18 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/txtLeft"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:padding="@dimen/dp5"
+            android:textSize="@dimen/sp14"
+            android:fontFamily="@font/urfa_regular"
+            android:text="You can't send messages to this group because you're no longer a participant."
+            android:layout_alignParentBottom="true"/>
+
     </RelativeLayout>
 
 </layout><!--                <ImageView

@@ -172,6 +172,8 @@ public class MoreOptionDialog extends AppBaseFragment implements ContactsListene
                 intent.putExtra("profilePic", "");
                 intent.putExtra("flag", "contact_user");
                 intent.putExtra("activityFrom", "SelectContactActivity");
+                intent.putExtra("userStatus","Active");      //Active
+
                 // intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 dismiss();
