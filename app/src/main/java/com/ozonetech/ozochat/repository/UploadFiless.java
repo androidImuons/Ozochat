@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.network.FileUtils;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
@@ -26,11 +27,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class UploadFiless {
-    private MutableLiveData<CommonResponse> commonResponseMutableLiveData;
+    private MutableLiveData<UploadResponse> commonResponseMutableLiveData;
     private String tag = "UploadFiless";
-    private CommonResponse commonResponse;
+    private UploadResponse commonResponse;
 
-    public MutableLiveData<CommonResponse> sendFiles(Context context, String user_id, String group_id, String admin_id, ArrayList<String> filepath) {
+    public MutableLiveData<UploadResponse> sendFiles(Context context, String user_id, String group_id, String admin_id, ArrayList<String> filepath) {
         commonResponseMutableLiveData = new MutableLiveData<>();
         MultipartBody.Part body1 = null;
         List<MultipartBody.Part> parts = new ArrayList<>();
@@ -41,7 +42,7 @@ public class UploadFiless {
 
         if (file_size > 10000) {
             Log.d(tag, "-----size send--" + file_size);
-            commonResponse = new CommonResponse();
+            commonResponse = new UploadResponse();
             commonResponse.setCode(404);
             commonResponse.setMessage("Maximum 10 MB Size Allowed");
             commonResponseMutableLiveData.setValue(commonResponse);
@@ -63,11 +64,11 @@ public class UploadFiless {
         map.put("admin_id", reqAdminID);
         map.put("sender_id", reqUserID);
 
-        Call<CommonResponse> call = apiService.uploadFiles(map, parts); //, body
+        Call<UploadResponse> call = apiService.uploadFiles(map, parts); //, body
 
-        call.enqueue(new Callback<CommonResponse>() {
+        call.enqueue(new Callback<UploadResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 if (response.isSuccessful()) {
                     Log.d("response 200", "--2-" + new Gson().toJson(response.body()));
                     commonResponse = response.body();
@@ -80,7 +81,7 @@ public class UploadFiless {
             }
 
             @Override
-            public void onFailure(Call<CommonResponse> call, Throwable t) {
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
                 //Toast.makeText(UserRepository.this.getClass(), "Please check your internet", Toast.LENGTH_SHORT).show();
                 Log.d("response fail", "--on fail-" + t.getMessage());
             }
@@ -103,13 +104,13 @@ public class UploadFiless {
     }
 
 
-    public MutableLiveData<CommonResponse> uploadGroupImage(Context context, String user_id, String group_id, String admin_id, String filepath) {
+    public MutableLiveData<UploadResponse> uploadGroupImage(Context context, String user_id, String group_id, String admin_id, String filepath) {
         commonResponseMutableLiveData = new MutableLiveData<>();
         MultipartBody.Part body1 = null;
         body1 = prepareImageFilePart(context,filepath);
         if (file_size > 10000) {
             Log.d(tag, "-----size send--" + file_size);
-            commonResponse = new CommonResponse();
+            commonResponse = new UploadResponse();
             commonResponse.setCode(404);
             commonResponse.setMessage("Maximum 10 MB Size Allowed");
             commonResponseMutableLiveData.setValue(commonResponse);
@@ -131,11 +132,11 @@ public class UploadFiless {
 //        map.put("admin_id", reqAdminID);
 //        map.put("sender_id", reqUserID);
 
-        Call<CommonResponse> call = apiService.uploadGroupImage(map, body1); //, body
+        Call<UploadResponse> call = apiService.uploadGroupImage(map, body1); //, body
 
-        call.enqueue(new Callback<CommonResponse>() {
+        call.enqueue(new Callback<UploadResponse>() {
             @Override
-            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 if (response.isSuccessful()) {
                     Log.d("response 200", "--Upload Img -" + new Gson().toJson(response.body()));
                     commonResponse = response.body();
@@ -148,7 +149,7 @@ public class UploadFiless {
             }
 
             @Override
-            public void onFailure(Call<CommonResponse> call, Throwable t) {
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
                 //Toast.makeText(UserRepository.this.getClass(), "Please check your internet", Toast.LENGTH_SHORT).show();
                 Log.d(tag, "--on fail-" + t.getMessage());
             }

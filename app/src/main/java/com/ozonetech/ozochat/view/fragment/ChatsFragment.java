@@ -46,6 +46,7 @@ import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
@@ -478,7 +479,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     }
 
     @Override
-    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
     }
 

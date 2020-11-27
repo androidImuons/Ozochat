@@ -14,6 +14,10 @@ public class UploadResponse {
     @Expose
     private String message;
 
+    @SerializedName("code")
+    @Expose
+    private int code;
+
     public Boolean getSuccess() {
         return success;
     }
@@ -36,5 +40,13 @@ public class UploadResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
     }
 }

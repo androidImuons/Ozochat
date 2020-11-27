@@ -21,6 +21,7 @@ import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.repository.CreateGroupRepository;
 import com.ozonetech.ozochat.repository.SelectContactRepository;
 import com.ozonetech.ozochat.repository.UploadFiless;
@@ -106,7 +107,7 @@ public class Contacts extends ViewModel implements Serializable {
 
     public LiveData<CreateGRoupREsponse> createGroupResponse;
     public LiveData<VerifiedContactsModel> commonResponse;
-    public LiveData<CommonResponse> uploadGroupImgResponse;
+    public LiveData<UploadResponse> uploadGroupImgResponse;
 
     public ContactsListener contactsListener;
 
@@ -139,7 +140,7 @@ public class Contacts extends ViewModel implements Serializable {
 
     public void uploadCreatedGroupPic(Context context, ContactsListener contactsListener, String user_id, String group_id, String admin_id, String groupImgPath) {
         if(uploadGroupImgResponse == null){
-            uploadGroupImgResponse = new MutableLiveData<CommonResponse>();
+            uploadGroupImgResponse = new MutableLiveData<UploadResponse>();
             uploadGroupImgResponse = new UploadFiless().uploadGroupImage(context, user_id, group_id, admin_id, groupImgPath);
             contactsListener.onGroupImgUploadSuccess(uploadGroupImgResponse);
         }else{

@@ -39,7 +39,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
@@ -58,6 +57,7 @@ import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.utils.MyDividerItemDecoration;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.GroupMembersAdpater;
@@ -658,7 +658,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     }
 
     @Override
-    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
     }
 

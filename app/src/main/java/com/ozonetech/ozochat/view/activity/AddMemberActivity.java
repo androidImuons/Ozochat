@@ -50,6 +50,7 @@ import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.AddMemberAdapter;
 import com.ozonetech.ozochat.view.adapter.SelectedGrpMemberAdpter;
@@ -396,7 +397,7 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
     }
 
     @Override
-    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
     }
 

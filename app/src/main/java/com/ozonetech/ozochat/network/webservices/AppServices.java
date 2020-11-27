@@ -74,11 +74,11 @@ public interface AppServices {
 
     @Multipart
     @POST("uploadFiles")
-    Call<CommonResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
+    Call<UploadResponse> uploadFiles(@PartMap Map<String, RequestBody> map,
                                     @Part List<MultipartBody.Part> file);
     @Multipart
     @POST("uploadGroupImage")
-    Call<CommonResponse> uploadGroupImage(@PartMap Map<String, RequestBody> map,
+    Call<UploadResponse> uploadGroupImage(@PartMap Map<String, RequestBody> map,
                                      @Part MultipartBody.Part file);
 
     @FormUrlEncoded

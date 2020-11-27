@@ -52,6 +52,7 @@ import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.Message;
+import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.network.SoketService;
@@ -138,9 +139,9 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             if (start_flag.equals("group")) {
                 admin_id = intent.getIntExtra("admin_id", 0);
                 group_id = intent.getStringExtra("chat_room_id");
+                contactProfilePic = intent.getStringExtra("group_image");
                 contactMobileNo = "";
                 contactStatus = "";
-                contactProfilePic = "";
                 chatRoomId = "";
 
             } else {
@@ -655,7 +656,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     }
 
     @Override
-    public void onGroupImgUploadSuccess(LiveData<CommonResponse> uploadGroupImgResponse) {
+    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
 
     }
 }
