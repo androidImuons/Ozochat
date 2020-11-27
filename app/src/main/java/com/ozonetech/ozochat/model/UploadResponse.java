@@ -3,8 +3,6 @@ package com.ozonetech.ozochat.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class UploadResponse {
     @SerializedName("success")
     @Expose
@@ -12,18 +10,6 @@ public class UploadResponse {
     @SerializedName("data")
     @Expose
     private DataObject dataObject;
-
-    public List<DataObject> getDataList() {
-        return dataList;
-    }
-
-    public void setDataList(List<DataObject> dataList) {
-        this.dataList = dataList;
-    }
-
-    @SerializedName("data")
-    @Expose
-    private List<DataObject> dataList;
 
     @SerializedName("message")
     @Expose

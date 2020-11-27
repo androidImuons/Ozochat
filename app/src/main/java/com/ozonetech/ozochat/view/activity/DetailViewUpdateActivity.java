@@ -1,5 +1,6 @@
 package com.ozonetech.ozochat.view.activity;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,6 +54,7 @@ import com.ozonetech.ozochat.databinding.WidgetHeaderViewBinding;
 import com.ozonetech.ozochat.databinding.WidgetHeaderViewTopBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
+import com.ozonetech.ozochat.listeners.UploadFilsListner;
 import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
@@ -68,6 +72,7 @@ import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
 
 import androidx.appcompat.widget.SearchView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -76,7 +81,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener , ContactsListener {
+public class DetailViewUpdateActivity extends BaseActivity implements
+        AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener,
+        ContactsListener {
 
     private boolean isHideToolbarView = false;
     ActivityDetailViewUpdateBinding dataBinding;
@@ -179,19 +186,20 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         dataBinding.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showSnackbar(dataBinding.rlChatDetail, "Clicked Image", Snackbar.LENGTH_SHORT);
+                // showSnackbar(dataBinding.rlChatDetail, "Clicked Image", Snackbar.LENGTH_SHORT);
+                requestGalleryPermission();
             }
         });
 
         contentMainBinding.llAddPeople.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent= new Intent(DetailViewUpdateActivity.this,AddMemberActivity.class);
+                Intent intent = new Intent(DetailViewUpdateActivity.this, AddMemberActivity.class);
                 Bundle args = new Bundle();
-                args.putSerializable("ARRAYLIST",(Serializable)groupMembers);
-                intent.putExtra("BUNDLE",args);
-                intent.putExtra("contactName",contactName);
-                intent.putExtra("group_id",group_id);
+                args.putSerializable("ARRAYLIST", (Serializable) groupMembers);
+                intent.putExtra("BUNDLE", args);
+                intent.putExtra("contactName", contactName);
+                intent.putExtra("group_id", group_id);
                 intent.putExtra("last_seen", last_seen);
                 intent.putExtra("contactProfilePic", contactProfilePic);
                 intent.putExtra("groupChat", groupChat);
@@ -232,6 +240,35 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
 
     }
+
+    private void requestGalleryPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    201);
+        } else {
+            startGalleryIntent();
+        }
+    }
+
+    private int SELECT_FILE = 1;
+
+    private void startGalleryIntent() {
+        Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+//        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        // startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"), SELECT_FILE);
+
+
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, SELECT_FILE);
+    }
+
 
     private void gotoLeftGroup(JsonArray jsonArray) {
         showProgressDialog("Please wait...");
@@ -380,13 +417,13 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     private void setRecyclerView(ArrayList<Contacts> groupMembers) {
 
-        for(int i=0;i<groupMembers.size();i++){
+        for (int i = 0; i < groupMembers.size(); i++) {
             String mobileNo = groupMembers.get(i).getPhone();
-            if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
-                if(groupMembers.get(i).getAdmin()){
+            if (mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))) {
+                if (groupMembers.get(i).getAdmin()) {
                     contentMainBinding.llAddPeople.setVisibility(View.VISIBLE);
                     dataBinding.image.setEnabled(true);
-                }else{
+                } else {
                     dataBinding.image.setEnabled(false);
                     contentMainBinding.llAddPeople.setVisibility(View.GONE);
                 }
@@ -472,10 +509,10 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     @Override
     public void onContactSelected(Contacts contact) {
-        for(int i=0;i<groupMembers.size();i++){
+        for (int i = 0; i < groupMembers.size(); i++) {
             String mobileNo = groupMembers.get(i).getPhone();
-            if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
-                if(groupMembers.get(i).getAdmin()){
+            if (mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))) {
+                if (groupMembers.get(i).getAdmin()) {
                     openDialog(contact);
                 }
             }
@@ -593,8 +630,14 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
             } else {
                 showSnackbar(dataBinding.rlChatDetail, "Until you grant the permission, we canot display the names", Snackbar.LENGTH_SHORT);
             }
+        } else if (requestCode == 201) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                startGalleryIntent();
+            }
+
         }
     }
+
     private void showContacts() {
         // Check the SDK version and whether the permission is already granted or not.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
@@ -636,7 +679,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                                 verifiedUsers.add(contacts);
                             }
 
-                          //  gotoAddMembertoGroup(verifiedUsers);
+                            //  gotoAddMembertoGroup(verifiedUsers);
                             gotoGroupDetails();
                         }
 
@@ -667,7 +710,17 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
     @Override
     public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
-
+        uploadGroupImgResponse.observe(DetailViewUpdateActivity.this, new Observer<UploadResponse>() {
+            @Override
+            public void onChanged(UploadResponse uploadResponse) {
+                if (uploadResponse.getSuccess()) {
+                    Glide.with(DetailViewUpdateActivity.this)
+                            .load(uploadResponse.getDataObject().getImage_url())
+                            .placeholder(R.drawable.person_icon)
+                            .into(dataBinding.image);
+                }
+            }
+        });
     }
 
     class LoadContact extends AsyncTask<Void, Void, Void> {
@@ -736,6 +789,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
         }
     }
+
     public ArrayList<Contacts> removeDuplicates(ArrayList<Contacts> list) {
         Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
 
@@ -752,6 +806,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         final ArrayList newList = new ArrayList(set);
         return newList;
     }
+
     private void sendContactsList(ArrayList<Contacts> selectUserslist) {
         ArrayList<MobileObject> conList = new ArrayList();
         for (int i = 0; i < selectUserslist.size(); i++) {
@@ -791,4 +846,52 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         contactsViewModel.sendContacts(DetailViewUpdateActivity.this, contactsViewModel.contactsListener = this, arrayListAge);
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == SELECT_FILE) {
+
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                    String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+                    Contacts contactsViewModel = new Contacts();
+                    contactsViewModel.contactsListener = (ContactsListener) DetailViewUpdateActivity.this;
+                    contactsViewModel.uploadCreatedGroupPic(DetailViewUpdateActivity.this, contactsViewModel.contactsListener = DetailViewUpdateActivity.this, "", group_id, String.valueOf(admin_id), getRealPathFromURI(Uri.parse(url)));//"content://media/external/images/media/55980"
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        Bitmap bitmap = null;
+        Uri outPutfileUri = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+            outPutfileUri = Uri.parse(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outPutfileUri.toString();
+
+
+//        String[] projection = { MediaStore.Images.Media.DATA };
+//        @SuppressWarnings("deprecation")
+//        Cursor cursor = managedQuery(uri, projection, null, null, null);
+//        int column_index = cursor
+//                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//        cursor.moveToFirst();
+//        return cursor.getString(column_index);
+    }
 }
