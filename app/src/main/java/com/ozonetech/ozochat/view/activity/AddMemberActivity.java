@@ -300,6 +300,11 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
     }
 
     @Override
+    public void onSuccessDeleteGroup(LiveData<LeftResponseModel> deleteGroupResponse) {
+
+    }
+
+    @Override
     public void onGetContactsSuccess(LiveData<VerifiedContactsModel> verifiedContactsResponse) {
         verifiedContactsResponse.observe(AddMemberActivity.this, new Observer<VerifiedContactsModel>() {
             @Override

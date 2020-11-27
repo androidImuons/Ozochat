@@ -31,6 +31,7 @@ public class UserChatViewModel extends ViewModel {
 
     public LiveData<LeftResponseModel> leftGroupResponse;
     public LiveData<LeftResponseModel> removeMemberResponse;
+    public LiveData<LeftResponseModel> deleteGroupResponse;
     public LiveData<AddMemberResponseModel> addMemberResponse;
     public LiveData<GroupDetailModel> groupDetailResponse;
 
@@ -101,6 +102,18 @@ public class UserChatViewModel extends ViewModel {
         }else{
             removeMemberResponse = new CreateGroupRepository().removeMember(jsonArray,context);
             groupInterface.onSuccessRemoveMember(removeMemberResponse);
+        }
+    }
+
+    public void deleteGroup(Context context, JsonArray jsonArray, CreateGroupInterface groupInterface) {
+        if (deleteGroupResponse == null) {
+            deleteGroupResponse = new MutableLiveData<LeftResponseModel>();
+            //we will load it asynchronously from server in this method
+            deleteGroupResponse = new CreateGroupRepository().deleteGroup(jsonArray,context);
+            groupInterface.onSuccessDeleteGroup(deleteGroupResponse);
+        }else{
+            deleteGroupResponse = new CreateGroupRepository().deleteGroup(jsonArray,context);
+            groupInterface.onSuccessDeleteGroup(deleteGroupResponse);
         }
     }
 }

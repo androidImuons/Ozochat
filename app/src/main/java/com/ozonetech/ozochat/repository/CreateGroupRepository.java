@@ -38,6 +38,9 @@ public class CreateGroupRepository {
     private MutableLiveData<LeftResponseModel> removeMemberResponse;
     LeftResponseModel removeMemberResponseModel;
 
+    private MutableLiveData<LeftResponseModel> deleteGroupResponse;
+    LeftResponseModel deleteGroupResponseModel;
+
     private MutableLiveData<AddMemberResponseModel> addMemberResponse;
     AddMemberResponseModel addMemberResponseModel;
 
@@ -199,5 +202,36 @@ public class CreateGroupRepository {
             }
         });
         return removeMemberResponse;
+    }
+
+    public LiveData<LeftResponseModel> deleteGroup(JsonArray jsonArray, Context context) {
+
+        Log.d(tag, "-----row body--" + jsonArray.toString());
+        deleteGroupResponse = new MutableLiveData<>();
+        MyPreferenceManager myPreferenceManager = new MyPreferenceManager(context);
+        AppServices apiService = ServiceGenerator.createService(AppServices.class, myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_TOKEN));
+        apiService.deleteGroup(jsonArray).enqueue(new Callback<LeftResponseModel>() {
+            @Override
+            public void onResponse(Call<LeftResponseModel> call, Response<LeftResponseModel> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    deleteGroupResponseModel = response.body();
+                    deleteGroupResponse.setValue(deleteGroupResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                    deleteGroupResponseModel = response.body();
+                    deleteGroupResponse.setValue(deleteGroupResponseModel);
+                    Log.d(tag, "- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(Call<LeftResponseModel> call, Throwable t) {
+                Log.d(tag, "--------------" + t.getMessage());
+            }
+        });
+        return deleteGroupResponse;
     }
 }

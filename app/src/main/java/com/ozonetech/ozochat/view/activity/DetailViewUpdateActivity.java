@@ -201,6 +201,24 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
             }
         });
 
+        contentMainBinding.cvDeleteGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //"[ {"member":"9922803527"}, {"groupId":"GP1606454875901"} ]"
+
+                JsonArray jsonArray = new JsonArray();
+                JsonObject member = new JsonObject();
+                member.addProperty("member", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
+                JsonObject groupId = new JsonObject();
+                groupId.addProperty("groupId", group_id);
+                jsonArray.add(member);
+                jsonArray.add(groupId);
+
+                goToDeleteGroup(jsonArray);
+
+            }
+        });
 
         contentMainBinding.cvExitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -231,6 +249,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         //gotoGroupDetails();
 
 
+    }
+
+    private void goToDeleteGroup(JsonArray jsonArray) {
+        showProgressDialog("Please wait...");
+        chatViewModel.deleteGroup(DetailViewUpdateActivity.this, jsonArray, chatViewModel.groupInterface = this);
     }
 
     private void gotoLeftGroup(JsonArray jsonArray) {
@@ -281,6 +304,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
                 try {
                     if (leftResponseModel.getSuccess()) {
+                        gotoGroupDetails();
                         showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
                     } else {
                         showSnackbar(dataBinding.rlChatDetail, leftResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
@@ -378,7 +402,45 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
         });
     }
 
+    @Override
+    public void onSuccessDeleteGroup(LiveData<LeftResponseModel> deleteGroupResponse) {
+        deleteGroupResponse.observe(DetailViewUpdateActivity.this, new Observer<LeftResponseModel>() {
+            @Override
+            public void onChanged(LeftResponseModel deleteGroupResponseModel) {
+                Log.d("GroupDetailModel", "--delete Group : Code" + deleteGroupResponse.toString());
+                hideProgressDialog();
+
+                try {
+                    if (deleteGroupResponseModel.getSuccess()) {
+                        showSnackbar(dataBinding.rlChatDetail, deleteGroupResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                        Intent intent=new Intent(DetailViewUpdateActivity.this,MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        showSnackbar(dataBinding.rlChatDetail, deleteGroupResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
+                    }
+                } catch (Exception e) {
+                } finally {
+                    hideProgressDialog();
+                }
+            }
+        });
+    }
+
     private void setRecyclerView(ArrayList<Contacts> groupMembers) {
+
+        String userMobileNo = myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE);
+        for(int i=0;i<groupMembers.size();i++){
+            if(groupMembers.get(i).getPhone().equalsIgnoreCase(userMobileNo)){
+                contentMainBinding.cvExitGroup.setVisibility(View.VISIBLE);
+                contentMainBinding.cvDeleteGroup.setVisibility(View.GONE);
+            }else{
+                contentMainBinding.cvExitGroup.setVisibility(View.GONE);
+                contentMainBinding.cvDeleteGroup.setVisibility(View.VISIBLE);
+            }
+
+        }
 
         for(int i=0;i<groupMembers.size();i++){
             String mobileNo = groupMembers.get(i).getPhone();
