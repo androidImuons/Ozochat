@@ -400,7 +400,7 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
                                 String admin_id = String.valueOf(groupCreateRecord.getAdminUserId());
 
                                 gotoUploadGroupPic(user_id,group_id,admin_id,groupImgPath);
-                                callChatActivity(createGRoupREsponse.getData().get(0));
+                              //  callChatActivity(createGRoupREsponse.getData().get(0));
 
 
                             }

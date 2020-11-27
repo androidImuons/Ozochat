@@ -131,13 +131,13 @@ public class UploadFiless {
         AppServices apiService = ServiceGenerator.createService(AppServices.class, session.getUserDetails().get(session.KEY_TOKEN));
 
         RequestBody reqGroupId = RequestBody.create(MultipartBody.FORM, group_id);
-        RequestBody reqUserID = RequestBody.create(MultipartBody.FORM, user_id);
-        RequestBody reqAdminID = RequestBody.create(MultipartBody.FORM, admin_id);
+      //  RequestBody reqUserID = RequestBody.create(MultipartBody.FORM, user_id);
+      //  RequestBody reqAdminID = RequestBody.create(MultipartBody.FORM, admin_id);
 
         HashMap<String, RequestBody> map = new HashMap<>();
         map.put("group_id", reqGroupId);
-        map.put("admin_id", reqAdminID);
-        map.put("sender_id", reqUserID);
+       // map.put("admin_id", reqAdminID);
+        //map.put("sender_id", reqUserID);
 
         Call<CommonResponse> call = apiService.uploadGroupImage(map, body1); //, body
 
