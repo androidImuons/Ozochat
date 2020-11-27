@@ -48,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.model.SelectionImageList;
 import com.ozonetech.ozochat.network.RunTimePermission;
 
 import java.io.File;
@@ -70,6 +71,8 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
     int MAX_VIDEO_SIZE_UPLOAD = 25; //MB
     RecyclerView peekRecyclerView;
     ArrayList<String> list;
+
+
 
 
     @Override
@@ -194,7 +197,9 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 98 && resultCode == 99){
            // list.get(data.getIntExtra("pos" , 0));
-            Log.i("getImagePath::" , list.get(data.getIntExtra("pos" , 0)));
+            data.getSerializableExtra("pos");
+            //Log.i("getImagePath::" , list.get(data.getIntExtra("pos" , 0)));
+            //Log.i("getImagePath::" , list.get(data.getIntExtra("pos" , 0)));
         }
     }
 
