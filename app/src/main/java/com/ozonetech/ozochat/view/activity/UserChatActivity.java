@@ -394,17 +394,15 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.d(tag, "---send message to get meesgae --" + args[0]);
                     getMessage();
+                    Log.d(tag, "---send message to get meesgae --" + args[0]);
                 }
             });
         } catch (JSONException e) {
             e.printStackTrace();
         }
         dataBinding.message.setText("");
-
     }
-
     private void getMessage() {
         if (MyApplication.getInstance().iSocket.connected()) {
             Log.d(tag, "-----is connectttd");
