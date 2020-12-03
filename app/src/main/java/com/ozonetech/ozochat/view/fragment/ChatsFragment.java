@@ -317,6 +317,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
                 if(chatRoom.getOneToOne() == 0){
                     chatRoom.setStatus("Active");
+                    //                   // chatRoom.setStatus(jsonObject.getString("status"));
                 }else{
                     chatRoom.setStatus("Active");
                 }

@@ -81,8 +81,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class DetailViewUpdateActivity extends BaseActivity implements
-        AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener,
+public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener,
         ContactsListener {
 
     private boolean isHideToolbarView = false;
@@ -479,7 +478,6 @@ public class DetailViewUpdateActivity extends BaseActivity implements
 
         }
 
-        for(int i=0;i<groupMembers.size();i++){
         for (int i = 0; i < groupMembers.size(); i++) {
             String mobileNo = groupMembers.get(i).getPhone();
             if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
