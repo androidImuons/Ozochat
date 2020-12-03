@@ -36,6 +36,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.databinding.FragmentChatsBinding;
@@ -80,6 +81,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     MyPreferenceManager myPreferenceManager;
     private Contacts contactsViewModel;
     private LinearLayoutManager linearLayout;
+    private ChatDatabase chatDatabase;
+    ArrayList<ChatRoom> arrlistofOptions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,21 +94,26 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                              Bundle savedInstanceState) {
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_chats, container, false);
         userChatListModel = ViewModelProviders.of(ChatsFragment.this).get(UserChatListModel.class);
+        chatDatabase = ChatDatabase.getInstance(getContext());
         myPreferenceManager = new MyPreferenceManager(getActivity());
         View view = dataBinding.getRoot();
         dataBinding.setLifecycleOwner(this);
         prefManager = new MyPreferenceManager(getContext());
         selectUsers = new ArrayList<Contacts>();
+
         if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
             requestContactPermission();
         }else{
             getrecentChat(0);
         }
+
         linearLayout= new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycelScroll();
-
+        getAllLocalData();
         return view;
     }
+
+
 
     private void recycelScroll() {
 
@@ -174,10 +182,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
                 }
             }
-            mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
 
-            dataBinding.recyclerView.setLayoutManager(linearLayout);
-            dataBinding.recyclerView.setAdapter(mAdapter);
+            updateDataBase(chatRoomList);
+
 /*
             dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
 */
@@ -215,6 +222,62 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 */
 
 
+    }
+
+    private void updateDataBase(ArrayList<ChatRoom> chatRoomList) {
+        class UpdateDataBase extends AsyncTask<Void, Void, Void>{
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                if(chatRoomList.size() != 0) {
+                    chatDatabase.getInstance(getContext()).chatRoomDao().deleteAll();
+                    for (ChatRoom chatRoom : chatRoomList)
+                        chatDatabase.getInstance(getContext()).chatRoomDao().insert(chatRoom);
+
+                    if(chatDatabase.getInstance(getContext()).chatRoomDao().getAll().size() != 0) {
+
+                    }
+                }
+
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                ArrayList<ChatRoom> arrlistofOptions =
+                        new ArrayList<ChatRoom>(chatDatabase.getInstance(getContext()).chatRoomDao().getAll());
+                showRecycleView(arrlistofOptions);
+            //    chatDatabase.getInstance(getContext()).chatRoomDao().getAll();
+            }
+        }
+        UpdateDataBase ut = new UpdateDataBase();
+        ut.execute();
+    }
+
+    private void getAllLocalData() {
+        if(chatDatabase.getInstance(getContext()).chatRoomDao().getAll().size() != 0){
+            ArrayList<ChatRoom> arrlistofOptions =
+                    new ArrayList<ChatRoom>(chatDatabase.getInstance(getContext()).chatRoomDao().getAll());
+            showRecycleView(arrlistofOptions);
+        }
+       /* AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                // Insert Data
+
+            }
+        });*/
+
+    }
+    private void showRecycleView( ArrayList<ChatRoom> chatRooms) {
+    /*    ArrayList<ChatRoom> arrlistofOptions =
+                new ArrayList<ChatRoom>(chatDatabase.getInstance(getContext()).chatRoomDao().getAll());
+        //ArrayList <ChatRoom> chatRoomArrayList = chatDatabase.getInstance(getContext()).chatRoomDao().getAll();*/
+        mAdapter = new ChatRoomsAdapter(getActivity(),chatRooms ,ChatsFragment.this);
+        dataBinding.recyclerView.setLayoutManager(linearLayout);
+        dataBinding.recyclerView.setAdapter(mAdapter);
     }
 
 
