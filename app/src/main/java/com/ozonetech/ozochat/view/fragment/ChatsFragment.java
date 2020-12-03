@@ -178,8 +178,11 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
                 }
             }
+        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
 
-            updateDataBase(chatRoomList);
+        dataBinding.recyclerView.setLayoutManager(linearLayout);
+        dataBinding.recyclerView.setAdapter(mAdapter);
+            //updateDataBase(chatRoomList);
 
 /*
             dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
