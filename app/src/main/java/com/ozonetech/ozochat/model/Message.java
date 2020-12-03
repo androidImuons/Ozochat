@@ -1,31 +1,50 @@
 package com.ozonetech.ozochat.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+@Entity
 public class Message implements Serializable {
+
+    @PrimaryKey(autoGenerate = true)
+    private int rendId;
 
     @SerializedName("id")
     @Expose
     private Integer id;
+
+    @ColumnInfo(name = "group_id")
     @SerializedName("group_id")
     @Expose
     private String groupId;
+
+    @ColumnInfo(name = "user_id")
     @SerializedName("user_id")
     @Expose
     private Integer userId;
+
+    @ColumnInfo(name = "message")
     @SerializedName("message")
     @Expose
     private String message;
+
+    @ColumnInfo(name = "created")
     @SerializedName("created")
     @Expose
     private String created;
 
+    @ColumnInfo(name = "sender_mobile")
     @SerializedName("sender_mobile")
     @Expose
     private String sender_mobile;
+
+    @ColumnInfo(name = "sender_name")
     @SerializedName("sender_name")
     @Expose
     private String sender_name;
@@ -96,4 +115,11 @@ public class Message implements Serializable {
         this.created = created;
     }
 
+    public int getRendId() {
+        return rendId;
+    }
+
+    public void setRendId(int rendId) {
+        this.rendId = rendId;
+    }
 }

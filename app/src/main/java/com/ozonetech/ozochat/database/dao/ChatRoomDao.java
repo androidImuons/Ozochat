@@ -8,6 +8,7 @@ import androidx.room.Update;
 
 import com.ozonetech.ozochat.database.entity.ChatRoom;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -19,10 +20,14 @@ public interface ChatRoomDao {
     @Insert
     void insert(ChatRoom chatRoom);
 
+
     @Delete
     void delete(ChatRoom chatRoom);
 
     @Update
     void update(ChatRoom chatRoom);
+
+    @Query("DELETE FROM chatroom")
+    void deleteAll();
 
 }

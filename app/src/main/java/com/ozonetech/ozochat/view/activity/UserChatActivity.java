@@ -6,11 +6,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -41,6 +43,7 @@ import io.socket.emitter.Emitter;
 
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.databinding.ActivityUserChatBinding;
 import com.ozonetech.ozochat.databinding.ToolbarConversationBinding;
@@ -56,6 +59,7 @@ import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.network.AppCommon;
 import com.ozonetech.ozochat.network.MyPreference;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
@@ -109,7 +113,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     private String start_flag;
     private String activityFrom;
     private String userStatus;
-
+    private ChatDatabase chatDatabase;
+    String getGroup_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,6 +175,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 }
             }
         }
+        chatDatabase = ChatDatabase.getInstance(this);
         init();
     }
 
@@ -211,6 +217,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     }
 
     private void init() {
+        messageArrayList = new ArrayList<>();
         toolbarDataBinding.actionBarTitle1.setText(contactName);
         toolbarDataBinding.actionBarTitle2.setText(last_seen);
         Glide.with(this)
@@ -359,7 +366,11 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 checkGroup();
             }
         }
+       // getAllLocalData();
     }
+
+
+
 
 
     private void sendMessage() {
@@ -434,13 +445,32 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
                 }
             });
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
     private void setRecyclerView(JSONArray data) {
+      /*  String newGroupId = addChar(group_id, 0);
+        newGroupId = addChar(newGroupId, newGroupId.length());
+
+        SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                "DELETE FROM message where group_id = "+newGroupId);
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().deleteGroupChat(query);
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+        });*/
         messageArrayList = new ArrayList<>();
         for (int i = data.length() - 1; i >= 0; i--) {
             try {
@@ -454,20 +484,66 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     message.setCreated(messageObj.getString("created"));
                     message.setSender_mobile(messageObj.getString("sender_mobile"));
                     message.setSender_name(messageObj.getString("sender_name"));
-                    messageArrayList.add(message);
+                    //chatDatabase.getInstance(this).chatMessageDao().insert(message);
+                   messageArrayList.add(message);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        //getAllLocalData();
+        showData();
+
+
+    }
+
+    private void showData() {
         String selfUserId = MyApplication.getInstance().getPrefManager().getUserId();
         mAdapter = new ChatRoomThreadAdapter(UserChatActivity.this, messageArrayList, selfUserId);
         dataBinding.recyclerView.setLayoutManager(new LinearLayoutManager(UserChatActivity.this, LinearLayoutManager.VERTICAL, false));
         dataBinding.recyclerView.setAdapter(mAdapter);
         dataBinding.recyclerView.scrollToPosition(messageArrayList.size() - 1);
+    }
+
+    private void getAllLocalData() {
+        String newGroupId = addChar(group_id, 0);
+        newGroupId = addChar(newGroupId, newGroupId.length());
+
+        SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                "SELECT * FROM message where group_id = "+newGroupId);
+      /*  AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                // Insert Data
+
+
+            }
+
+        });*/
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                if(chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().getGroupList(query).size() != 0){
+                    messageArrayList =
+                            new ArrayList<Message>(chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().getGroupList(query));
+
+                }
+               showData();
+
+
+            }
+        });
+        //showData();
 
     }
 
+    public String addChar(String str,  int position) {
+        StringBuilder sb = new StringBuilder(str);
+        sb.insert(position, "'");
+        return sb.toString();
+    }
 
     @Override
     public void onBackPressed() {
