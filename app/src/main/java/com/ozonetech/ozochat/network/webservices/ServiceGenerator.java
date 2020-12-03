@@ -30,11 +30,11 @@ public class ServiceGenerator {
 //    https://ozochatsocketlive.ozonetech.biz
 
 
-   // public static String API_BASE_URL = "https://ozochatapireplica.ozonetech.biz/";// replica
-    public static String API_BASE_URL = "https://ozochatapilive.ozonetech.biz/";// live
+    public static String API_BASE_URL = "https://ozochatapireplica.ozonetech.biz/";// replica
+   // public static String API_BASE_URL = "https://ozochatapilive.ozonetech.biz/";// live
 
-   // public static String SOCKETURL = "https://ozochatsocketreplica.ozonetech.biz/";// replica socket
-    public static String SOCKETURL="https://ozochatsocketlive.ozonetech.biz/";// Live socket
+    public static String SOCKETURL = "https://ozochatsocketreplica.ozonetech.biz/";// replica socket
+   // public static String SOCKETURL="https://ozochatsocketlive.ozonetech.biz/";// Live socket
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)

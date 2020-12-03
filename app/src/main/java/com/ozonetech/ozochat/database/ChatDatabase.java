@@ -28,6 +28,6 @@ public abstract class ChatDatabase extends RoomDatabase {
 
         //creating the app database with Room database builder
         //MyToDos is the name of the database
-         return chatDatabase = Room.databaseBuilder(mCtx, ChatDatabase.class, "OzoChztDB").allowMainThreadQueries().build();
+         return chatDatabase = Room.databaseBuilder(mCtx, ChatDatabase.class, "OzoChatDB").allowMainThreadQueries().build();
     }
 }
