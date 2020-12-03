@@ -109,7 +109,7 @@ public class SoketService extends Service {
                 @Override
                 public void run() {
                     // Log.d("socketid","---"+args[0]);
-                    Log.d("socketid", "---" + signalApplication.getSocket().id());
+                    Log.d(tag, "- connection create --" + signalApplication.getSocket().id());
                     if (socketConnectionListner != null) {
                         socketConnectionListner.onSocketConnect(true);
                     }
@@ -122,7 +122,13 @@ public class SoketService extends Service {
                         e.printStackTrace();
                     }
 
-                    signalApplication.getSocket().emit("updateStatus", jsonObject);
+                    signalApplication.getSocket().emit("updateStatus", jsonObject).
+                            on("updateStatus", new Emitter.Listener() {
+                                @Override
+                                public void call(Object... args) {
+                                    Log.d(tag,"----update status on connection--");
+                                }
+                            });
                 }
             });
         }
@@ -145,7 +151,13 @@ public class SoketService extends Service {
                         e.printStackTrace();
                     }
 
-                    signalApplication.getSocket().emit("updateStatus", jsonObject);
+                    signalApplication.getSocket().emit("updateStatus", jsonObject).
+                            on("updateStatus", new Emitter.Listener() {
+                                @Override
+                                public void call(Object... args) {
+                                    Log.d(tag,"----update status on connection error--");
+                                }
+                            });
                 }
             });
         }
@@ -169,7 +181,13 @@ public class SoketService extends Service {
                         e.printStackTrace();
                     }
 
-                    signalApplication.getSocket().emit("updateStatus", jsonObject);
+                    signalApplication.getSocket().emit("updateStatus", jsonObject).
+                            on("updateStatus", new Emitter.Listener() {
+                                @Override
+                                public void call(Object... args) {
+                                    Log.d(tag,"----update status on diconnect--");
+                                }
+                            });
                 }
             });
         }

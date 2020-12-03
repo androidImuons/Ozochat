@@ -449,7 +449,7 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
                 try {
                     if (deleteGroupResponseModel.getSuccess()) {
                         showSnackbar(dataBinding.rlChatDetail, deleteGroupResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
-                        Intent intent=new Intent(DetailViewUpdateActivity.this,MainActivity.class);
+                        Intent intent = new Intent(DetailViewUpdateActivity.this, MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
@@ -467,11 +467,11 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
     private void setRecyclerView(ArrayList<Contacts> groupMembers) {
 
         String userMobileNo = myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE);
-        for(int i=0;i<groupMembers.size();i++){
-            if(groupMembers.get(i).getPhone().equalsIgnoreCase(userMobileNo)){
+        for (int i = 0; i < groupMembers.size(); i++) {
+            if (groupMembers.get(i).getPhone().equalsIgnoreCase(userMobileNo)) {
                 contentMainBinding.cvExitGroup.setVisibility(View.VISIBLE);
                 contentMainBinding.cvDeleteGroup.setVisibility(View.GONE);
-            }else{
+            } else {
                 contentMainBinding.cvExitGroup.setVisibility(View.GONE);
                 contentMainBinding.cvDeleteGroup.setVisibility(View.VISIBLE);
             }
@@ -480,471 +480,471 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 
         for (int i = 0; i < groupMembers.size(); i++) {
             String mobileNo = groupMembers.get(i).getPhone();
-            if(mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))){
-                if(groupMembers.get(i).getAdmin()){
+            if (mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))) {
+                if (groupMembers.get(i).getAdmin()) {
                     contentMainBinding.llAddPeople.setVisibility(View.VISIBLE);
                     dataBinding.image.setEnabled(true);
-                }else{
+                } else {
                     dataBinding.image.setEnabled(false);
                     contentMainBinding.llAddPeople.setVisibility(View.GONE);
                 }
             }
         }
+            contentMainBinding.searchtoolbar.setTitle(String.valueOf(groupMembers.size()) + " participants");
+            // white background notification bar
+            whiteNotificationBar(contentMainBinding.rvContactsList);
 
-        contentMainBinding.searchtoolbar.setTitle(String.valueOf(groupMembers.size()) + " participants");
-        // white background notification bar
-        whiteNotificationBar(contentMainBinding.rvContactsList);
+            groupMembersAdpater = new GroupMembersAdpater(DetailViewUpdateActivity.this, groupMembers, this);
+            contentMainBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            contentMainBinding.rvContactsList.setItemAnimator(new DefaultItemAnimator());
+            contentMainBinding.rvContactsList.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
+            contentMainBinding.rvContactsList.setAdapter(groupMembersAdpater);
 
-        groupMembersAdpater = new GroupMembersAdpater(DetailViewUpdateActivity.this, groupMembers, this);
-        contentMainBinding.rvContactsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        contentMainBinding.rvContactsList.setItemAnimator(new DefaultItemAnimator());
-        contentMainBinding.rvContactsList.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
-        contentMainBinding.rvContactsList.setAdapter(groupMembersAdpater);
+        }
 
-    }
+        @Override
+        public boolean onCreateOptionsMenu (Menu menu){
+            getMenuInflater().inflate(R.menu.menu_main, menu);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+            // Associate searchable configuration with the SearchView
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            searchView = (SearchView) menu.findItem(R.id.action_search)
+                    .getActionView();
+            searchView.setSearchableInfo(searchManager
+                    .getSearchableInfo(getComponentName()));
+            searchView.setMaxWidth(Integer.MAX_VALUE);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager
-                .getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
+            // listening to search query text change
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    // filter recycler view when query submitted
+                    groupMembersAdpater.getFilter().filter(query);
+                    return false;
+                }
 
-        // listening to search query text change
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // filter recycler view when query submitted
-                groupMembersAdpater.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                // filter recycler view when text is changed
-                groupMembersAdpater.getFilter().filter(query);
-                return false;
-            }
-        });
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_search) {
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    // filter recycler view when text is changed
+                    groupMembersAdpater.getFilter().filter(query);
+                    return false;
+                }
+            });
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+        @Override
+        public boolean onOptionsItemSelected (MenuItem item){
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
 
-    @Override
-    public void onBackPressed() {
-        // close search view on back button pressed
-        if (!searchView.isIconified()) {
-            searchView.setIconified(true);
-            return;
-        }
-        super.onBackPressed();
-    }
-
-    private void whiteNotificationBar(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int flags = view.getSystemUiVisibility();
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            view.setSystemUiVisibility(flags);
-            getWindow().setStatusBarColor(Color.WHITE);
-        }
-    }
-
-    @Override
-    public void onContactSelected(Contacts contact) {
-        for (int i = 0; i < groupMembers.size(); i++) {
-            String mobileNo = groupMembers.get(i).getPhone();
-            if (mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))) {
-                if (groupMembers.get(i).getAdmin()) {
-                    openDialog(contact);
-                }
-            }
-        }
-
-    }
-
-    private void openDialog(Contacts contactPerson) {
-
-
-        LayoutInflater inflater = (LayoutInflater)
-                getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.group_action_menu, null);
-
-        // create the popup window
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        popupWindow = new PopupWindow(popupView, width, height, focusable);
-
-        TextView tvRemove = popupView.findViewById(R.id.tvRemove);
-        tvRemove.setText("Remove " + contactPerson.getName());
-        tvRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //[ {"admin":9922803527}, {"member": [ {"mobile": "7087741181"} ]}, {"groupId":"GP1606199463412"} ]
-
-                JsonArray jsonArray = new JsonArray();
-
-                JsonObject group_admin = new JsonObject();
-                group_admin.addProperty("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
-
-
-                JsonArray memerArray = new JsonArray();
-                JsonObject member = new JsonObject();
-                member.addProperty("mobile", contactPerson.getPhone());
-                memerArray.add(member);
-                JsonObject memersObjeect = new JsonObject();
-                memersObjeect.add("member", memerArray);
-
-                JsonObject groupId = new JsonObject();
-                groupId.addProperty("groupId", group_id);
-
-                jsonArray.add(group_admin);
-                jsonArray.add(memersObjeect);
-                jsonArray.add(groupId);
-
-                gotoRemoveMember(jsonArray);
-
-            }
-        });
-
-
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
-        popupWindow.showAtLocation(dataBinding.rlChatDetail, Gravity.CENTER, 0, 0);
-
-        // dismiss the popup window when touched
-        popupView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                popupWindow.dismiss();
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_search) {
                 return true;
             }
-        });
 
-    }
+            return super.onOptionsItemSelected(item);
+        }
 
-    private void gotoRemoveMember(JsonArray jsonArray) {
-        showProgressDialog("Please wait...");
-        chatViewModel.removeMember(DetailViewUpdateActivity.this, jsonArray, chatViewModel.groupInterface = this);
-    }
+        @Override
+        public void onBackPressed () {
+            // close search view on back button pressed
+            if (!searchView.isIconified()) {
+                searchView.setIconified(true);
+                return;
+            }
+            super.onBackPressed();
+        }
 
-    public void requestContactPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        android.Manifest.permission.READ_CONTACTS)) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Read Contacts permission");
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setMessage("Please enable access to contacts.");
-                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @TargetApi(Build.VERSION_CODES.M)
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            requestPermissions(
-                                    new String[]
-                                            {android.Manifest.permission.READ_CONTACTS}
-                                    , PERMISSIONS_REQUEST_READ_CONTACTS);
-                        }
-                    });
-                    builder.show();
+        private void whiteNotificationBar (View view){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int flags = view.getSystemUiVisibility();
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                view.setSystemUiVisibility(flags);
+                getWindow().setStatusBarColor(Color.WHITE);
+            }
+        }
+
+        @Override
+        public void onContactSelected (Contacts contact){
+            for (int i = 0; i < groupMembers.size(); i++) {
+                String mobileNo = groupMembers.get(i).getPhone();
+                if (mobileNo.equalsIgnoreCase(myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_MOBILE))) {
+                    if (groupMembers.get(i).getAdmin()) {
+                        openDialog(contact);
+                    }
+                }
+            }
+
+        }
+
+        private void openDialog (Contacts contactPerson){
+
+
+            LayoutInflater inflater = (LayoutInflater)
+                    getSystemService(LAYOUT_INFLATER_SERVICE);
+            View popupView = inflater.inflate(R.layout.group_action_menu, null);
+
+            // create the popup window
+            int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            boolean focusable = true; // lets taps outside the popup also dismiss it
+            popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+            TextView tvRemove = popupView.findViewById(R.id.tvRemove);
+            tvRemove.setText("Remove " + contactPerson.getName());
+            tvRemove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //[ {"admin":9922803527}, {"member": [ {"mobile": "7087741181"} ]}, {"groupId":"GP1606199463412"} ]
+
+                    JsonArray jsonArray = new JsonArray();
+
+                    JsonObject group_admin = new JsonObject();
+                    group_admin.addProperty("admin", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE));
+
+
+                    JsonArray memerArray = new JsonArray();
+                    JsonObject member = new JsonObject();
+                    member.addProperty("mobile", contactPerson.getPhone());
+                    memerArray.add(member);
+                    JsonObject memersObjeect = new JsonObject();
+                    memersObjeect.add("member", memerArray);
+
+                    JsonObject groupId = new JsonObject();
+                    groupId.addProperty("groupId", group_id);
+
+                    jsonArray.add(group_admin);
+                    jsonArray.add(memersObjeect);
+                    jsonArray.add(groupId);
+
+                    gotoRemoveMember(jsonArray);
+
+                }
+            });
+
+
+            // show the popup window
+            // which view you pass in doesn't matter, it is only used for the window tolken
+            popupWindow.showAtLocation(dataBinding.rlChatDetail, Gravity.CENTER, 0, 0);
+
+            // dismiss the popup window when touched
+            popupView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    popupWindow.dismiss();
+                    return true;
+                }
+            });
+
+        }
+
+        private void gotoRemoveMember (JsonArray jsonArray){
+            showProgressDialog("Please wait...");
+            chatViewModel.removeMember(DetailViewUpdateActivity.this, jsonArray, chatViewModel.groupInterface = this);
+        }
+
+        public void requestContactPermission () {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            android.Manifest.permission.READ_CONTACTS)) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Read Contacts permission");
+                        builder.setPositiveButton(android.R.string.ok, null);
+                        builder.setMessage("Please enable access to contacts.");
+                        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @TargetApi(Build.VERSION_CODES.M)
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                requestPermissions(
+                                        new String[]
+                                                {android.Manifest.permission.READ_CONTACTS}
+                                        , PERMISSIONS_REQUEST_READ_CONTACTS);
+                            }
+                        });
+                        builder.show();
+                    } else {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{android.Manifest.permission.READ_CONTACTS},
+                                PERMISSIONS_REQUEST_READ_CONTACTS);
+                    }
                 } else {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{android.Manifest.permission.READ_CONTACTS},
-                            PERMISSIONS_REQUEST_READ_CONTACTS);
+                    showContacts();
                 }
             } else {
                 showContacts();
             }
-        } else {
-            showContacts();
         }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission is granted
-                showContacts();
+        @Override
+        public void onRequestPermissionsResult ( int requestCode, String[] permissions,
+        int[] grantResults){
+            if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission is granted
+                    showContacts();
+                } else {
+                    showSnackbar(dataBinding.rlChatDetail, "Until you grant the permission, we canot display the names", Snackbar.LENGTH_SHORT);
+                }
+            } else if (requestCode == 201) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    startGalleryIntent();
+                }
+
+            }
+        }
+
+        private void showContacts () {
+            // Check the SDK version and whether the permission is already granted or not.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+                //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
             } else {
-                showSnackbar(dataBinding.rlChatDetail, "Until you grant the permission, we canot display the names", Snackbar.LENGTH_SHORT);
+                // Android version is lesser than 6.0 or the permission is already granted.
+                phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+                LoadContact loadContact = new LoadContact();
+                loadContact.execute();
             }
-        } else if (requestCode == 201) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                startGalleryIntent();
-            }
-
         }
-    }
 
-    private void showContacts() {
-        // Check the SDK version and whether the permission is already granted or not.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
-            //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-        } else {
-            // Android version is lesser than 6.0 or the permission is already granted.
-            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-            LoadContact loadContact = new LoadContact();
-            loadContact.execute();
-        }
-    }
+        @Override
+        public void onGetContactsSuccess
+        (LiveData < VerifiedContactsModel > verifiedContactsResponse) {
+            verifiedContactsResponse.observe(DetailViewUpdateActivity.this, new Observer<VerifiedContactsModel>() {
+                @Override
+                public void onChanged(VerifiedContactsModel verifiedContactsModel) {
+                    //save access token
+                    hideProgressDialog();
+                    try {
+                        if (verifiedContactsModel.getSuccess()) {
 
-    @Override
-    public void onGetContactsSuccess(LiveData<VerifiedContactsModel> verifiedContactsResponse) {
-        verifiedContactsResponse.observe(DetailViewUpdateActivity.this, new Observer<VerifiedContactsModel>() {
-            @Override
-            public void onChanged(VerifiedContactsModel verifiedContactsModel) {
-                //save access token
-                hideProgressDialog();
-                try {
-                    if (verifiedContactsModel.getSuccess()) {
-
-                        if (verifiedContactsModel.getData() != null && verifiedContactsModel.getData().size() != 0) {
-                            verifiedUsers = new ArrayList<>();
-                            for (int i = 0; i < verifiedContactsModel.getData().size(); i++) {
-                                Contacts contacts = new Contacts();
-                                for (int j = 0; j < selectUsers.size(); j++) {
-                                    String mobile = selectUsers.get(j).getPhone().contains("+91") ? selectUsers.get(j).getPhone().replace("+91", "") : selectUsers.get(j).getPhone();
-                                    if (verifiedContactsModel.getData().get(i).getPhone().equalsIgnoreCase(mobile)) {
-                                        contacts.setName(selectUsers.get(j).getName());
+                            if (verifiedContactsModel.getData() != null && verifiedContactsModel.getData().size() != 0) {
+                                verifiedUsers = new ArrayList<>();
+                                for (int i = 0; i < verifiedContactsModel.getData().size(); i++) {
+                                    Contacts contacts = new Contacts();
+                                    for (int j = 0; j < selectUsers.size(); j++) {
+                                        String mobile = selectUsers.get(j).getPhone().contains("+91") ? selectUsers.get(j).getPhone().replace("+91", "") : selectUsers.get(j).getPhone();
+                                        if (verifiedContactsModel.getData().get(i).getPhone().equalsIgnoreCase(mobile)) {
+                                            contacts.setName(selectUsers.get(j).getName());
+                                        }
                                     }
+                                    contacts.setPhone(verifiedContactsModel.getData().get(i).getPhone());
+                                    contacts.setProfilePicture(verifiedContactsModel.getData().get(i).getProfilePicture());
+                                    contacts.setUid(verifiedContactsModel.getData().get(i).getUid());
+                                    contacts.setStatus("Hii, I am using Ozochat");
+                                    verifiedUsers.add(contacts);
                                 }
-                                contacts.setPhone(verifiedContactsModel.getData().get(i).getPhone());
-                                contacts.setProfilePicture(verifiedContactsModel.getData().get(i).getProfilePicture());
-                                contacts.setUid(verifiedContactsModel.getData().get(i).getUid());
-                                contacts.setStatus("Hii, I am using Ozochat");
-                                verifiedUsers.add(contacts);
+
+                                //  gotoAddMembertoGroup(verifiedUsers);
+                                gotoGroupDetails();
                             }
 
-                            //  gotoAddMembertoGroup(verifiedUsers);
-                            gotoGroupDetails();
+
+                            Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
+                                    "\n Data : " + verifiedContactsModel.getData());
+                            //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            //Toast.makeText(AddMemberActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
+                                    "\n Data : " + verifiedContactsModel.getData());
+                        }
+
+                    } catch (Exception e) {
+                    } finally {
+                        hideProgressDialog();
+                    }
+                }
+            });
+
+        }
+
+        @Override
+        public void onCreateGroupSuccess (LiveData < CreateGRoupREsponse > createGroupResponse) {
+
+        }
+
+        @Override
+        public void onGroupImgUploadSuccess (LiveData < UploadResponse > uploadGroupImgResponse) {
+            uploadGroupImgResponse.observe(DetailViewUpdateActivity.this, new Observer<UploadResponse>() {
+                @Override
+                public void onChanged(UploadResponse uploadResponse) {
+                    if (uploadResponse.getSuccess()) {
+                        Glide.with(DetailViewUpdateActivity.this)
+                                .load(uploadResponse.getDataObject().getImage_url())
+                                .placeholder(R.drawable.person_icon)
+                                .into(dataBinding.image);
+                    }
+                }
+            });
+        }
+
+        class LoadContact extends AsyncTask<Void, Void, Void> {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                // Get Contact list from Phone
+
+                if (phones != null) {
+                    Log.e("count", "" + phones.getCount());
+                    if (phones.getCount() == 0) {
+
+                    }
+
+                    while (phones.moveToNext()) {
+                        Bitmap bit_thumb = null;
+                        String id = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+                        String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String number = phoneNumber.replaceAll("\\s", "");
+
+
+                        Contacts selectUser = new Contacts();
+                        selectUser.setName(name);
+                        selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
+                        selectUser.setPhone(number);
+                        selectUser.setStatus("I am a Naturalist");
+                        if (!myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE).equals(number)) {
+                            selectUsers.add(selectUser);
                         }
 
 
-                        Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
-                                "\n Data : " + verifiedContactsModel.getData());
-                        //  Toast.makeText(SelectContactActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.e("Cursor close 1", "----------------");
+                }
 
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                // sortContacts();
+                int count = selectUsers.size();
+                ArrayList<Contacts> removed = new ArrayList<>();
+                ArrayList<Contacts> contacts = new ArrayList<>();
+                for (int i = 0; i < selectUsers.size(); i++) {
+                    Contacts inviteFriendsProjo = selectUsers.get(i);
+
+                    if (inviteFriendsProjo.getName().matches("\\d+(?:\\.\\d+)?") || inviteFriendsProjo.getName().trim().length() == 0) {
+                        removed.add(inviteFriendsProjo);
+                        Log.d("Removed Contact", new Gson().toJson(inviteFriendsProjo));
                     } else {
-                        //Toast.makeText(AddMemberActivity.this, verifiedContactsModel.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("SelectContactActivity", "----\n Message : " + verifiedContactsModel.getMessage() +
-                                "\n Data : " + verifiedContactsModel.getData());
+                        contacts.add(inviteFriendsProjo);
                     }
-
-                } catch (Exception e) {
-                } finally {
-                    hideProgressDialog();
                 }
+                contacts.addAll(removed);
+                selectUsers = removeDuplicates(contacts);
+                sendContactsList(selectUsers);
+
             }
-        });
-
-    }
-
-    @Override
-    public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
-
-    }
-
-    @Override
-    public void onGroupImgUploadSuccess(LiveData<UploadResponse> uploadGroupImgResponse) {
-        uploadGroupImgResponse.observe(DetailViewUpdateActivity.this, new Observer<UploadResponse>() {
-            @Override
-            public void onChanged(UploadResponse uploadResponse) {
-                if (uploadResponse.getSuccess()) {
-                    Glide.with(DetailViewUpdateActivity.this)
-                            .load(uploadResponse.getDataObject().getImage_url())
-                            .placeholder(R.drawable.person_icon)
-                            .into(dataBinding.image);
-                }
-            }
-        });
-    }
-
-    class LoadContact extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
         }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Get Contact list from Phone
+        public ArrayList<Contacts> removeDuplicates (ArrayList < Contacts > list) {
+            Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
 
-            if (phones != null) {
-                Log.e("count", "" + phones.getCount());
-                if (phones.getCount() == 0) {
-
-                }
-
-                while (phones.moveToNext()) {
-                    Bitmap bit_thumb = null;
-                    String id = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-                    String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    String number = phoneNumber.replaceAll("\\s", "");
-
-
-                    Contacts selectUser = new Contacts();
-                    selectUser.setName(name);
-                    selectUser.setProfilePicture("https://api.androidhive.info/images/nature/david1.jpg");
-                    selectUser.setPhone(number);
-                    selectUser.setStatus("I am a Naturalist");
-                    if (!myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_MOBILE).equals(number)) {
-                        selectUsers.add(selectUser);
+                @Override
+                public int compare(Contacts o1, Contacts o2) {
+                    if (o1.getPhone().equalsIgnoreCase(o2.getPhone())) {
+                        return 0;
                     }
-
-
+                    return 1;
                 }
-            } else {
-                Log.e("Cursor close 1", "----------------");
-            }
+            });
+            set.addAll(list);
 
-            return null;
+            final ArrayList newList = new ArrayList(set);
+            return newList;
         }
+
+        private void sendContactsList (ArrayList < Contacts > selectUserslist) {
+            ArrayList<MobileObject> conList = new ArrayList();
+            for (int i = 0; i < selectUserslist.size(); i++) {
+                String mobile = selectUserslist.get(i).getPhone().contains("+91") ? selectUserslist.get(i).getPhone().replace("+91", "") : selectUserslist.get(i).getPhone();
+                String number = mobile.replaceAll("\\s", "");
+
+                boolean flag = true;
+                for (int j = 0; j < conList.size(); j++) {
+                    if (conList.get(j).getMobiles().equals(number)) {
+                        flag = false;
+                        break;
+                    } else {
+                        flag = true;
+                    }
+                }
+
+                if (flag) {
+                    conList.add(new MobileObject(number));
+                    Log.d("AddMemberActivity", "--not--number--" + number);
+                } else {
+                    Log.d("AddMemberActivity", "--already--number--" + number);
+                }
+
+
+            }
+            NumberListObject arrayListAge = new NumberListObject();
+            arrayListAge.setMobile(conList);
+            gotoFetchValidMembers(arrayListAge);
+        }
+
+        private void gotoFetchValidMembers (NumberListObject arrayListAge){
+            showProgressDialog("Please wait...");
+            arrayListAge.setSender_id(myPreferenceManager.getUserId());
+            for (int i = 0; i < arrayListAge.getMobile().size(); i++) {
+                Log.d("AddMemberActivity", "--contact-" + arrayListAge.getMobile().get(i).getMobiles());
+            }
+            contactsViewModel.sendContacts(DetailViewUpdateActivity.this, contactsViewModel.contactsListener = this, arrayListAge);
+        }
+
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            // sortContacts();
-            int count = selectUsers.size();
-            ArrayList<Contacts> removed = new ArrayList<>();
-            ArrayList<Contacts> contacts = new ArrayList<>();
-            for (int i = 0; i < selectUsers.size(); i++) {
-                Contacts inviteFriendsProjo = selectUsers.get(i);
+        protected void onActivityResult ( int requestCode, int resultCode, @Nullable Intent data){
+            super.onActivityResult(requestCode, resultCode, data);
+            if (resultCode == Activity.RESULT_OK) {
+                if (requestCode == SELECT_FILE) {
 
-                if (inviteFriendsProjo.getName().matches("\\d+(?:\\.\\d+)?") || inviteFriendsProjo.getName().trim().length() == 0) {
-                    removed.add(inviteFriendsProjo);
-                    Log.d("Removed Contact", new Gson().toJson(inviteFriendsProjo));
-                } else {
-                    contacts.add(inviteFriendsProjo);
-                }
-            }
-            contacts.addAll(removed);
-            selectUsers = removeDuplicates(contacts);
-            sendContactsList(selectUsers);
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                        String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+                        Contacts contactsViewModel = new Contacts();
+                        contactsViewModel.contactsListener = (ContactsListener) DetailViewUpdateActivity.this;
+                        contactsViewModel.uploadCreatedGroupPic(DetailViewUpdateActivity.this, contactsViewModel.contactsListener = DetailViewUpdateActivity.this, "", group_id, String.valueOf(admin_id), getRealPathFromURI(Uri.parse(url)));//"content://media/external/images/media/55980"
 
-        }
-    }
-
-    public ArrayList<Contacts> removeDuplicates(ArrayList<Contacts> list) {
-        Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
-
-            @Override
-            public int compare(Contacts o1, Contacts o2) {
-                if (o1.getPhone().equalsIgnoreCase(o2.getPhone())) {
-                    return 0;
-                }
-                return 1;
-            }
-        });
-        set.addAll(list);
-
-        final ArrayList newList = new ArrayList(set);
-        return newList;
-    }
-
-    private void sendContactsList(ArrayList<Contacts> selectUserslist) {
-        ArrayList<MobileObject> conList = new ArrayList();
-        for (int i = 0; i < selectUserslist.size(); i++) {
-            String mobile = selectUserslist.get(i).getPhone().contains("+91") ? selectUserslist.get(i).getPhone().replace("+91", "") : selectUserslist.get(i).getPhone();
-            String number = mobile.replaceAll("\\s", "");
-
-            boolean flag = true;
-            for (int j = 0; j < conList.size(); j++) {
-                if (conList.get(j).getMobiles().equals(number)) {
-                    flag = false;
-                    break;
-                } else {
-                    flag = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
-            if (flag) {
-                conList.add(new MobileObject(number));
-                Log.d("AddMemberActivity", "--not--number--" + number);
-            } else {
-                Log.d("AddMemberActivity", "--already--number--" + number);
+        }
+
+        public String getRealPathFromURI (Uri uri){
+            Bitmap bitmap = null;
+            Uri outPutfileUri = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+                outPutfileUri = Uri.parse(url);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-
-        }
-        NumberListObject arrayListAge = new NumberListObject();
-        arrayListAge.setMobile(conList);
-        gotoFetchValidMembers(arrayListAge);
-    }
-
-    private void gotoFetchValidMembers(NumberListObject arrayListAge) {
-        showProgressDialog("Please wait...");
-        arrayListAge.setSender_id(myPreferenceManager.getUserId());
-        for (int i = 0; i < arrayListAge.getMobile().size(); i++) {
-            Log.d("AddMemberActivity", "--contact-" + arrayListAge.getMobile().get(i).getMobiles());
-        }
-        contactsViewModel.sendContacts(DetailViewUpdateActivity.this, contactsViewModel.contactsListener = this, arrayListAge);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE) {
-
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
-                    String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
-                    Contacts contactsViewModel = new Contacts();
-                    contactsViewModel.contactsListener = (ContactsListener) DetailViewUpdateActivity.this;
-                    contactsViewModel.uploadCreatedGroupPic(DetailViewUpdateActivity.this, contactsViewModel.contactsListener = DetailViewUpdateActivity.this, "", group_id, String.valueOf(admin_id), getRealPathFromURI(Uri.parse(url)));//"content://media/external/images/media/55980"
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-
-    public String getRealPathFromURI(Uri uri) {
-        Bitmap bitmap = null;
-        Uri outPutfileUri = null;
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
-            String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
-            outPutfileUri = Uri.parse(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return outPutfileUri.toString();
+            return outPutfileUri.toString();
 
 
 //        String[] projection = { MediaStore.Images.Media.DATA };
@@ -954,5 +954,6 @@ public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayo
 //                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 //        cursor.moveToFirst();
 //        return cursor.getString(column_index);
-    }
+        }
+
 }

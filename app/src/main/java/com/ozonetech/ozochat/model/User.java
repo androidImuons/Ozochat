@@ -13,7 +13,7 @@ public class User {
     @SerializedName("mobile")
     @Expose
     private String mobile;
-    @SerializedName("image")
+    @SerializedName("profilePicUrl")
     @Expose
     private String profilePic;
     @SerializedName("otp")

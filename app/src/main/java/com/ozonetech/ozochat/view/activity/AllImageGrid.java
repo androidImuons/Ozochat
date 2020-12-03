@@ -53,28 +53,28 @@ public class AllImageGrid extends Activity {
             selectionImageLists.get(adapterPosition).setSelected(true);
         homeAdapter.update(selectionImageLists);
         boolean anySelect = false;
-        for (int i = 0; i < selectionImageLists.size(); i++){
-            if(selectionImageLists.get(i).isSelected()) {
+        for (int i = 0; i < selectionImageLists.size(); i++) {
+            if (selectionImageLists.get(i).isSelected()) {
                 anySelect = true;
                 break;
             }
         }
-            if(anySelect){
-                saveBtn.setVisibility(View.VISIBLE);
-            }else
-                saveBtn.setVisibility(View.GONE);
+        if (anySelect) {
+            saveBtn.setVisibility(View.VISIBLE);
+        } else
+            saveBtn.setVisibility(View.GONE);
 
     }
+
     @OnClick(R.id.save)
-    void setSaveBtn()
-    {
+    void setSaveBtn() {
         ArrayList<String> selectedList = new ArrayList<>();
-        for (int i = 0; i < selectionImageLists.size(); i++){
-            if(selectionImageLists.get(i).isSelected()) {
+        for (int i = 0; i < selectionImageLists.size(); i++) {
+            if (selectionImageLists.get(i).isSelected()) {
                 selectedList.add(selectionImageLists.get(i).getImagePath());
             }
         }
-       Intent i = new Intent();
+        Intent i = new Intent();
         i.putExtra("pos", selectedList);
         setResult(99, i);
         finish();

@@ -16,7 +16,26 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceGenerator {
 
-    public static String API_BASE_URL = "http://3.0.49.131/api/";
+
+//    Rahul Sir here are the new baseurls :
+//
+//    Replica :
+//            -------------------
+//    https://ozochatapireplica.ozonetech.biz
+//    https://ozochatsocketreplica.ozonetech.biz
+//
+//    Live :
+//            -------------------
+//    https://ozochatapilive.ozonetech.biz
+//    https://ozochatsocketlive.ozonetech.biz
+
+
+   // public static String API_BASE_URL = "https://ozochatapireplica.ozonetech.biz/";// replica
+    public static String API_BASE_URL = "https://ozochatapilive.ozonetech.biz/";// live
+
+   // public static String SOCKETURL = "https://ozochatsocketreplica.ozonetech.biz/";// replica socket
+    public static String SOCKETURL="https://ozochatsocketlive.ozonetech.biz/";// Live socket
+
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS).
