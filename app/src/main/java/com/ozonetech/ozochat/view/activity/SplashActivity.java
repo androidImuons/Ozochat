@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.gson.Gson;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
@@ -53,14 +55,17 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 try {
                     sleep(2000);
-                    if (AppCommon.getInstance(SplashActivity.this).isUserLogIn()) {
-                       startActivity(new Intent(SplashActivity.this, MainActivity.class));
-  //                     startActivity(new Intent(SplashActivity.this, ProfileInfoNew.class)
-//                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
-                    } else {
-                        startActivity(new Intent(SplashActivity.this, WelcomeScreen.class));
+
+                    if (checkGoogleService()){
+                        if (AppCommon.getInstance(SplashActivity.this).isUserLogIn()) {
+                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                        } else {
+                            startActivity(new Intent(SplashActivity.this, WelcomeScreen.class));
+                        }
+                        finish();
+                    }else{
+                        Log.d("SplashActivity","---google service not avail..");
                     }
-                    finish();
                 } catch (Exception e) {
 
                 }
@@ -87,6 +92,21 @@ public class SplashActivity extends AppCompatActivity {
             mIsBound = true;
             mBoundService.IsBendable();
         }
+    }
+
+    public boolean checkGoogleService(){
+        GoogleApiAvailability isavailable= GoogleApiAvailability.getInstance();
+      int status=isavailable.isGooglePlayServicesAvailable(getApplicationContext());
+      if (status!= ConnectionResult.SUCCESS){
+          if (isavailable.isUserResolvableError(status)){
+              isavailable.getErrorDialog(this,status,1425)  .show();
+              Log.d("SplashActivity","---google service not avail.1.");
+          }
+          return false;
+      }else{
+          Log.d("SplashActivity","---google service  avail..2");
+          return true;
+      }
     }
 
 

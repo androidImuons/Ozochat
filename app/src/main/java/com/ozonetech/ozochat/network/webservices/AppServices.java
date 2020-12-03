@@ -10,6 +10,7 @@ import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
 import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
+import com.ozonetech.ozochat.utils.AppVersionModel;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 import com.ozonetech.ozochat.viewmodel.VerifiedContactsModel;
@@ -88,5 +89,10 @@ public interface AppServices {
 
     @POST("deleteGroup")
     Call<LeftResponseModel> deleteGroup(@Body JsonArray array);
+
+    @FormUrlEncoded
+    @POST("getVersion")
+    Call<AppVersionModel> updateApp(@FieldMap Map<String, String> groupMap);
+
 
 }

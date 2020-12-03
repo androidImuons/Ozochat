@@ -100,20 +100,16 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         dataBinding.setLifecycleOwner(this);
         prefManager = new MyPreferenceManager(getContext());
         selectUsers = new ArrayList<Contacts>();
-
-        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
-            requestContactPermission();
-        }else{
-            getrecentChat(0);
-        }
-
+//        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+//            requestContactPermission();
+//        }else{
+//            getrecentChat(0);
+//        }
         linearLayout= new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycelScroll();
         getAllLocalData();
         return view;
     }
-
-
 
     private void recycelScroll() {
 
@@ -295,6 +291,12 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         chatViewModel.getchat(getContext(),myPreferenceManager.getUserId());*/
         //  renderUserChatList();
 
+
+        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+            requestContactPermission();
+        }else{
+            getrecentChat(0);
+        }
 
 
 
