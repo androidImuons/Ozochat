@@ -15,8 +15,8 @@ import java.util.List;
 
 @Dao
 public interface ChatMessageDao {
-    @Query("SELECT * FROM message")
-    List<Message> getAll();
+    @Query("SELECT * FROM message where group_id=:group_id")
+    List<Message> getAll(String group_id);
 
     /*@Query("SELECT * FROM message where group_id : groupId")
     public abstract List<Message> getAllNew(String groupId);*/

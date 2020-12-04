@@ -11,6 +11,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.network.ConnectivityReceiver;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
@@ -26,13 +27,13 @@ public class MyApplication extends Application {
     private static MyApplication mInstance;
     private MyPreferenceManager pref;
     public Socket iSocket;
-
+    public static ChatDatabase chatDatabase;
     @Override
     public void onCreate() {
         super.onCreate();
         Fresco.initialize(this);
         mInstance = this;
-
+        chatDatabase = ChatDatabase.getInstance(this);
         try {
 
             IO.Options opts = new IO.Options();
@@ -45,6 +46,7 @@ public class MyApplication extends Application {
             Log.d(TAG, "----exception--" + e.getMessage());
         }
     }
+
 
     public Socket getSocket() {
         if (iSocket.connected()) {

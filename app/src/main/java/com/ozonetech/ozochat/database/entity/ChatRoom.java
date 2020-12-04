@@ -2,6 +2,7 @@ package com.ozonetech.ozochat.database.entity;
 
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -18,8 +19,14 @@ import java.io.Serializable;
 @Entity
 public class ChatRoom implements Serializable {
 
-    @PrimaryKey(autoGenerate = true)
+   // @PrimaryKey(autoGenerate = true)
     private int id;
+
+    @ColumnInfo(name = "user_contact_no")
+    @SerializedName("user_contact_no")
+    @Expose
+    private String user_contact_no;
+
 
     @ColumnInfo(name = "uid")
     @SerializedName("uid")
@@ -31,6 +38,8 @@ public class ChatRoom implements Serializable {
     @Expose
     private Integer adminId;
 
+    @NonNull
+    @PrimaryKey()
     @ColumnInfo(name = "groupId")
     @SerializedName("group_id")
     @Expose
@@ -77,7 +86,6 @@ public class ChatRoom implements Serializable {
     private String groupImage;
 
 
-
     @BindingAdapter({"profilePicture"})
     public static void loadImage(ImageView view, String imageUrl) {
         Glide.with(view.getContext())
@@ -106,6 +114,15 @@ public class ChatRoom implements Serializable {
     @SerializedName("status")
     @Expose
     private String status;
+
+
+    public String getUser_contact_no() {
+        return user_contact_no;
+    }
+
+    public void setUser_contact_no(String user_contact_number) {
+        this.user_contact_no = user_contact_number;
+    }
 
 
     public ChatRoom() {

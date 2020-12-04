@@ -86,7 +86,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
-        int check_UserId = message.getUserId();
+        int check_UserId =Integer.parseInt( message.getSender_id());
         if (check_UserId == userId) {
             return SELF;
         }

@@ -14,8 +14,11 @@ import java.util.List;
 @Dao
 public interface ChatRoomDao {
 
-    @Query("SELECT * FROM chatroom")
+    @Query("SELECT * FROM chatroom ")
     List<ChatRoom> getAll();
+
+    @Query("SELECT * FROM chatroom where user_contact_no=:mobile")
+    List<ChatRoom> getRecentList(String mobile);
 
     @Insert
     void insert(ChatRoom chatRoom);

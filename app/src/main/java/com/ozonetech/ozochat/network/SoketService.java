@@ -10,19 +10,25 @@ import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.ozonetech.ozochat.MyApplication;
+import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.view.activity.UserChatActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+
+import static com.ozonetech.ozochat.MyApplication.chatDatabase;
 
 
 public class SoketService extends Service {
@@ -46,6 +52,7 @@ public class SoketService extends Service {
 
     public void IsBendable() {
     }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -115,6 +122,7 @@ public class SoketService extends Service {
                     }
 
                     JSONObject jsonObject = new JSONObject();
+                    //checkNonSendMessage();
                     try {
                         jsonObject.put("setStatus", "online");
                         jsonObject.put("user_id", myPreferenceManager.getUserId());
@@ -126,7 +134,7 @@ public class SoketService extends Service {
                             on("updateStatus", new Emitter.Listener() {
                                 @Override
                                 public void call(Object... args) {
-                                    Log.d(tag,"----update status on connection--");
+                                    Log.d(tag, "----update status on connection--");
                                 }
                             });
                 }
@@ -155,7 +163,7 @@ public class SoketService extends Service {
                             on("updateStatus", new Emitter.Listener() {
                                 @Override
                                 public void call(Object... args) {
-                                    Log.d(tag,"----update status on connection error--");
+                                    Log.d(tag, "----update status on connection error--");
                                 }
                             });
                 }
@@ -185,7 +193,7 @@ public class SoketService extends Service {
                             on("updateStatus", new Emitter.Listener() {
                                 @Override
                                 public void call(Object... args) {
-                                    Log.d(tag,"----update status on diconnect--");
+                                    Log.d(tag, "----update status on diconnect--");
                                 }
                             });
                 }
@@ -250,10 +258,57 @@ public class SoketService extends Service {
         public void run() {
             if (signalApplication.iSocket.connected()) {
                 Log.d(tag, "----connect");
+
             } else {
                 Log.d(tag, "---reconetccet");
                 connectConnection();
             }
         }
     }
+    private void checkNonSendMessage() {
+
+        SimpleSQLiteQuery query = new SimpleSQLiteQuery(
+                "SELECT * FROM message");
+        ArrayList<Message> unsendMsgLsit = new ArrayList<>();
+        if (chatDatabase.getInstance(this).chatMessageDao().getGroupList(query).size() != 0) {
+            unsendMsgLsit =
+                    new ArrayList<Message>(chatDatabase.getInstance(this).chatMessageDao().getGroupList(query));
+            sendUnSendMessage(unsendMsgLsit);
+        }
+    }
+
+    private void sendUnSendMessage(ArrayList<Message> unsendMsgLsit) {
+        for (int i = 0; i < unsendMsgLsit.size(); i++) {
+            Message message = unsendMsgLsit.get(i);
+            JSONObject jsonObject = new JSONObject();
+            Log.d(tag, "-unsend message  :" + message.isStatus());
+            try {
+                jsonObject.put("sender_id", MyApplication.getInstance().getPrefManager().getUserId());
+                jsonObject.put("user_id", message.getUserId());
+                jsonObject.put("group_id", message.getGroupId());
+                jsonObject.put("message", message.getMessage());
+                Log.d(tag, "---send un message parameter-- user_id :" + jsonObject);
+                if (!message.isStatus()) {
+                    MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
+                        @Override
+                        public void call(Object... args) {
+                            Log.d(tag, "--un-send message to get meesgae --" + args[0]);
+                            updateunsendMessage(message);
+                        }
+                    });
+                    updateunsendMessage(message);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateunsendMessage(Message message) {
+
+        message.setStatus(true);
+        chatDatabase.getInstance(this).chatMessageDao().update(message);
+    }
+
+
 }

@@ -19,6 +19,7 @@ public class Message implements Serializable {
     @Expose
     private Integer id;
 
+
     @ColumnInfo(name = "group_id")
     @SerializedName("group_id")
     @Expose
@@ -48,6 +49,35 @@ public class Message implements Serializable {
     @SerializedName("sender_name")
     @Expose
     private String sender_name;
+
+    public String getSender_id() {
+        return sender_id;
+    }
+
+    public void setSender_id(String sender_id) {
+        this.sender_id = sender_id;
+    }
+
+    @ColumnInfo(name = "sender_id")
+    @SerializedName("sender_id")
+    @Expose
+    private String sender_id;
+
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    @ColumnInfo(name = "status")
+    @SerializedName("status")
+    @Expose
+    private boolean status;
+
+
 
     public boolean isIs_contact() {
         return is_contact;

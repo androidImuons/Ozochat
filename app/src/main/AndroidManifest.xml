@@ -36,9 +36,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.activity.AddMemberActivity"
-            android:launchMode="singleTop">
+        <service
+            android:name=".DbService"
+            android:exported="false"></service>
 
+        <activity
+            android:name=".view.activity.AddMemberActivity"
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -47,7 +51,8 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.DetailViewUpdateActivity"
+        <activity
+            android:name=".view.activity.DetailViewUpdateActivity"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.app.searchable"
@@ -85,7 +90,7 @@
         </activity>
         <activity android:name=".view.activity.PhotoVideoRedirectActivity" />
         <activity android:name=".view.activity.UploadStatus" />
-        <activity android:name=".view.activity.AllImageGrid"/>
+        <activity android:name=".view.activity.AllImageGrid" />
         <activity android:name=".view.activity.OTPActivity" />
         <activity android:name=".view.activity.EnterPhoneNumberActivity" />
         <activity android:name=".view.activity.WelcomeScreen" />

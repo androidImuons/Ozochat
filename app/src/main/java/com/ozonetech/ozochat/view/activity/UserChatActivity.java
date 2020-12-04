@@ -77,6 +77,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -115,6 +116,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     private String userStatus;
     private ChatDatabase chatDatabase;
     String getGroup_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -366,36 +368,56 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 checkGroup();
             }
         }
-       // getAllLocalData();
+        // getAllLocalData();
     }
-
-
-
 
 
     private void sendMessage() {
-        if (MyApplication.getInstance().iSocket.connected()) {
-            Log.d(tag, "-----is connectttd---->" + MyApplication.getInstance().iSocket.id());
-        } else {
-            Log.d(tag, "-----not connectttd");
-        }
-        final String message = dataBinding.message.getText().toString().trim();
 
-        if (TextUtils.isEmpty(message)) {
+        final String message1 = dataBinding.message.getText().toString().trim();
+
+        if (TextUtils.isEmpty(message1)) {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
         } else {
-            triggerSendMessage();
+            if (MyApplication.getInstance().iSocket.connected()) {
+                Log.d(tag, "-----is connectttd---->" + MyApplication.getInstance().iSocket.id());
+                triggerSendMessage(dataBinding.message.getText().toString());
+            } else {
+                is_call = false;
+                Log.d(tag, "-----not connectttd");
+                Date date = new Date();
+                long unixTime = date.getTime() / 1000L;
+                Message message = new Message();
+                int index =0;
+                if (chatDatabase.chatMessageDao().getAll(group_id).size()!=0){
+                    index=chatDatabase.chatMessageDao().getAll(group_id).get(0).getId();
+                }
+
+                message.setId(index+1);
+                message.setUserId(admin_id);
+                message.setSender_id(prefManager.getUserId());
+                message.setGroupId(group_id);
+                message.setMessage(dataBinding.message.getText().toString());
+                message.setCreated(String.valueOf(unixTime));
+                message.setSender_mobile(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE));
+                message.setSender_name(prefManager.getUserDetails().get(prefManager.KEY_USER_NAME));
+                message.setStatus(false);
+                chatDatabase.getInstance(this).chatMessageDao().insert(message);
+                dataBinding.message.setText("");
+                getAllLocalData();
+
+            }
         }
     }
 
-    private void triggerSendMessage() {
+    private void triggerSendMessage(String s) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("sender_id", MyApplication.getInstance().getPrefManager().getUserId());
             jsonObject.put("user_id", admin_id);
             jsonObject.put("group_id", group_id);
-            jsonObject.put("message", dataBinding.message.getText().toString());
+            jsonObject.put("message", s);
             Log.d(tag, "---send message parameter-- user_id :" + jsonObject);
             if (MyApplication.getInstance().iSocket.connected()) {
                 Log.d(tag, "-----is connectttd");
@@ -414,6 +436,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         }
         dataBinding.message.setText("");
     }
+
     private void getMessage() {
         if (MyApplication.getInstance().iSocket.connected()) {
             Log.d(tag, "-----is connectttd");
@@ -452,7 +475,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     }
 
     private void setRecyclerView(JSONArray data) {
-      /*  String newGroupId = addChar(group_id, 0);
+        String newGroupId = addChar(group_id, 0);
         newGroupId = addChar(newGroupId, newGroupId.length());
 
         SimpleSQLiteQuery query = new SimpleSQLiteQuery(
@@ -466,11 +489,9 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 {
                     e.printStackTrace();
                 }
-
-
             }
 
-        });*/
+        });
         messageArrayList = new ArrayList<>();
         for (int i = data.length() - 1; i >= 0; i--) {
             try {
@@ -478,21 +499,22 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 if (!messageObj.getString("message").equals("")) {
                     Message message = new Message();
                     message.setId(messageObj.getInt("id"));
-                    message.setUserId(messageObj.getInt("sender_id"));
+                    message.setUserId(messageObj.getInt("user_id"));
+                    message.setSender_id(String.valueOf(messageObj.getInt("sender_id")));
                     message.setGroupId(messageObj.getString("group_id"));
                     message.setMessage(messageObj.getString("message"));
                     message.setCreated(messageObj.getString("created"));
                     message.setSender_mobile(messageObj.getString("sender_mobile"));
                     message.setSender_name(messageObj.getString("sender_name"));
-                    //chatDatabase.getInstance(this).chatMessageDao().insert(message);
-                   messageArrayList.add(message);
+                    chatDatabase.getInstance(this).chatMessageDao().insert(message);
+                    messageArrayList.add(message);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        //getAllLocalData();
-        showData();
+        getAllLocalData();
+        // showData();
 
 
     }
@@ -508,38 +530,28 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     private void getAllLocalData() {
         String newGroupId = addChar(group_id, 0);
         newGroupId = addChar(newGroupId, newGroupId.length());
-
+        Log.d(tag, "-----group id for query--" + newGroupId);
         SimpleSQLiteQuery query = new SimpleSQLiteQuery(
-                "SELECT * FROM message where group_id = "+newGroupId);
-      /*  AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                // Insert Data
+                "SELECT * FROM message where group_id = " + newGroupId);
+        if (chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().getGroupList(query).size() != 0) {
+            messageArrayList =
+                    new ArrayList<Message>(chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().getGroupList(query));
+
+        }
+        showData();
 
 
-            }
-
-        });*/
-        runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                if(chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().getGroupList(query).size() != 0){
-                    messageArrayList =
-                            new ArrayList<Message>(chatDatabase.getInstance(UserChatActivity.this).chatMessageDao().getGroupList(query));
-
-                }
-               showData();
-
-
-            }
-        });
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        });
         //showData();
 
     }
 
-    public String addChar(String str,  int position) {
+    public String addChar(String str, int position) {
         StringBuilder sb = new StringBuilder(str);
         sb.insert(position, "'");
         return sb.toString();
@@ -734,6 +746,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         return outPutfileUri.toString();
     }
 
+    boolean is_call;
+
     @Override
     public void onSocketConnect(boolean flag) {
         super.onSocketConnect(flag);
@@ -749,12 +763,23 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     checkGroup();
                 }
             }
+            if (is_call){
+               // checkNonSendMessage();
+            }
+            is_call = false;
+
 
         } else {
             Log.d(tag, "-----re connect socket--");
             SoketService.instance.connectConnection();
+            Log.d(tag, "---get local data--");
+            if (!is_call) {
+                getAllLocalData();
+                is_call = true;
+            }
         }
     }
+
 
     @Override
     public void onContactClick(Message message) {
@@ -793,6 +818,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             public void onChanged(UploadFilesResponse uploadFilesResponse) {
                 if (uploadFilesResponse.getSuccess()) {
                     getMessage();
+                } else {
+
                 }
             }
         });
