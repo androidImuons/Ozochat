@@ -81,8 +81,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class DetailViewUpdateActivity extends BaseActivity implements
-        AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener,
+public class DetailViewUpdateActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener, CreateGroupInterface, GroupMembersAdpater.ContactsAdapterListener,
         ContactsListener {
 
     private boolean isHideToolbarView = false;
