@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
+import com.jaiselrahman.filepicker.model.MediaFile;
 import com.ozonetech.ozochat.listeners.UploadFilsListner;
 import com.ozonetech.ozochat.model.CommonResponse;
 import com.ozonetech.ozochat.model.UploadFilesResponse;
@@ -37,13 +38,13 @@ public class UploadFiless {
     MutableLiveData<UploadFilesResponse> UploadFilesLiveData;
     UploadFilesResponse uploadFilesResponse;
 
-    public MutableLiveData<UploadFilesResponse> sendFiles(Context context, String user_id, String group_id, String admin_id, ArrayList<String> filepath) {
+    public MutableLiveData<UploadFilesResponse> sendFiles(Context context, String user_id, String group_id, String admin_id, ArrayList<MediaFile> filepath) {
         UploadFilesLiveData = new MutableLiveData<>();
         MultipartBody.Part body1 = null;
         List<MultipartBody.Part> parts = new ArrayList<>();
         for (int i = 0; i < filepath.size(); i++) {
-            Log.d(tag, "--upload url--" + filepath.get(i));
-            parts.add(prepareFilePart(filepath.get(i),context));
+            Log.d(tag, "--upload url--" + filepath.get(i).getUri());
+            parts.add(prepareFilePart(filepath.get(i).getUri().toString(),context));
         }
 
         if (file_size > 10000) {

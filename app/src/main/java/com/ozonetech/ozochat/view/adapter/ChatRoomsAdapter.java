@@ -1,6 +1,7 @@
 package com.ozonetech.ozochat.view.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,6 +12,9 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.database.entity.ChatRoom;
 import com.ozonetech.ozochat.view.fragment.ChatsFragment;
@@ -29,9 +33,11 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     private ArrayList<ChatRoom> chatRoomArrayList;
     private static String today;
     private ChatRoomsAdapter.ClickListener clickListener;
+    private String tag="ChatRoomsAdapter";
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name, message, timestamp, count;
-        CircleImageView thumbnail;
+        SimpleDraweeView thumbnail;
 
         public ViewHolder(View view) {
             super(view);
@@ -39,7 +45,7 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
             message = (TextView) view.findViewById(R.id.message);
             timestamp = (TextView) view.findViewById(R.id.timestamp);
             count = (TextView) view.findViewById(R.id.count);
-            thumbnail=(CircleImageView) view.findViewById(R.id.thumbnail);
+            thumbnail=(SimpleDraweeView) view.findViewById(R.id.thumbnail);
         }
     }
 
@@ -64,11 +70,19 @@ public class ChatRoomsAdapter extends RecyclerView.Adapter<ChatRoomsAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ChatRoom chatRoom = chatRoomArrayList.get(position);
+        Log.d(tag,"----image url--"+chatRoom.getProfilePicture());
 
-        Glide.with(mContext)
-                .load(chatRoom.getProfilePicture())
-                .placeholder(R.drawable.person_icon)
-                .into(holder.thumbnail);
+        RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+        roundingParams.setBorder(mContext.getResources().getColor(R.color.colorPrimaryDark), 1.0f);
+        roundingParams.setRoundAsCircle(true);
+        holder.thumbnail.getHierarchy().setRoundingParams(roundingParams);
+        holder.thumbnail.setImageURI(chatRoom.getProfilePicture());
+//        RequestOptions options = new RequestOptions();
+//        Glide.with(mContext)
+//                .load(chatRoom.getProfilePicture())
+//                .apply(options.centerCrop())
+//                .placeholder(R.drawable.person_icon)
+//                .into(holder.thumbnail);
         holder.name.setText(chatRoom.getUsername());
         holder.message.setText(chatRoom.getLastMessage());
         if (chatRoom.getUnreadCount() > 0) {

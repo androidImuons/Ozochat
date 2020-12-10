@@ -12,9 +12,9 @@ import java.io.Serializable;
 @Entity
 public class Message implements Serializable {
 
-    @PrimaryKey(autoGenerate = true)
-    private int rendId;
-
+//    @PrimaryKey(autoGenerate = true)
+//    private int rendId;
+    @PrimaryKey()
     @SerializedName("id")
     @Expose
     private Integer id;
@@ -49,6 +49,19 @@ public class Message implements Serializable {
     @SerializedName("sender_name")
     @Expose
     private String sender_name;
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    @ColumnInfo(name = "file")
+    @SerializedName("file")
+    @Expose
+    private String file;
 
     public String getSender_id() {
         return sender_id;
@@ -145,11 +158,11 @@ public class Message implements Serializable {
         this.created = created;
     }
 
-    public int getRendId() {
-        return rendId;
-    }
-
-    public void setRendId(int rendId) {
-        this.rendId = rendId;
-    }
+//    public int getRendId() {
+//        return rendId;
+//    }
+//
+//    public void setRendId(int rendId) {
+//        this.rendId = rendId;
+//    }
 }

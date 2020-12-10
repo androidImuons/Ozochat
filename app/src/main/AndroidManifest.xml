@@ -37,7 +37,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <service
-            android:name=".DbService"
+            android:name=".network.DbService"
             android:exported="false"></service>
 
         <activity
@@ -114,6 +114,10 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+        </service>
+        <service android:name=".network.ContactDBService"
+            android:exported="false">
+
         </service>
 
         <meta-data

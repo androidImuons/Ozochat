@@ -132,8 +132,6 @@ public class UploadStatus extends AppCompatActivity implements SurfaceHolder.Cal
                     }
                 }
             }
-
-
             @Override
             public void permissionDenied() {
             }

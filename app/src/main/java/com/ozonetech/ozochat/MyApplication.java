@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.amitshekhar.DebugDB;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import io.socket.client.IO;
@@ -45,6 +46,9 @@ public class MyApplication extends Application {
             e.printStackTrace();
             Log.d(TAG, "----exception--" + e.getMessage());
         }
+
+
+        Log.d("address","--address-"+DebugDB.getAddressLog());
     }
 
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SplashActivity"
+    tools:context=".view.activity.SplashActivity"
     android:background="@drawable/bg">
 
     <ImageView
@@ -15,6 +15,7 @@
         android:layout_centerInParent="true"/>
 
     <TextView
+        android:id="@+id/txt_ozochat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

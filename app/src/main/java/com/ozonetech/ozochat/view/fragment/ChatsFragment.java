@@ -44,10 +44,12 @@ import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.ScrollListener;
 import com.ozonetech.ozochat.listeners.UserRecentChatListener;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.ContactModel;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.MobileObject;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.UploadResponse;
+import com.ozonetech.ozochat.network.ContactDBService;
 import com.ozonetech.ozochat.network.SoketService;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.SelectContactActivity;
@@ -72,6 +74,7 @@ import java.util.TreeSet;
 import io.socket.emitter.Emitter;
 
 import static android.os.Looper.getMainLooper;
+
 public class ChatsFragment extends BaseFragment implements UserRecentChatListener, ContactsListener, ChatRoomsAdapter.ClickListener {
 
     FragmentChatsBinding dataBinding;
@@ -105,7 +108,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 //        }else{
 //            getrecentChat(0);
 //        }
-        linearLayout= new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        linearLayout = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycelScroll();
         getAllLocalData();
         return view;
@@ -113,10 +116,10 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
     private void recycelScroll() {
 
-        ScrollListener scrollListener=new ScrollListener() {
+        ScrollListener scrollListener = new ScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
-                Log.d(tag,"--page-"+page);
+                Log.d(tag, "--page-" + page);
                 return true;
             }
         };
@@ -153,7 +156,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         Log.d(tag, "---myContactsArrayList : " + myContactsArrayList);
 
         for (int i = 0; i < chatRoomList.size(); i++) {
-
             if (chatRoomList.get(i).getOneToOne() == 1) {
                 String contactMobileNo = chatRoomList.get(i).getMobile();
 
@@ -174,15 +176,15 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     chatRoomList.get(i).setUsername(contactMobileNo);
                 }
 
-                } else if (chatRoomList.get(i).getOneToOne() == 0) {
-                    chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
-                }
+            } else if (chatRoomList.get(i).getOneToOne() == 0) {
+                chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
             }
+        }
 //        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
 //
 //        dataBinding.recyclerView.setLayoutManager(linearLayout);
 //        dataBinding.recyclerView.setAdapter(mAdapter);
-            updateDataBase(chatRoomList);
+        updateDataBase(chatRoomList);
 
 /*
             dataBinding.recyclerView.addOnItemTouchListener(new ChatRoomsAdapter.RecyclerTouchListener(getActivity(), dataBinding.recyclerView, new ChatRoomsAdapter.ClickListener() {
@@ -208,7 +210,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 *//*
 
 
-*/
+         */
 /*
                 @Override
                 public void onLongClick(View view, int position) {
@@ -224,16 +226,17 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     }
 
     private void updateDataBase(ArrayList<ChatRoom> chatRoomList) {
-        class UpdateDataBase extends AsyncTask<Void, Void, Void>{
+        class UpdateDataBase extends AsyncTask<Void, Void, Void> {
 
             @Override
             protected Void doInBackground(Void... voids) {
-                if(chatRoomList.size() != 0) {
+                if (chatRoomList.size() != 0) {
                     chatDatabase.getInstance(getContext()).chatRoomDao().deleteAll();
-                    for (ChatRoom chatRoom : chatRoomList)
+                    for (ChatRoom chatRoom : chatRoomList) {
                         chatDatabase.getInstance(getContext()).chatRoomDao().insert(chatRoom);
-
-                    if(chatDatabase.getInstance(getContext()).chatRoomDao().getRecentList(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE)).size() != 0) {
+                        Log.d(tag, "---insert-profile imahge ---" + chatRoom.getProfilePicture());
+                    }
+                    if (chatDatabase.getInstance(getContext()).chatRoomDao().getRecentList(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE)).size() != 0) {
 
                     }
                 }
@@ -247,9 +250,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 super.onPostExecute(aVoid);
                 ArrayList<ChatRoom> arrlistofOptions =
                         new ArrayList<ChatRoom>(chatDatabase.getInstance(getContext()).chatRoomDao().getRecentList(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE)));
-              Log.d(tag,"---database List--"+arrlistofOptions.size());
+                Log.d(tag, "---database List--" + arrlistofOptions.size());
                 showRecycleView(arrlistofOptions);
-            //    chatDatabase.getInstance(getContext()).chatRoomDao().getAll();
+                //    chatDatabase.getInstance(getContext()).chatRoomDao().getAll();
             }
         }
         UpdateDataBase ut = new UpdateDataBase();
@@ -257,15 +260,15 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     }
 
     private void getAllLocalData() {
-        if(chatDatabase.getInstance(getContext()).chatRoomDao().getRecentList(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE)).size() != 0){
+        if (chatDatabase.getInstance(getContext()).chatRoomDao().getRecentList(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE)).size() != 0) {
             dataBinding.llStartChat.setVisibility(View.GONE);
             ArrayList<ChatRoom> arrlistofOptions =
                     new ArrayList<ChatRoom>(chatDatabase.getInstance(getContext()).chatRoomDao().getRecentList(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE)));
             showRecycleView(arrlistofOptions);
 
-            Log.d(tag,"----before list check db recent--"+arrlistofOptions.size());
-        }else{
-            Log.d(tag,"----before list check db recent- zero-");
+            Log.d(tag, "----before list check db recent--" + arrlistofOptions.size());
+        } else {
+            Log.d(tag, "----before list check db recent- zero-");
             dataBinding.llStartChat.setVisibility(View.VISIBLE);
         }
        /* AsyncTask.execute(new Runnable() {
@@ -277,11 +280,12 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         });*/
 
     }
-    private void showRecycleView( ArrayList<ChatRoom> chatRooms) {
+
+    private void showRecycleView(ArrayList<ChatRoom> chatRooms) {
     /*    ArrayList<ChatRoom> arrlistofOptions =
                 new ArrayList<ChatRoom>(chatDatabase.getInstance(getContext()).chatRoomDao().getAll());
         //ArrayList <ChatRoom> chatRoomArrayList = chatDatabase.getInstance(getContext()).chatRoomDao().getAll();*/
-        mAdapter = new ChatRoomsAdapter(getActivity(),chatRooms ,ChatsFragment.this);
+        mAdapter = new ChatRoomsAdapter(getActivity(), chatRooms, ChatsFragment.this);
         dataBinding.recyclerView.setLayoutManager(linearLayout);
         dataBinding.recyclerView.setAdapter(mAdapter);
     }
@@ -302,12 +306,13 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         //  renderUserChatList();
 
 
-        if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+        if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS) == null) {
             requestContactPermission();
-        }else{
+        } else {
+            List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
+            Log.d(tag, " on resume--314--" + prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size());
             getrecentChat(0);
         }
-
 
 
     }
@@ -316,7 +321,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         JSONObject json = new JSONObject();
         try {
             json.put("sender_id", myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_USER_ID));
-            json.put("offset",offset);
+            json.put("offset", offset);
             MyApplication.getInstance().getSocket().emit("recentChatEvent", json).on("recentChatEvent", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -372,6 +377,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 //      "msg_counter":0
 
                 ChatRoom chatRoom = new ChatRoom();
+                chatRoom.setId(i);
                 chatRoom.setUid(jsonObject.getInt("uid"));
                 chatRoom.setAdminId(jsonObject.getInt("admin_id"));
                 chatRoom.setGroupId(jsonObject.getString("group_id"));
@@ -379,9 +385,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setGroupName(jsonObject.getString("group_name"));
                 chatRoom.setUsername(jsonObject.getString("usermobile"));
                 chatRoom.setLastMessage(jsonObject.getString("message"));
-                if(chatRoom.getOneToOne() == 0){
+                if (chatRoom.getOneToOne() == 0) {
                     chatRoom.setProfilePicture(jsonObject.getString("group_image"));
-                }else{
+                } else {
                     chatRoom.setProfilePicture(jsonObject.getString("profile_image"));
                 }
                 chatRoom.setTitle(jsonObject.getString("title"));
@@ -392,10 +398,10 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setUsermobile(jsonObject.getString("usermobile"));
                 chatRoom.setUser_contact_no(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE));
 
-                if(chatRoom.getOneToOne() == 0){
+                if (chatRoom.getOneToOne() == 0) {
                     chatRoom.setStatus("Active");
                     //                   // chatRoom.setStatus(jsonObject.getString("status"));
-                }else{
+                } else {
                     chatRoom.setStatus("Active");
                 }
 
@@ -492,6 +498,8 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission is granted
+                Intent intent = new Intent(getActivity(), ContactDBService.class);
+                getActivity().startService(intent);
                 showContacts();
             } else {
                 showSnackbar(dataBinding.llStartChat, "Until you grant the permission, we canot display the names", Snackbar.LENGTH_SHORT);
@@ -504,11 +512,30 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
             //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
+
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            phones = getContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-            LoadContact loadContact = new LoadContact();
-            loadContact.execute();
+//            phones = getContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+//            LoadContact loadContact = new LoadContact();
+//            loadContact.execute();
+
+
+            List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
+            ArrayList<Contacts> list = new ArrayList<>();
+            for (int i = 0; i < validContactList.size(); i++) {
+                ContactModel contactModel = validContactList.get(i);
+                Contacts contacts = new Contacts();
+                contacts.setName(contactModel.getName());
+                contacts.setPhone(contactModel.getPhone());
+                contacts.setProfilePicture(contactModel.getProfilePicture());
+                contacts.setUid(contactModel.getUid());
+                contacts.setStatus("Hii, I am using Ozochat");
+                list.add(contacts);
+            }
+            Log.d(tag, "-show -db valid contatct--" + validContactList.size());
+            prefManager.saveArrayListContact(list, prefManager.KEY_CONTACTS);
+
+            getrecentChat(0);
         }
     }
 
@@ -566,7 +593,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     }
 
 
-
     @Override
     public void onCreateGroupSuccess(LiveData<CreateGRoupREsponse> createGroupResponse) {
 
@@ -580,21 +606,21 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     @Override
     public void onClick(View view, int position, ChatRoom chatRoom) {
         Log.d(tag, "---chat user click--" + position);
-       // ChatRoom chatRoom = chatRoomList.get(position);
+        // ChatRoom chatRoom = chatRoomList.get(position);
         Intent intent = new Intent(getActivity(), UserChatActivity.class);
         intent.putExtra("admin_id", chatRoom.getAdminId());
         intent.putExtra("chat_room_id", chatRoom.getGroupId());
-        intent.putExtra("group_image",chatRoom.getProfilePicture());
-        intent.putExtra("group_name",chatRoom.getGroupName());
-        intent.putExtra("last_seen",chatRoom.getTimestamp());
+        intent.putExtra("group_image", chatRoom.getProfilePicture());
+        intent.putExtra("group_name", chatRoom.getGroupName());
+        intent.putExtra("last_seen", chatRoom.getTimestamp());
         intent.putExtra("mobileNo", chatRoom.getMobile());
-        intent.putExtra("oneToOne",chatRoom.getOneToOne());
+        intent.putExtra("oneToOne", chatRoom.getOneToOne());
         intent.putExtra("profilePic", chatRoom.getProfilePicture());
-        intent.putExtra("uid",chatRoom.getUid());
-        intent.putExtra("usermobile",chatRoom.getUsermobile());
+        intent.putExtra("uid", chatRoom.getUid());
+        intent.putExtra("usermobile", chatRoom.getUsermobile());
         intent.putExtra("name", chatRoom.getUsername());
-        intent.putExtra("status","online");
-        intent.putExtra("userStatus",chatRoom.getStatus());      //Active
+        intent.putExtra("status", "online");
+        intent.putExtra("userStatus", chatRoom.getStatus());      //Active
         intent.putExtra("flag", "user_chat");
         intent.putExtra("activityFrom", "MainActivity");
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -668,6 +694,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
         }
     }
+
     public ArrayList<Contacts> removeDuplicates(ArrayList<Contacts> list) {
         Set<Contacts> set = new TreeSet(new Comparator<Contacts>() {
 
@@ -727,16 +754,16 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
     @Override
     public void onSocketConnect(boolean flag) {
         super.onSocketConnect(flag);
-        if (flag){
-            Log.d(tag,"----- connect socket--");
-            if(prefManager.getArrayListContact(prefManager.KEY_CONTACTS)==null){
+        if (flag) {
+            Log.d(tag, "----- connect socket--");
+            if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS) == null) {
                 requestContactPermission();
-            }else{
+            } else {
                 getrecentChat(0);
             }
-        }else{
-            Log.d(tag,"-----re connect socket--");
-           SoketService.instance.connectConnection();
+        } else {
+            Log.d(tag, "-----re connect socket--");
+            SoketService.instance.connectConnection();
         }
     }
 }

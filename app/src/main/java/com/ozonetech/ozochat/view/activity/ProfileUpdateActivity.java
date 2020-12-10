@@ -349,7 +349,7 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                             showSnackbar(binding.rrLayer, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                         }
                     } else {
-                        AppCommon.getInstance(ProfileUpdateActivity.this).showDialog(ProfileUpdateActivity.this, authResponse.getMessage());
+                        //AppCommon.getInstance(ProfileUpdateActivity.this).showDialog(ProfileUpdateActivity.this, authResponse.getMessage());
                     }
                 }
 

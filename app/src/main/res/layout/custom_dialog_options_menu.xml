@@ -79,7 +79,7 @@
 
 
             <LinearLayout
-                android:id="@+id/layoutVideo"
+                android:id="@+id/layout_file"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="40dp"
@@ -93,14 +93,14 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:backgroundTint="@color/light_blue_400"
-                    android:src="@drawable/ic_videocam" />
+                    android:src="@drawable/ic_file" />
 
                 <TextView
                     android:id="@+id/tvVideo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Video"
+                    android:text="Document"
                     android:fontFamily="@font/urfa_medium"
                     android:layout_marginTop="10dp"
                     android:textSize="14sp"

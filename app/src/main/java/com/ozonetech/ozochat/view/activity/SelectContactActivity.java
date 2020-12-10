@@ -43,6 +43,7 @@ import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivitySelectContactBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.ContactModel;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.GroupCreateRecord;
 import com.ozonetech.ozochat.model.MobileObject;
@@ -62,6 +63,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static com.ozonetech.ozochat.MyApplication.chatDatabase;
 
 public class SelectContactActivity extends BaseActivity implements ContactsAdapter.ContactsAdapterListener, ContactsListener {
     MyPreferenceManager prefManager;
@@ -142,10 +145,32 @@ public class SelectContactActivity extends BaseActivity implements ContactsAdapt
             //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-            LoadContact loadContact = new LoadContact();
-            loadContact.execute();
+//            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+//                    null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+//            LoadContact loadContact = new LoadContact();
+//            loadContact.execute();
+
+
+            List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
+            ArrayList<Contacts>list=new ArrayList<>();
+            for (int i=0;i<validContactList.size();i++){
+                ContactModel contactModel=validContactList.get(i);
+                Contacts contacts = new Contacts();
+                contacts.setName(contactModel.getName());
+                contacts.setPhone(contactModel.getPhone());
+                contacts.setProfilePicture(contactModel.getProfilePicture());
+                contacts.setUid(contactModel.getUid());
+                contacts.setStatus("Hii, I am using Ozochat");
+                list.add(contacts);
+            }
+            Log.d(tag, "--db valid contatct--" + validContactList.size());
+            prefManager.saveArrayListContact(list, prefManager.KEY_CONTACTS);
+
+
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            setRecyclerView(inflater, list);
+
+
         }
     }
 

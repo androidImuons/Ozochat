@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -35,6 +35,15 @@
             android:text="zkd.jvbb,vjb"
             android:fontFamily="@font/urfa_regular"
             android:textSize="14dp" />
+
+        <ImageView
+            android:id="@+id/iv_file"
+            android:layout_width="300dp"
+            android:visibility="gone"
+            android:layout_marginRight="10dp"
+            android:layout_height="150dp">
+
+        </ImageView>
     </LinearLayout>
 
 
@@ -50,4 +59,4 @@
         android:paddingLeft="10dp"
         android:paddingTop="6dp"
         android:textSize="10dp" />
-</RelativeLayout>
+</LinearLayout>

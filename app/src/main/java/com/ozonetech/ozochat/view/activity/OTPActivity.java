@@ -20,6 +20,7 @@ import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.model.OTPResponse;
 import com.ozonetech.ozochat.model.User;
 import com.ozonetech.ozochat.network.AppCommon;
+import com.ozonetech.ozochat.network.ContactDBService;
 import com.ozonetech.ozochat.network.ViewUtils;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
@@ -119,6 +120,8 @@ public class OTPActivity extends AppCompatActivity {
                                 prefManager.storeUser(user);
 //                                startActivity(new Intent(OTPActivity.this, MainActivity.class)
 //                                        .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
+                                Intent intent=new Intent(OTPActivity.this, ContactDBService.class);
+                                startService(intent);
                                 startActivity(new Intent(OTPActivity.this, ProfileInfoNew.class)
                                         .putExtra("userData" , new Gson().toJson(authResponse.getUser())));
 

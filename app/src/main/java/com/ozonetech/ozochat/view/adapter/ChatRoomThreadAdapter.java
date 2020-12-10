@@ -7,11 +7,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
@@ -35,17 +38,20 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private Context mContext;
     private ArrayList<Message> messageArrayList;
+    private String tag="ChatRoomThreadAdapter";
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView message;
         TextView timestamp;
         TextView txt_sender_name;
+        ImageView iv_file;
 
         public ViewHolder(View view) {
             super(view);
             message = (TextView) itemView.findViewById(R.id.message);
             timestamp = (TextView) itemView.findViewById(R.id.timestamp);
             txt_sender_name = itemView.findViewById(R.id.sender_name);
+            iv_file = (ImageView) itemView.findViewById(R.id.iv_file);
         }
     }
 
@@ -86,7 +92,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
-        int check_UserId =Integer.parseInt( message.getSender_id());
+        int check_UserId = Integer.parseInt(message.getSender_id());
         if (check_UserId == userId) {
             return SELF;
         }
@@ -99,7 +105,17 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Message message = messageArrayList.get(position);
-        ((ViewHolder) holder).message.setText(message.getMessage());
+        if (message.getMessage() != null && !message.getMessage().equals("null")) {
+            ((ViewHolder) holder).message.setText(message.getMessage());
+            ((ViewHolder) holder).message.setVisibility(View.VISIBLE);
+            ((ViewHolder) holder).iv_file.setVisibility(View.GONE);
+            Log.d(tag,"----message avail"+message.getMessage());
+        } else if (message.getFile() != null) {
+            Log.d(tag,"----file avail"+message.getFile());
+            showFile(((ViewHolder)holder),message,position);
+        }
+
+
         Log.d("group", "--is group yes-" + userChatActivity.groupChat);
         if (userChatActivity.groupChat == 0) {
             if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS) != null) {
@@ -127,6 +143,22 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         timestamp = getTimeStamp(timestamp);
 
         ((ViewHolder) holder).timestamp.setText(timestamp);
+    }
+
+    private void showFile(ViewHolder holder, Message message, int position) {
+        if (message.getFile().contains("pdf")){
+
+        }else if (message.getFile().contains("jpg")||message.getFile().contains("png")||message.getFile().contains("mp4")){
+            RequestOptions options = new RequestOptions();
+            Glide.with(mContext)
+                    .load(message.getFile())
+                    .apply(options.centerCrop())
+                    .placeholder(R.drawable.ic_file)
+                    .into(((ViewHolder) holder).iv_file);
+            ((ViewHolder) holder).iv_file.setVisibility(View.VISIBLE);
+            ((ViewHolder) holder).message.setVisibility(View.GONE);
+        }
+
     }
 
     private void setName(TextView holder, Message message) {

@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityMainBinding;
+import com.ozonetech.ozochat.network.ContactDBService;
 import com.ozonetech.ozochat.utils.AppUpdateChecker;
 import com.ozonetech.ozochat.utils.AppVersionModel;
 import com.ozonetech.ozochat.view.dialog.DialogAppUpdater;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         dataBinding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
+Intent intent=new Intent(this,ContactDBService.class);
+startService(intent);
         setPopUpWindow();
         setActionBar();
         //setupUi();

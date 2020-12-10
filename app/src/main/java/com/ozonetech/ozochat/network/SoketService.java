@@ -129,7 +129,8 @@ public class SoketService extends Service {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
+                    Intent intent = new Intent(getApplicationContext(), DbService.class);
+                    startService(intent);
                     signalApplication.getSocket().emit("updateStatus", jsonObject).
                             on("updateStatus", new Emitter.Listener() {
                                 @Override

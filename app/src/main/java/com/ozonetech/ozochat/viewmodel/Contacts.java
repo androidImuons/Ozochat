@@ -7,12 +7,16 @@ import androidx.databinding.BindingAdapter;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.jaiselrahman.filepicker.model.MediaFile;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.listeners.CommonResponseInterface;
 import com.ozonetech.ozochat.listeners.ContactsListener;
@@ -34,20 +38,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity
 public class Contacts extends ViewModel implements Serializable {
+
+    @ColumnInfo(name = "name")
     @SerializedName("name")
     @Expose
     private String name;
+
+    @PrimaryKey()
+    @ColumnInfo(name = "uid")
     @SerializedName("uid")
     @Expose
     private Integer uid;
+
+    @ColumnInfo(name = "imageurl")
     @SerializedName("imageUrl")
     @Expose
     private String profilePicture;
+
+    @ColumnInfo(name = "number")
     @SerializedName("number")
     @Expose
     private String phone;
+
+    @ColumnInfo(name = "status")
     String status;
+
+
     private Boolean isAdmin;
 
     public Boolean getAdmin() {
@@ -158,7 +176,7 @@ public class Contacts extends ViewModel implements Serializable {
 
     }
     public UploadFilsListner uploadFilsListner;
-    public void uploadfiles(Context context, ContactsListener contactsListener, String user_id, String group_id, String admin_id, ArrayList<String> groupImgPath) {
+    public void uploadfiles(Context context, ContactsListener contactsListener, String user_id, String group_id, String admin_id, ArrayList<MediaFile> groupImgPath) {
         if(uploadFilesResponseLiveData == null){
             uploadFilesResponseLiveData = new MutableLiveData<UploadFilesResponse>();
             uploadFilesResponseLiveData = new UploadFiless().sendFiles(context, user_id, group_id, admin_id, groupImgPath);
