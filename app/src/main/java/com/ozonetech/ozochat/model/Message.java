@@ -63,6 +63,20 @@ public class Message implements Serializable {
     @Expose
     private String file;
 
+
+    @ColumnInfo(name = "storageFile")
+    @SerializedName("storageFile")
+    @Expose
+    public String storageFile;
+
+    public String getStorageFile() {
+        return storageFile;
+    }
+
+    public void setStorageFile(String storageFile) {
+        this.storageFile = storageFile;
+    }
+
     public String getSender_id() {
         return sender_id;
     }

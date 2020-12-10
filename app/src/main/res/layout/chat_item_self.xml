@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/dp2"
     android:gravity="right"
     android:orientation="vertical"
-    android:layout_margin="@dimen/dp2"
     android:paddingLeft="70dp"
     android:paddingRight="16dp">
 
@@ -14,41 +14,81 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:textIsSelectable="true"
-        android:textStyle="bold"
-        android:visibility="gone"
-        android:fontFamily="@font/urfa_regular"
         android:background="@drawable/bg_bubble_white"
-        android:textSize="14dp" />
+        android:fontFamily="@font/urfa_regular"
+        android:textIsSelectable="true"
+        android:textSize="14dp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:textStyle="bold"
-        android:visibility="visible"
-        android:textIsSelectable="true"
         android:background="@drawable/bg_bubble_blue"
-        android:textSize="14dp" />
+        android:textIsSelectable="true"
+        android:textSize="14dp"
+        android:textStyle="bold"
+        android:visibility="visible" />
 
-    <ImageView
-        android:id="@+id/iv_file"
-        android:layout_width="300dp"
+
+    <RelativeLayout
+        android:id="@+id/rl_layer_file"
+        android:layout_width="150dp"
         android:visibility="gone"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
         android:layout_height="150dp">
 
+        <ImageView
+            android:id="@+id/iv_file"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"></ImageView>
+<LinearLayout
+    android:id="@+id/ll_download"
+    android:layout_width="match_parent"
+    android:gravity="center"
+    android:padding="@dimen/dp5"
+    android:layout_centerInParent="true"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="@dimen/dp20"
+        android:backgroundTint="@color/colorWhite"
+        android:background="@drawable/ic_downarrow"
+        android:layout_height="@dimen/dp20">
     </ImageView>
+    <TextView
+        android:id="@+id/txt_file_size"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="@dimen/dp10"
+        android:text="dfsfns"
+        android:textColor="@color/colorBlack"
+        android:fontFamily="@font/urfa_regular"
+        android:layout_height="wrap_content">
+
+    </TextView>
+</LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="@dimen/dp50"
+            android:layout_height="@dimen/dp50"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            android:progress="0"
+            android:progressBackgroundTint="@color/green_400">
+
+        </ProgressBar>
+    </RelativeLayout>
 
 
     <TextView
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@id/message"
         android:layout_below="@id/message"
+        android:layout_alignRight="@id/message"
         android:layout_margin="@dimen/dp2"
         android:padding="@dimen/dp2"
         android:textSize="10dp" />

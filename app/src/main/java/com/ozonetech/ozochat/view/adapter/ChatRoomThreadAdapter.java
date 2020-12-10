@@ -2,34 +2,57 @@ package com.ozonetech.ozochat.view.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.downloader.Error;
+import com.downloader.OnCancelListener;
+import com.downloader.OnDownloadListener;
+import com.downloader.OnPauseListener;
+import com.downloader.OnProgressListener;
+import com.downloader.OnStartOrResumeListener;
+import com.downloader.PRDownloader;
+import com.downloader.Progress;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.model.Message;
+import com.ozonetech.ozochat.utils.FileUtil;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import iamutkarshtiwari.github.io.ananas.editimage.utils.Utils;
+
 public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static String TAG = ChatRoomThreadAdapter.class.getSimpleName();
     private final MyPreferenceManager prefManager;
+    private final String dirPath;
 
     private int userId;
     private int SELF = 100;
@@ -38,13 +61,17 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private Context mContext;
     private ArrayList<Message> messageArrayList;
-    private String tag="ChatRoomThreadAdapter";
+    private String tag = "ChatRoomThreadAdapter";
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView message;
         TextView timestamp;
         TextView txt_sender_name;
         ImageView iv_file;
+        LinearLayout ll_download;
+        TextView txt_file_size;
+        ProgressBar progressBar;
+        RelativeLayout rl_layer_file;
 
         public ViewHolder(View view) {
             super(view);
@@ -52,6 +79,10 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             timestamp = (TextView) itemView.findViewById(R.id.timestamp);
             txt_sender_name = itemView.findViewById(R.id.sender_name);
             iv_file = (ImageView) itemView.findViewById(R.id.iv_file);
+            ll_download = (LinearLayout) itemView.findViewById(R.id.ll_download);
+            txt_file_size = (TextView) itemView.findViewById(R.id.txt_file_size);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+            rl_layer_file = (RelativeLayout) itemView.findViewById(R.id.rl_layer_file);
         }
     }
 
@@ -66,6 +97,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         Calendar calendar = Calendar.getInstance();
         today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)); //2020-11-04T10:25:31.000Z
         prefManager = new MyPreferenceManager(mContext.getApplicationContext());
+        dirPath = FileUtil.getRootDirPath(mContext);
     }
 
     @Override
@@ -88,7 +120,6 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         return new ViewHolder(itemView);
     }
 
-
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
@@ -108,11 +139,23 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (message.getMessage() != null && !message.getMessage().equals("null")) {
             ((ViewHolder) holder).message.setText(message.getMessage());
             ((ViewHolder) holder).message.setVisibility(View.VISIBLE);
-            ((ViewHolder) holder).iv_file.setVisibility(View.GONE);
-            Log.d(tag,"----message avail"+message.getMessage());
+            ((ViewHolder) holder).rl_layer_file.setVisibility(View.GONE);
+            Log.d(tag, "----message avail" + message.getMessage());
         } else if (message.getFile() != null) {
-            Log.d(tag,"----file avail"+message.getFile());
-            showFile(((ViewHolder)holder),message,position);
+
+            try {
+                if (message.getStorageFile() != null) {
+                    showLocalDbFile(((ViewHolder) holder), message, position);
+                    Log.d(tag, "----file avail" + message.getStorageFile());
+                } else {
+                    Log.d(tag, "----file avail" + message.getFile());
+                    showFile(((ViewHolder) holder), message, position);
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -135,6 +178,10 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         } else {
             ((ViewHolder) holder).txt_sender_name.setVisibility(View.GONE);
         }
+
+        if (getItemViewType(position) == SELF) {
+
+        }
         String timestamp = message.getCreated();
         if (timestamp.contains("T")) {
             timestamp = timestamp.replace("T", " ");
@@ -145,20 +192,131 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         ((ViewHolder) holder).timestamp.setText(timestamp);
     }
 
-    private void showFile(ViewHolder holder, Message message, int position) {
-        if (message.getFile().contains("pdf")){
+    private void showLocalDbFile(ViewHolder holder, Message message, int position) {
+        holder.ll_download.setVisibility(View.GONE);
+        holder.progressBar.setVisibility(View.GONE);
+        ((ViewHolder) holder).message.setVisibility(View.GONE);
+        ((ViewHolder) holder).rl_layer_file.setVisibility(View.VISIBLE);
+        if (message.getStorageFile().contains("pdf")) {
 
-        }else if (message.getFile().contains("jpg")||message.getFile().contains("png")||message.getFile().contains("mp4")){
+        } else if (message.getStorageFile().contains("jpg") || message.getStorageFile().contains("png") || message.getStorageFile().contains("mp4")) {
+            RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
+            Glide.with(mContext)
+                    .load(message.getStorageFile())
+                    .skipMemoryCache(true)
+                    .apply(options.centerCrop())
+                    .placeholder(R.drawable.ic_file)
+                    .into(((ViewHolder) holder).iv_file);
+        }
+    }
+
+    private void showFile(ViewHolder holder, Message message, int position) throws IOException {
+        holder.rl_layer_file.setVisibility(View.VISIBLE);
+        holder.message.setVisibility(View.GONE);
+        final int[] file_size = {0};
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL myUrl = new URL(message.getFile());
+                    URLConnection urlConnection = myUrl.openConnection();
+                    urlConnection.connect();
+                    file_size[0] = urlConnection.getContentLength();
+
+                    file_size[0] = file_size[0] / 1000;
+                    Log.i("sasa", "file_size = " + file_size[0]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        holder.txt_file_size.setText(file_size[0] + " KB");
+        holder.ll_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadfile(holder, message, position);
+            }
+        });
+
+
+        if (message.getFile().contains("pdf")) {
+
+        } else if (message.getFile().contains("jpg") || message.getFile().contains("png") || message.getFile().contains("mp4")) {
             RequestOptions options = new RequestOptions();
             Glide.with(mContext)
                     .load(message.getFile())
                     .apply(options.centerCrop())
                     .placeholder(R.drawable.ic_file)
                     .into(((ViewHolder) holder).iv_file);
-            ((ViewHolder) holder).iv_file.setVisibility(View.VISIBLE);
-            ((ViewHolder) holder).message.setVisibility(View.GONE);
         }
 
+
+    }
+
+    private void downloadfile(ViewHolder holder, Message message, int position) {
+        holder.rl_layer_file.setTag(holder);
+        String filename = message.getId().toString() + message.getFile().substring(message.getFile().lastIndexOf("."));
+        ;
+        Log.d(tag, "----file generate---" + filename);
+        int downloadid = PRDownloader.download(message.getFile(), dirPath, filename).build().setOnStartOrResumeListener(new OnStartOrResumeListener() {
+            @Override
+            public void onStartOrResume() {
+                holder.ll_download.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(View.VISIBLE);
+            }
+        }).setOnPauseListener(new OnPauseListener() {
+            @Override
+            public void onPause() {
+                holder.ll_download.setVisibility(View.VISIBLE);
+                holder.progressBar.setVisibility(View.GONE);
+            }
+        })
+                .setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel() {
+                holder.ll_download.setVisibility(View.VISIBLE);
+                holder.progressBar.setVisibility(View.GONE);
+            }
+        })
+                .setOnProgressListener(new OnProgressListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onProgress(Progress progress) {
+                long progressPercent = progress.currentBytes * 100 / progress.totalBytes;
+                holder.progressBar.setProgress((int) progressPercent);
+                holder.progressBar.setMin((int) progressPercent);
+                holder.progressBar.setIndeterminate(false);
+                holder.ll_download.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(View.VISIBLE);
+            }
+        })
+                .start(new OnDownloadListener() {
+            @Override
+            public void onDownloadComplete() {
+                String file = "file://" + dirPath + "/" + filename;
+                Log.d(tag, "---file name download--" + file);
+                holder.ll_download.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(View.GONE);
+                ChatDatabase.getInstance(mContext).chatMessageDao().updateStorage(file, message.getId());
+            }
+
+            @Override
+            public void onError(Error error) {
+                holder.ll_download.setVisibility(View.VISIBLE);
+                holder.progressBar.setVisibility(View.GONE);
+            }
+        });
+        holder.progressBar.setTag(downloadid);
+        holder.progressBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int id = (Integer) view.getTag();
+                PRDownloader.cancel(id);
+                holder.ll_download.setVisibility(View.VISIBLE);
+                holder.progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void setName(TextView holder, Message message) {
