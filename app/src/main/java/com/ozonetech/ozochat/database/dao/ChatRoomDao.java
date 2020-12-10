@@ -33,4 +33,5 @@ public interface ChatRoomDao {
     @Query("DELETE FROM chatroom")
     void deleteAll();
 
+
 }

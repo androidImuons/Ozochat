@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,6 +41,7 @@ import io.socket.emitter.Emitter;
 import com.jaiselrahman.filepicker.activity.FilePickerActivity;
 import com.jaiselrahman.filepicker.config.Configurations;
 import com.jaiselrahman.filepicker.model.MediaFile;
+import com.ozonetech.ozochat.model.DataObject;
 import com.ozonetech.ozochat.network.DbService;
 import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
@@ -113,6 +115,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
     private String userStatus;
     private ChatDatabase chatDatabase;
     String getGroup_id;
+    private ArrayList<MediaFile> files;
 
 
     @Override
@@ -426,11 +429,14 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             } else {
                 Log.d(tag, "-----not connectttd");
             }
+
+
             MyApplication.getInstance().getSocket().emit("sendMessage", jsonObject).on("sendMessage", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
+                    Log.d(tag, "----send message--433--" + args[0]);
                     getMessage();
-                    Log.d(tag, "---send message to get meesgae --" + args[0]);
+
                 }
             });
         } catch (JSONException e) {
@@ -528,12 +534,12 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
     private Message insertOrUpdate(Message item) {
         List<Message> itemsFromDB = chatDatabase.chatMessageDao().getItemById(item.getId());
-        chatDatabase.chatMessageDao().insert(item);
+        // chatDatabase.chatMessageDao().insert(item);
 
-//        if (itemsFromDB.isEmpty())
-//            chatDatabase.chatMessageDao().insert(item);
+        if (itemsFromDB.isEmpty())
+            chatDatabase.chatMessageDao().insert(item);
 //        else
-//            chatDatabase.chatMessageDao().update(item);
+//           // chatDatabase.chatMessageDao().update(item);
         return item;
     }
 
@@ -653,6 +659,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 
     }
 
+    PopupWindow popupWindow;
 
     private void openDialog() {
         // inflate the layout of the popup window
@@ -664,15 +671,13 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         int width = LinearLayout.LayoutParams.MATCH_PARENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        popupWindow = new PopupWindow(popupView, width, height, focusable);
 
         LinearLayout layoutGallery = popupView.findViewById(R.id.layoutGallery);
         layoutGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//                startActivityForResult(pickIntent, IMAGE_PICKER_SELECT);
+
                 Intent intent = new Intent(getApplicationContext(), FilePickerActivity.class);
                 intent.putExtra(FilePickerActivity.CONFIGS, new Configurations.Builder()
                         .setCheckPermission(true)
@@ -684,9 +689,6 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                         .build());
                 startActivityForResult(intent, IMAGE_PICKER_SELECT);
 
-                // startActivityForResult(Intent.createChooser(pickIntent, "Select Picture"), IMAGE_PICKER_SELECT);
-//                Intent intent=new Intent(UserChatActivity.this,UploadStatus.class);
-//                startActivity(intent);
             }
         });
 
@@ -694,36 +696,6 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         layout_files.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-//                startActivityForResult(pickIntent, VIDEO_PICKER_SELECT);
-
-                Intent intent;
-                if (android.os.Build.MANUFACTURER.equalsIgnoreCase("samsung")) {
-                    intent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-                    intent.putExtra("CONTENT_TYPE", "*/*");
-                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-                } else {
-
-                    String[] mimeTypes =
-                            {"application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .doc & .docx
-                                    "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .ppt & .pptx
-                                    "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xls & .xlsx
-                                    "text/plain",
-                                    "application/pdf",
-                                    "application/zip", "application/vnd.android.package-archive"};
-
-                    intent = new Intent(Intent.ACTION_GET_CONTENT); // or ACTION_OPEN_DOCUMENT
-                    intent.setType("*/*");
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                }
-
-                Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-                chooseFile.setType("*/*");
-                chooseFile = Intent.createChooser(chooseFile, "Choose a file");
-                //  startActivityForResult(chooseFile,FILE_PICKER_SELECT);
-
 
                 Intent intent_file = new Intent(getApplicationContext(), FilePickerActivity.class);
                 intent_file.putExtra(FilePickerActivity.CONFIGS, new Configurations.Builder()
@@ -749,8 +721,6 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         layoutAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-               // startActivityForResult(pickIntent, AUDIO_PICKER_SELECT);
 
                 Intent intent_file = new Intent(getApplicationContext(), FilePickerActivity.class);
                 intent_file.putExtra(FilePickerActivity.CONFIGS, new Configurations.Builder()
@@ -779,6 +749,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 return true;
             }
         });
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -843,11 +814,14 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
 //                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
 //
 //            }
-
+            if (popupWindow != null) {
+                popupWindow.dismiss();
+            }
             Contacts contactsViewModel = new Contacts();
             contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
-            ArrayList<MediaFile> files = data.getParcelableArrayListExtra(FilePickerActivity.MEDIA_FILES);
+         files = data.getParcelableArrayListExtra(FilePickerActivity.MEDIA_FILES);
             //Do something with files
+
 
             switch (requestCode) {
                 case IMAGE_PICKER_SELECT:
@@ -855,7 +829,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     break;
                 case FILE_PICKER_SELECT:
                     contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
-                break;
+                    break;
                 case AUDIO_PICKER_SELECT:
                     contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
                     break;
@@ -959,12 +933,38 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onChanged(UploadFilesResponse uploadFilesResponse) {
                 if (uploadFilesResponse.getSuccess()) {
-                    getMessage();
+                   StoreImage(uploadFilesResponse.getDataList());
+
                 } else {
 
                 }
             }
         });
+    }
+
+    private void StoreImage(List<DataObject> dataList) {
+        for (int i=0;i<dataList.size();i++){
+            Date date = new Date();
+            long unixTime = date.getTime() / 1000L;
+         Log.d(tag,"-947--"+   files.get(i).getThumbnail());
+            Log.d(tag,"-948--"+   files.get(i).getPath());
+
+            Message message = new Message();
+
+            message.setId(dataList.get(i).getMsg_id());
+            message.setUserId(admin_id);
+            message.setSender_id(prefManager.getUserId());
+            message.setGroupId(group_id);
+            message.setMessage(null);
+            message.setCreated(getTimeStampFormat(String.valueOf(unixTime)));
+            message.setSender_mobile(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE));
+            message.setSender_name(prefManager.getUserDetails().get(prefManager.KEY_USER_NAME));
+            message.setFile(dataList.get(i).getUploadedFileUrl());
+            message.setStorageFile("file://"+files.get(i).getPath());
+            message.setStatus(true);
+            ChatDatabase.getInstance(getApplicationContext()).chatMessageDao().insert(message);
+        }
+        getMessage();
     }
 
 

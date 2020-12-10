@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.amitshekhar.DebugDB;
+import com.downloader.PRDownloader;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import io.socket.client.IO;
@@ -46,7 +47,7 @@ public class MyApplication extends Application {
             e.printStackTrace();
             Log.d(TAG, "----exception--" + e.getMessage());
         }
-
+        PRDownloader.initialize(getApplicationContext());
 
         Log.d("address","--address-"+DebugDB.getAddressLog());
     }

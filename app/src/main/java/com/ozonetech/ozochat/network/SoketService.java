@@ -212,7 +212,7 @@ public class SoketService extends Service {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    Log.d(tag, "--message -data--" + args);
+                                    Log.d(tag, "--message -data--" + args[0]);
                                 }
                             }
 

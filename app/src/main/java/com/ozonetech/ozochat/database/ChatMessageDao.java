@@ -32,6 +32,8 @@ public interface ChatMessageDao {
     @Update
     void update(Message chatRoom);
 
+
+
     @Query("DELETE FROM message")
     void deleteAll();
 
@@ -40,6 +42,10 @@ public interface ChatMessageDao {
 
 //    @Insert
 //    void insert(Message products);
+
+
+    @Query("UPDATE message SET storageFile=:file WHERE id = :id")
+    void updateStorage(String file, int id);
 
 
 }

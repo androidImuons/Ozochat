@@ -6,9 +6,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 
+import androidx.core.content.ContextCompat;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 public class FileUtil {
     public static final String FOLDER_NAME = "OZOCHAT";
@@ -20,7 +23,7 @@ public class FileUtil {
             baseDir = Environment.getExternalStorageDirectory();
         } else {
             baseDir = Environment
-                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         }
         if (baseDir == null)
             return Environment.getExternalStorageDirectory();
@@ -132,5 +135,22 @@ public class FileUtil {
 
         }
         return false;
+    }
+
+    public static String getRootDirPath(Context context) {
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            File file = createFolders();
+            return file.getAbsolutePath();
+        } else {
+            return createFolders().getAbsolutePath();
+        }
+    }
+
+    public static String getProgressDisplayLine(long currentBytes, long totalBytes) {
+        return getBytesToMBString(currentBytes) + "/" + getBytesToMBString(totalBytes);
+    }
+
+    private static String getBytesToMBString(long bytes){
+        return String.format(Locale.ENGLISH, "%.2fMb", bytes / (1024.00 * 1024.00));
     }
 }

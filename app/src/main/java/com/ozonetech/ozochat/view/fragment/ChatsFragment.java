@@ -307,6 +307,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
 
         if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS) == null) {
+            Log.d(tag, " --310--" + prefManager.getArrayListContact(prefManager.KEY_CONTACTS));
             requestContactPermission();
         } else {
             List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
