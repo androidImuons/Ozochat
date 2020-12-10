@@ -285,7 +285,6 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             public void onProgress(Progress progress) {
                 long progressPercent = progress.currentBytes * 100 / progress.totalBytes;
                 holder.progressBar.setProgress((int) progressPercent);
-                holder.progressBar.setMin((int) progressPercent);
                 holder.progressBar.setIndeterminate(false);
                 holder.ll_download.setVisibility(View.GONE);
                 holder.progressBar.setVisibility(View.VISIBLE);

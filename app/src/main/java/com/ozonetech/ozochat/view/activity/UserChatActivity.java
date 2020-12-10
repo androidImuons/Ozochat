@@ -536,10 +536,12 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         List<Message> itemsFromDB = chatDatabase.chatMessageDao().getItemById(item.getId());
         // chatDatabase.chatMessageDao().insert(item);
 
-        if (itemsFromDB.isEmpty())
+        if (itemsFromDB.isEmpty()){
             chatDatabase.chatMessageDao().insert(item);
-//        else
-//           // chatDatabase.chatMessageDao().update(item);
+        } else{
+            chatDatabase.chatMessageDao().updated_time(item.getCreated(),item.getId());
+        }
+
         return item;
     }
 

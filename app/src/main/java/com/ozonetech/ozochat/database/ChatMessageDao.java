@@ -32,6 +32,8 @@ public interface ChatMessageDao {
     @Update
     void update(Message chatRoom);
 
+    @Query("UPDATE message SET created=:time WHERE id = :id")
+    int updated_time(String time,int id);
 
 
     @Query("DELETE FROM message")
