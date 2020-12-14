@@ -68,8 +68,6 @@ public class FileUtil {
     }
 
     /**
-     * 保存图片
-     *
      * @param bitName
      * @param mBitmap
      */

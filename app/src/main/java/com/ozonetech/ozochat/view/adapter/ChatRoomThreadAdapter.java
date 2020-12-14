@@ -2,8 +2,10 @@ package com.ozonetech.ozochat.view.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +36,11 @@ import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.utils.FileUtil;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.utils.ThubnailUtils;
+import com.ozonetech.ozochat.view.activity.PhotoVideoRedirectActivity;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -156,6 +161,8 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            viewVideoImage(message, (ViewHolder) holder,position);
         }
 
 
@@ -179,9 +186,6 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ((ViewHolder) holder).txt_sender_name.setVisibility(View.GONE);
         }
 
-        if (getItemViewType(position) == SELF) {
-
-        }
         String timestamp = message.getCreated();
         if (timestamp.contains("T")) {
             timestamp = timestamp.replace("T", " ");
@@ -190,6 +194,27 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         timestamp = getTimeStamp(timestamp);
 
         ((ViewHolder) holder).timestamp.setText(timestamp);
+
+    }
+
+    private void viewVideoImage(Message message, ViewHolder holder, int position) {
+        holder.rl_layer_file.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            Message message1=ChatDatabase.getInstance(mContext).chatMessageDao().getFile(message.getGroupId(), message.getId());
+
+                Intent mIntent = new Intent(mContext, PhotoVideoRedirectActivity.class);
+                mIntent.putExtra("PATH","file://"+message1.getStorageFile());
+                mIntent.putExtra("THUMB","file://"+message1.getStorageFile());
+                if (message1.getStorageFile().contains("mp4")){
+                    mIntent.putExtra("WHO", "video");
+                }else{
+                    mIntent.putExtra("WHO", "Image");
+                }
+                mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(mIntent);
+            }
+        });
     }
 
     private void showLocalDbFile(ViewHolder holder, Message message, int position) {
@@ -197,18 +222,42 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         holder.progressBar.setVisibility(View.GONE);
         ((ViewHolder) holder).message.setVisibility(View.GONE);
         ((ViewHolder) holder).rl_layer_file.setVisibility(View.VISIBLE);
-        if (message.getStorageFile().contains("pdf")) {
-
-        } else if (message.getStorageFile().contains("jpg") || message.getStorageFile().contains("png") || message.getStorageFile().contains("mp4")) {
-            RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
+        if (message.getFile().contains("pdf") || message.getFile().contains("txt")
+                || message.getFile().contains("xml")
+                || message.getFile().contains("html")
+                || message.getFile().contains("rtf")
+                || message.getFile().contains("csv")
+                || message.getFile().contains("doc")
+                || message.getFile().contains("xls")
+                || message.getFile().contains("xlsx")
+                || message.getFile().contains("zip")) {
+            Log.d(tag, "-----file--" + message.getStorageFile());
+            RequestOptions options = new RequestOptions();
             Glide.with(mContext)
                     .load(message.getStorageFile())
+                    .apply(options.centerCrop())
+                    .placeholder(R.drawable.ic_file)
+                    .thumbnail(Glide.with(mContext).load(message.getStorageFile()))
+                    .into(((ViewHolder) holder).iv_file);
+            File file = new File(message.getStorageFile());
+            Log.d(tag, "----getAbsolutePath path--" + file.getAbsolutePath().trim());
+            //      holder.iv_file.setImageBitmap(ThubnailUtils.getPictureImage(message.getFile().trim()));
+
+        } else if (message.getStorageFile().contains("jpg")
+                || message.getStorageFile().contains("png")
+                || message.getStorageFile().contains("mp4")) {
+            RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
+            Glide.with(mContext)
+                    .load("file://" + message.getStorageFile())
                     .skipMemoryCache(true)
                     .apply(options.centerCrop())
                     .placeholder(R.drawable.ic_file)
                     .into(((ViewHolder) holder).iv_file);
+
+            Log.d(tag, "--storage path 231--" + message.getStorageFile());
         }
     }
+
 
     private void showFile(ViewHolder holder, Message message, int position) throws IOException {
         holder.rl_layer_file.setVisibility(View.VISIBLE);
@@ -240,15 +289,34 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         });
 
 
-        if (message.getFile().contains("pdf")) {
-
-        } else if (message.getFile().contains("jpg") || message.getFile().contains("png") || message.getFile().contains("mp4")) {
+        if (message.getFile().contains("pdf") || message.getFile().contains("txt")
+                || message.getFile().contains("xml")
+                || message.getFile().contains("html")
+                || message.getFile().contains("rtf")
+                || message.getFile().contains("csv")
+                || message.getFile().contains("doc")
+                || message.getFile().contains("xls")
+                || message.getFile().contains("xlsx")
+                || message.getFile().contains("zip")) {
             RequestOptions options = new RequestOptions();
             Glide.with(mContext)
                     .load(message.getFile())
                     .apply(options.centerCrop())
                     .placeholder(R.drawable.ic_file)
+                    .thumbnail(Glide.with(mContext).load(message.getFile()))
                     .into(((ViewHolder) holder).iv_file);
+        } else if (message.getFile().contains("jpg") || message.getFile().contains("png") || message.getFile().contains("mp4")) {
+
+            RequestOptions options = new RequestOptions();
+            Glide.with(mContext)
+                    .load(message.getFile())
+                    .apply(options.centerCrop())
+                    .placeholder(R.drawable.ic_file)
+                    .thumbnail(Glide.with(mContext).load(message.getFile()))
+                    .into(((ViewHolder) holder).iv_file);
+
+        } else if (message.getFile().contains("mp4")) {
+
         }
 
 
@@ -273,39 +341,39 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
         })
                 .setOnCancelListener(new OnCancelListener() {
-            @Override
-            public void onCancel() {
-                holder.ll_download.setVisibility(View.VISIBLE);
-                holder.progressBar.setVisibility(View.GONE);
-            }
-        })
+                    @Override
+                    public void onCancel() {
+                        holder.ll_download.setVisibility(View.VISIBLE);
+                        holder.progressBar.setVisibility(View.GONE);
+                    }
+                })
                 .setOnProgressListener(new OnProgressListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onProgress(Progress progress) {
-                long progressPercent = progress.currentBytes * 100 / progress.totalBytes;
-                holder.progressBar.setProgress((int) progressPercent);
-                holder.progressBar.setIndeterminate(false);
-                holder.ll_download.setVisibility(View.GONE);
-                holder.progressBar.setVisibility(View.VISIBLE);
-            }
-        })
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onProgress(Progress progress) {
+                        long progressPercent = progress.currentBytes * 100 / progress.totalBytes;
+                        holder.progressBar.setProgress((int) progressPercent);
+                        holder.progressBar.setIndeterminate(false);
+                        holder.ll_download.setVisibility(View.GONE);
+                        holder.progressBar.setVisibility(View.VISIBLE);
+                    }
+                })
                 .start(new OnDownloadListener() {
-            @Override
-            public void onDownloadComplete() {
-                String file = "file://" + dirPath + "/" + filename;
-                Log.d(tag, "---file name download--" + file);
-                holder.ll_download.setVisibility(View.GONE);
-                holder.progressBar.setVisibility(View.GONE);
-                ChatDatabase.getInstance(mContext).chatMessageDao().updateStorage(file, message.getId());
-            }
+                    @Override
+                    public void onDownloadComplete() {
+                        String file = dirPath + "/" + filename;
+                        Log.d(tag, "---file name download--" + file);
+                        holder.ll_download.setVisibility(View.GONE);
+                        holder.progressBar.setVisibility(View.GONE);
+                        ChatDatabase.getInstance(mContext).chatMessageDao().updateStorage(file, message.getId());
+                    }
 
-            @Override
-            public void onError(Error error) {
-                holder.ll_download.setVisibility(View.VISIBLE);
-                holder.progressBar.setVisibility(View.GONE);
-            }
-        });
+                    @Override
+                    public void onError(Error error) {
+                        holder.ll_download.setVisibility(View.VISIBLE);
+                        holder.progressBar.setVisibility(View.GONE);
+                    }
+                });
         holder.progressBar.setTag(downloadid);
         holder.progressBar.setOnClickListener(new View.OnClickListener() {
             @Override

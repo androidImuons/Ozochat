@@ -14,14 +14,25 @@ import android.widget.VideoView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.ozonetech.ozochat.R;
+import com.volokh.danylo.video_player_manager.manager.PlayerItemChangeListener;
+import com.volokh.danylo.video_player_manager.manager.SingleVideoPlayerManager;
+import com.volokh.danylo.video_player_manager.manager.VideoPlayerManager;
+import com.volokh.danylo.video_player_manager.meta.MetaData;
+import com.volokh.danylo.video_player_manager.ui.SimpleMainThreadMediaPlayerListener;
+import com.volokh.danylo.video_player_manager.ui.VideoPlayerView;
 
 
 /**
  * Created by sotsys016-2 on 13/8/16 in com.cnc3camera.
  */
 public class PhotoVideoRedirectActivity extends AppCompatActivity {
+
+    private SimpleDraweeView imgShow;
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,16 +43,20 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
         init();
 
     }
+
     VideoView videoView;
+    VideoPlayerView videoPlayerView;
+
     private void init() {
 
-        SimpleDraweeView imgShow =  findViewById(R.id.imgShow);
+        imgShow = findViewById(R.id.imgShow);
         videoView = (VideoView) findViewById(R.id.vidShow);
-
-        if(getIntent().getStringExtra("WHO").equalsIgnoreCase("Image")){
-
+        videoPlayerView = findViewById(R.id.video_player);
+        if (getIntent().getStringExtra("WHO").equalsIgnoreCase("Image")) {
+            imgShow.setVisibility(View.GONE);
+            videoPlayerView.setVisibility(View.GONE);
             imgShow.setVisibility(View.VISIBLE);
-
+            url = getIntent().getStringExtra("PATH");
             imgShow.setImageURI(getIntent().getStringExtra("PATH"));
             /*Glide.with(PhotoVideoRedirectActivity.this)
                     .load(getIntent().getStringExtra("PATH"))
@@ -58,38 +73,78 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
                         }
                     }).placeholder(R.drawable.ic_photo_cont)
                     .into(imgShow);*/
-        }else {
+        } else {
 
-            videoView.setVisibility(View.VISIBLE);
-            try {
-                videoView.setMediaController(null);
-                videoView.setVideoURI(Uri.parse(getIntent().getStringExtra("PATH")));
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-            videoView.requestFocus();
-            //videoView.setZOrderOnTop(true);
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                public void onPrepared(MediaPlayer mp) {
+            imgShow.setVisibility(View.VISIBLE);
+            videoPlayerView.setVisibility(View.VISIBLE);
+            showVideo();
+//            videoView.setVisibility(View.VISIBLE);
+//            try {
+//                videoView.setMediaController(null);
+//                videoView.setVideoURI(Uri.parse(getIntent().getStringExtra("PATH")));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            videoView.requestFocus();
+//            //videoView.setZOrderOnTop(true);
+//            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                public void onPrepared(MediaPlayer mp) {
+//
+//                    videoView.start();
+//                }
+//            });
+//            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mp) {
+//                    videoView.start();
+//                }
+//            });
 
-                    videoView.start();
-                }
-            });
-            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    videoView.start();
-                }
-            });
+
         }
 
     }
 
+    private void showVideo() {
+        videoPlayerView.onVideoStoppedMainThread();
+
+        videoPlayerView.addMediaPlayerListener(new SimpleMainThreadMediaPlayerListener() {
+            @Override
+            public void onVideoPreparedMainThread() {
+                // We hide the cover when video is prepared. Playback is about to start
+                imgShow.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onVideoStoppedMainThread() {
+                // We show the cover when video is stopped
+                imgShow.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onVideoCompletionMainThread() {
+                // We show the cover when video is completed
+                imgShow.setVisibility(View.VISIBLE);
+            }
+        });
+
+        if (videoPlayerManager != null) {
+            videoPlayerManager.stopAnyPlayback();
+        }
+
+        videoPlayerManager.playNewVideo(null, videoPlayerView, url);
+    }
+
+    VideoPlayerManager videoPlayerManager = new SingleVideoPlayerManager(new PlayerItemChangeListener() {
+        @Override
+        public void onPlayerItemChanged(MetaData currentItemMetaData) {
+
+        }
+    });
+
     @Override
     public void onBackPressed() {
-        if (videoView.isPlaying()) {
-            videoView.pause();
-        }
+        videoPlayerView.onVideoStoppedMainThread();
         super.onBackPressed();
     }
 }

@@ -49,5 +49,6 @@ public interface ChatMessageDao {
     @Query("UPDATE message SET storageFile=:file WHERE id = :id")
     void updateStorage(String file, int id);
 
-
+    @Query("Select * from message WHERE group_id = :g_id AND id=:id")
+    Message getFile(String g_id, int id);
 }

@@ -407,6 +407,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 message.setCreated(getTimeStampFormat(String.valueOf(unixTime)));
                 message.setSender_mobile(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE));
                 message.setSender_name(prefManager.getUserDetails().get(prefManager.KEY_USER_NAME));
+                message.setType("txt");
                 message.setStatus(false);
                 chatDatabase.getInstance(this).chatMessageDao().insert(message);
                 dataBinding.message.setText("");
@@ -514,6 +515,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                     message.setCreated(messageObj.getString("created"));
                     message.setSender_mobile(messageObj.getString("sender_mobile"));
                     message.setSender_name(messageObj.getString("sender_name"));
+
                     if (messageObj.has("file")) {
                         message.setFile(messageObj.getString("file"));
                     } else {
@@ -938,7 +940,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                    StoreImage(uploadFilesResponse.getDataList());
 
                 } else {
-
+Log.d(tag,"---image upload fail--"+uploadFilesResponse.getMessage());
                 }
             }
         });
@@ -949,8 +951,9 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             Date date = new Date();
             long unixTime = date.getTime() / 1000L;
          Log.d(tag,"-947--"+   files.get(i).getThumbnail());
-            Log.d(tag,"-948--"+   files.get(i).getPath());
-
+            Log.d(tag,"-getmimi--"+   files.get(i).getMimeType());
+            Log.d(tag,"-getmimi--"+   files.get(i).getMediaType());
+            Log.d(tag,"-thb--"+   files.get(i).getName());
             Message message = new Message();
 
             message.setId(dataList.get(i).getMsg_id());
@@ -962,7 +965,8 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             message.setSender_mobile(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE));
             message.setSender_name(prefManager.getUserDetails().get(prefManager.KEY_USER_NAME));
             message.setFile(dataList.get(i).getUploadedFileUrl());
-            message.setStorageFile("file://"+files.get(i).getPath());
+            message.setStorageFile(files.get(i).getPath());
+            message.setType(files.get(i).getMimeType());
             message.setStatus(true);
             ChatDatabase.getInstance(getApplicationContext()).chatMessageDao().insert(message);
         }

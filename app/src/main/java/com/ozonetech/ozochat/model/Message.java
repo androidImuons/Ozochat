@@ -63,6 +63,19 @@ public class Message implements Serializable {
     @Expose
     private String file;
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @ColumnInfo(name = "type")
+    @SerializedName("type")
+    @Expose
+    private String type;
+
 
     @ColumnInfo(name = "storageFile")
     @SerializedName("storageFile")

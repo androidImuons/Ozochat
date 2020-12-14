@@ -17,7 +17,13 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:visibility="gone" />
-
+    <com.volokh.danylo.video_player_manager.ui.VideoPlayerView
+        android:id="@+id/video_player"
+        android:visibility="visible"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        />
 
     <TextView
         android:id="@+id/tvContactName"
@@ -26,6 +32,7 @@
         android:layout_margin="@dimen/dp2"
         android:gravity="center"
         android:layout_centerHorizontal="true"
+        android:visibility="gone"
         android:layout_centerVertical="true"
         android:fontFamily="@font/urfa_medium"
         android:text="@string/coming_soon"
