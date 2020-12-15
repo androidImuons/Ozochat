@@ -34,7 +34,7 @@ import com.ozonetech.ozochat.view.dialog.DialogAppUpdater;
 import com.ozonetech.ozochat.view.fragment.CallsFragment;
 import com.ozonetech.ozochat.view.fragment.CameraFragment;
 import com.ozonetech.ozochat.view.fragment.ChatsFragment;
-import com.ozonetech.ozochat.view.fragment.StatusFragment;
+import com.ozonetech.ozochat.view.fragment.UserStatusFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -275,7 +275,7 @@ startService(intent);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new CameraFragment(), "");
         adapter.addFragment(new ChatsFragment(), "CHATS");
-        adapter.addFragment(new StatusFragment(), "STATUS");
+        adapter.addFragment(new UserStatusFragment(), "STATUS");
         adapter.addFragment(new CallsFragment(), "CALLS");
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);

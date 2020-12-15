@@ -32,4 +32,5 @@
     <dimen name="header_view_start_margin_bottom">14dp</dimen>
     <dimen name="header_view_start_text_size">32sp</dimen>
     <dimen name="header_view_end_text_size">18sp</dimen>
+    <dimen name="dp150">150dp</dimen>
 </resources>

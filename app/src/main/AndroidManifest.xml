@@ -36,9 +36,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".view.activity.StatusEditActivity"></activity>
+
         <service
             android:name=".network.DbService"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <activity
             android:name=".view.activity.AddMemberActivity"
@@ -115,10 +117,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".network.ContactDBService"
-            android:exported="false">
-
-        </service>
+        <service
+            android:name=".network.ContactDBService"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
