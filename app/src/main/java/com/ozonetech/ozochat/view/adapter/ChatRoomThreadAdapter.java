@@ -276,7 +276,6 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     }
                 }
             }
-
         }
     }
 
@@ -388,6 +387,11 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         holder.ll_download.setVisibility(View.GONE);
                         holder.progressBar.setVisibility(View.GONE);
                         ChatDatabase.getInstance(mContext).chatMessageDao().updateStorage(file, message.getId());
+                        try {
+                            showpdfFile(ChatDatabase.getInstance(mContext).chatMessageDao().getFile(message.getGroupId(),message.getId()),holder,position);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
