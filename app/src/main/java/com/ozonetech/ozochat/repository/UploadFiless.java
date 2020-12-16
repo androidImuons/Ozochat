@@ -101,7 +101,6 @@ public class UploadFiless {
         });
         return UploadFilesLiveData;
     }
-
     double file_size;
 
     private MultipartBody.Part prepareFilePart(String fileUri, Context context) {

@@ -1,9 +1,14 @@
 package com.ozonetech.ozochat.view.adapter;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.pdf.PdfRenderer;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -43,6 +48,7 @@ import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
@@ -222,27 +228,14 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         holder.progressBar.setVisibility(View.GONE);
         ((ViewHolder) holder).message.setVisibility(View.GONE);
         ((ViewHolder) holder).rl_layer_file.setVisibility(View.VISIBLE);
-        if (message.getFile().contains("pdf") || message.getFile().contains("txt")
-                || message.getFile().contains("xml")
-                || message.getFile().contains("html")
-                || message.getFile().contains("rtf")
-                || message.getFile().contains("csv")
-                || message.getFile().contains("doc")
-                || message.getFile().contains("xls")
-                || message.getFile().contains("xlsx")
-                || message.getFile().contains("zip")) {
+        if (message.getFile().contains("pdf")) {
             Log.d(tag, "-----file--" + message.getStorageFile());
-            RequestOptions options = new RequestOptions();
-            Glide.with(mContext)
-                    .load(message.getStorageFile())
-                    .apply(options.centerCrop())
-                    .placeholder(R.drawable.ic_file)
-                    .thumbnail(Glide.with(mContext).load(message.getStorageFile()))
-                    .into(((ViewHolder) holder).iv_file);
-            File file = new File(message.getStorageFile());
-            Log.d(tag, "----getAbsolutePath path--" + file.getAbsolutePath().trim());
-            //      holder.iv_file.setImageBitmap(ThubnailUtils.getPictureImage(message.getFile().trim()));
 
+            try {
+                showpdfFile(message,holder,position);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (message.getStorageFile().contains("jpg")
                 || message.getStorageFile().contains("png")
                 || message.getStorageFile().contains("mp4")) {
@@ -255,6 +248,35 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     .into(((ViewHolder) holder).iv_file);
 
             Log.d(tag, "--storage path 231--" + message.getStorageFile());
+        }
+    }
+
+    private void showpdfFile(Message message, ViewHolder holder, int position) throws IOException {
+        Bitmap bitmap = null;
+        ContentResolver contentResolver = mContext.getContentResolver();
+        ParcelFileDescriptor fileDescriptor = contentResolver.openFileDescriptor(Uri.parse(message.getStorageFile()), "r");
+        if (fileDescriptor != null) {
+            PdfRenderer pdfRenderer = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                pdfRenderer = new PdfRenderer(fileDescriptor);
+                if (pdfRenderer != null) {
+                    if (pdfRenderer.getPageCount() > 0) {
+                        PdfRenderer.Page page = pdfRenderer.openPage(0);
+                        // Set the width and height based on the desired preview size
+                        // and the aspect ratio of the pdf page
+                        int bitmapWidth = 0;
+                        int bitmapHeight = 0;
+                        // Create a white bitmap to make sure that PDFs without
+                        // a background color are rendered on a white background
+                        int[] colors = new int[] { mContext.getResources().getColor(R.color.red), mContext.getResources().getColor(R.color.colorBlue), mContext.getResources().getColor(R.color.green) };
+                        bitmap = Bitmap.createBitmap(colors, bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                        page.close();
+                        holder.iv_file.setImageBitmap(bitmap);
+                    }
+                }
+            }
+
         }
     }
 

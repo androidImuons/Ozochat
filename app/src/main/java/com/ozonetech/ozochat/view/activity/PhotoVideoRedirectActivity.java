@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
 
     private SimpleDraweeView imgShow;
     private String url;
+    private String tag="PhotoVideoRedirect";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
             videoPlayerView.setVisibility(View.GONE);
             imgShow.setVisibility(View.VISIBLE);
             url = getIntent().getStringExtra("PATH");
+            Log.d(tag,"----url--"+url);
             imgShow.setImageURI(getIntent().getStringExtra("PATH"));
             /*Glide.with(PhotoVideoRedirectActivity.this)
                     .load(getIntent().getStringExtra("PATH"))
@@ -74,7 +77,8 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
                     }).placeholder(R.drawable.ic_photo_cont)
                     .into(imgShow);*/
         } else {
-
+            url = getIntent().getStringExtra("PATH");
+            Log.d(tag,"----url--"+url);
             imgShow.setVisibility(View.VISIBLE);
             videoPlayerView.setVisibility(View.VISIBLE);
             showVideo();
@@ -131,7 +135,6 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
         if (videoPlayerManager != null) {
             videoPlayerManager.stopAnyPlayback();
         }
-
         videoPlayerManager.playNewVideo(null, videoPlayerView, url);
     }
 
