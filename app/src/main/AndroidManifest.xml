@@ -98,7 +98,8 @@
         <activity android:name=".view.activity.WelcomeScreen" />
         <activity android:name=".view.activity.SettingActivity" />
         <activity android:name=".view.activity.ProfileUpdateActivity" />
-
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
         <receiver
             android:name=".network.ConnectivityReceiver"
             android:enabled="true">

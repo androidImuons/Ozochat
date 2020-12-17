@@ -3,6 +3,7 @@ package com.ozonetech.ozochat.view.fragment
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,7 +23,9 @@ import com.ozonetech.ozochat.databinding.FragmentUserStatusBinding
 import com.ozonetech.ozochat.utils.MyPreferenceManager
 import com.ozonetech.ozochat.view.activity.StatusEditActivity
 import com.ozonetech.ozochat.view.adapter.UserStatusAdapter
+import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class UserStatusFragment : Fragment() {
@@ -33,6 +36,8 @@ class UserStatusFragment : Fragment() {
     private lateinit var myAdapter: UserStatusAdapter
     private lateinit var options: Options
     private var returnValue = ArrayList<String>()
+    private var returnValueUri = ArrayList<Uri>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +91,13 @@ class UserStatusFragment : Fragment() {
                 if (resultCode == Activity.RESULT_OK) {
                     returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)!!
 
-                    gotoImgEditor(returnValue)
+                    for (i in 0 until returnValue.size)
+                    {
+                        val imageUri = Uri.fromFile(File(returnValue.get(i)))
+                        returnValueUri.add(imageUri)
+                    }
+
+                    gotoImgEditor(returnValueUri)
                     /* val bundle = Bundle()
                     bundle.putSerializable("KEY_ARRAYLIST", returnValue)
                     val mapFragment = AddImageWithCaptionFragment()
@@ -98,7 +109,9 @@ class UserStatusFragment : Fragment() {
         }
     }
 
-    private fun gotoImgEditor(returnValue: ArrayList<String>) {
+    private fun gotoImgEditor(returnValue: ArrayList<Uri>) {
+
+
         val intent = Intent(activity, StatusEditActivity::class.java)
         intent.putExtra("key", returnValue);
         startActivity(intent)
