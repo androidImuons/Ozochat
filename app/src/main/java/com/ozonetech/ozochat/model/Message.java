@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Entity
 public class Message implements Serializable {
 
-//    @PrimaryKey(autoGenerate = true)
+    //    @PrimaryKey(autoGenerate = true)
 //    private int rendId;
     @PrimaryKey()
     @SerializedName("id")
@@ -63,6 +63,19 @@ public class Message implements Serializable {
     @Expose
     private String file;
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @ColumnInfo(name = "type")
+    @SerializedName("type")
+    @Expose
+    private String type;
+
 
     @ColumnInfo(name = "storageFile")
     @SerializedName("storageFile")
@@ -103,7 +116,6 @@ public class Message implements Serializable {
     @SerializedName("status")
     @Expose
     private boolean status;
-
 
 
     public boolean isIs_contact() {
@@ -170,6 +182,15 @@ public class Message implements Serializable {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    String size=null;
+
+    public void setSize(String result) {
+        this.size = result;
+    }
+    public String getSize(){
+        return this.size;
     }
 
 //    public int getRendId() {

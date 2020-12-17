@@ -47,10 +47,11 @@ public class UploadFiless {
             parts.add(prepareFilePart(filepath.get(i).getUri().toString(),context));
         }
 
-        if (file_size > 10000) {
+        if (file_size > 100000) {
             Log.d(tag, "-----size send--" + file_size);
             uploadFilesResponse = new UploadFilesResponse();
             uploadFilesResponse.setCode(404);
+            uploadFilesResponse.setSuccess(false);
             uploadFilesResponse.setMessage("Maximum 10 MB Size Allowed");
             UploadFilesLiveData.setValue(uploadFilesResponse);
             return UploadFilesLiveData;
@@ -91,11 +92,15 @@ public class UploadFiless {
             public void onFailure(Call<UploadFilesResponse> call, Throwable t) {
                 //Toast.makeText(UserRepository.this.getClass(), "Please check your internet", Toast.LENGTH_SHORT).show();
                 Log.d("response fail", "--on fail-" + t.getMessage());
+                uploadFilesResponse = new UploadFilesResponse();
+                uploadFilesResponse.setCode(404);
+                uploadFilesResponse.setSuccess(false);
+                uploadFilesResponse.setMessage("onfailuer");
+                UploadFilesLiveData.setValue(uploadFilesResponse);
             }
         });
         return UploadFilesLiveData;
     }
-
     double file_size;
 
     private MultipartBody.Part prepareFilePart(String fileUri, Context context) {

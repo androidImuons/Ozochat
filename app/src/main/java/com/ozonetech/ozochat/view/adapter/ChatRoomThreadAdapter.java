@@ -1,9 +1,22 @@
 package com.ozonetech.ozochat.view.adapter;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.pdf.PdfDocument;
+import android.graphics.pdf.PdfRenderer;
+import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +25,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,18 +43,27 @@ import com.downloader.OnPauseListener;
 import com.downloader.OnProgressListener;
 import com.downloader.OnStartOrResumeListener;
 import com.downloader.PRDownloader;
+import com.downloader.PRDownloaderConfig;
 import com.downloader.Progress;
+import com.jaiselrahman.filepicker.utils.FileUtils;
+import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.utils.FileUtil;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
+import com.ozonetech.ozochat.utils.ThubnailUtils;
+import com.ozonetech.ozochat.view.activity.PhotoVideoRedirectActivity;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +86,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private Context mContext;
     private ArrayList<Message> messageArrayList;
     private String tag = "ChatRoomThreadAdapter";
+    private ImageView last_ivAudio;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView message;
@@ -72,6 +97,9 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         TextView txt_file_size;
         ProgressBar progressBar;
         RelativeLayout rl_layer_file;
+        LinearLayout ll_audio_layer;
+        SeekBar sheekbar;
+        ImageView iv_audio_donload;
 
         public ViewHolder(View view) {
             super(view);
@@ -83,6 +111,10 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             txt_file_size = (TextView) itemView.findViewById(R.id.txt_file_size);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
             rl_layer_file = (RelativeLayout) itemView.findViewById(R.id.rl_layer_file);
+            ll_audio_layer = (LinearLayout) itemView.findViewById(R.id.ll_audio_layer);
+            sheekbar = (SeekBar) itemView.findViewById(R.id.sheekbar);
+            iv_audio_donload = (ImageView) itemView.findViewById(R.id.iv_audio_donload);
+
         }
     }
 
@@ -133,6 +165,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         return position;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Message message = messageArrayList.get(position);
@@ -140,6 +173,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ((ViewHolder) holder).message.setText(message.getMessage());
             ((ViewHolder) holder).message.setVisibility(View.VISIBLE);
             ((ViewHolder) holder).rl_layer_file.setVisibility(View.GONE);
+            ((ViewHolder) holder).ll_audio_layer.setVisibility(View.GONE);
             Log.d(tag, "----message avail" + message.getMessage());
         } else if (message.getFile() != null) {
 
@@ -156,6 +190,8 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            viewVideoImage(message, (ViewHolder) holder, position);
         }
 
 
@@ -179,9 +215,6 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ((ViewHolder) holder).txt_sender_name.setVisibility(View.GONE);
         }
 
-        if (getItemViewType(position) == SELF) {
-
-        }
         String timestamp = message.getCreated();
         if (timestamp.contains("T")) {
             timestamp = timestamp.replace("T", " ");
@@ -190,16 +223,88 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         timestamp = getTimeStamp(timestamp);
 
         ((ViewHolder) holder).timestamp.setText(timestamp);
+        seekbarListner(message, (ViewHolder) holder, position);
     }
 
-    private void showLocalDbFile(ViewHolder holder, Message message, int position) {
-        holder.ll_download.setVisibility(View.GONE);
-        holder.progressBar.setVisibility(View.GONE);
-        ((ViewHolder) holder).message.setVisibility(View.GONE);
-        ((ViewHolder) holder).rl_layer_file.setVisibility(View.VISIBLE);
-        if (message.getStorageFile().contains("pdf")) {
+    private void seekbarListner(Message message, ViewHolder holder, int position) {
+        holder.sheekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                int x = (int) Math.ceil(progress / 1000f);
+                if (x != 0 && mediaPlayer != null && !mediaPlayer.isPlaying()) {
+                    //clearMediaPlayer();
+                }
+            }
 
-        } else if (message.getStorageFile().contains("jpg") || message.getStorageFile().contains("png") || message.getStorageFile().contains("mp4")) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                   // mediaPlayer.seekTo(holder.sheekbar.getProgress());
+                }
+            }
+        });
+    }
+
+    private void viewVideoImage(Message message, ViewHolder holder, int position) {
+        holder.rl_layer_file.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Message message1 = ChatDatabase.getInstance(mContext).chatMessageDao().getFile(message.getGroupId(), message.getId());
+
+                Intent mIntent = new Intent(mContext, PhotoVideoRedirectActivity.class);
+                mIntent.putExtra("PATH", "file://" + message1.getStorageFile());
+                mIntent.putExtra("THUMB", "file://" + message1.getStorageFile());
+                if (message1.getStorageFile().contains("mp4")) {
+                    mIntent.putExtra("WHO", "video");
+                } else {
+                    mIntent.putExtra("WHO", "Image");
+                }
+                mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), message.getStorageFile()));
+                intent.setDataAndType(uri, "application/pdf");
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (message.getFile().contains("pdf")) {
+
+                } else {
+                    mContext.startActivity(mIntent);
+                }
+            }
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void showLocalDbFile(ViewHolder holder, Message message, int position) {
+
+        if (message.getFile().contains("pdf")) {
+            Log.d(tag, "-----file--" + message.getStorageFile());
+
+            holder.ll_download.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);
+            ((ViewHolder) holder).message.setVisibility(View.GONE);
+            ((ViewHolder) holder).rl_layer_file.setVisibility(View.VISIBLE);
+            holder.ll_audio_layer.setVisibility(View.GONE);
+            try {
+                showpdfFile(message, holder, position);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (message.getFile().contains("jpg")
+                || message.getFile().contains("png")
+                || message.getFile().contains("mp4")) {
+            holder.ll_download.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);
+            ((ViewHolder) holder).message.setVisibility(View.GONE);
+            ((ViewHolder) holder).rl_layer_file.setVisibility(View.VISIBLE);
+            holder.ll_audio_layer.setVisibility(View.GONE);
             RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
             Glide.with(mContext)
                     .load(message.getStorageFile())
@@ -207,31 +312,85 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     .apply(options.centerCrop())
                     .placeholder(R.drawable.ic_file)
                     .into(((ViewHolder) holder).iv_file);
+
+            Log.d(tag, "--storage path 231--" + message.getStorageFile());
+        }
+        else if (message.getFile().contains("mp3") ||
+                message.getFile().contains("pk")) {
+            holder.ll_download.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);
+            ((ViewHolder) holder).message.setVisibility(View.GONE);
+            ((ViewHolder) holder).rl_layer_file.setVisibility(View.GONE);
+            holder.ll_audio_layer.setVisibility(View.VISIBLE);
+            holder.iv_audio_donload.setBackground(mContext.getDrawable(R.drawable.ic_stop));
+            holder.iv_audio_donload.setTag(0);
+
+
+            holder.iv_audio_donload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (last_ivAudio!=null){
+                        last_ivAudio.setBackground(mContext.getDrawable(R.drawable.ic_stop));
+                        last_ivAudio=holder.iv_audio_donload;
+                    }else{
+                        last_ivAudio=holder.iv_audio_donload;
+                    }
+
+                    if ((Integer) view.getTag() == 0) {
+                        holder.iv_audio_donload.setTag(1);
+                        holder.iv_audio_donload.setBackground(mContext.getDrawable(R.drawable.ic_play));
+                        setAudioFile(message, holder, position);
+                    } else {
+                        holder.iv_audio_donload.setTag(0);
+                        holder.iv_audio_donload.setBackground(mContext.getDrawable(R.drawable.ic_stop));
+                        if (mediaPlayer!=null&&mediaPlayer.isPlaying()) {
+                            mediaPlayer.pause();
+                        }
+                    }
+                }
+            });
+
         }
     }
 
-    private void showFile(ViewHolder holder, Message message, int position) throws IOException {
-        holder.rl_layer_file.setVisibility(View.VISIBLE);
-        holder.message.setVisibility(View.GONE);
-        final int[] file_size = {0};
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL myUrl = new URL(message.getFile());
-                    URLConnection urlConnection = myUrl.openConnection();
-                    urlConnection.connect();
-                    file_size[0] = urlConnection.getContentLength();
-
-                    file_size[0] = file_size[0] / 1000;
-                    Log.i("sasa", "file_size = " + file_size[0]);
-                } catch (IOException e) {
-                    e.printStackTrace();
+    private void showpdfFile(Message message, ViewHolder holder, int position) throws IOException {
+        Bitmap bitmap = null;
+        ContentResolver contentResolver = mContext.getContentResolver();
+        ParcelFileDescriptor fileDescriptor = contentResolver.openFileDescriptor(Uri.parse(message.getStorageFile()), "r");
+        if (fileDescriptor != null) {
+            PdfRenderer pdfRenderer = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                pdfRenderer = new PdfRenderer(fileDescriptor);
+                if (pdfRenderer != null) {
+                    if (pdfRenderer.getPageCount() > 0) {
+                        PdfRenderer.Page page = pdfRenderer.openPage(0);
+                        // Set the width and height based on the desired preview size
+                        // and the aspect ratio of the pdf page
+                        int bitmapWidth = 250;
+                        int bitmapHeight = 250;
+                        // Create a white bitmap to make sure that PDFs without
+                        // a background color are rendered on a white background
+                        int[] colors = new int[]{mContext.getResources().getColor(R.color.red), mContext.getResources().getColor(R.color.colorBlue), mContext.getResources().getColor(R.color.green)};
+                        bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                        page.close();
+                        holder.iv_file.setImageBitmap(bitmap);
+                    }
                 }
             }
-        }).start();
+        }
+    }
 
-        holder.txt_file_size.setText(file_size[0] + " KB");
+
+    private void showFile(ViewHolder holder, Message message, int position) throws IOException {
+
+        final int[] file_size = new int[1];
+        if (message.getSize() == null) {
+            new DownLoadImageTask(holder.txt_file_size, message).execute(message.getFile());
+        } else {
+            holder.txt_file_size.setText(message.getSize());
+        }
+
         holder.ll_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -239,19 +398,117 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
         });
 
+        holder.iv_audio_donload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadfile(holder, message, position);
+            }
+        });
 
-        if (message.getFile().contains("pdf")) {
+        if (message.getFile().contains("pdf") || message.getFile().contains("txt")
+                || message.getFile().contains("xml")
+                || message.getFile().contains("html")
+                || message.getFile().contains("rtf")
+                || message.getFile().contains("csv")
+                || message.getFile().contains("doc")
+                || message.getFile().contains("xls")
+                || message.getFile().contains("xlsx")
+                || message.getFile().contains("zip")) {
 
-        } else if (message.getFile().contains("jpg") || message.getFile().contains("png") || message.getFile().contains("mp4")) {
+            holder.rl_layer_file.setVisibility(View.VISIBLE);
+            holder.message.setVisibility(View.GONE);
+            ((ViewHolder) holder).ll_audio_layer.setVisibility(View.GONE);
+
+
             RequestOptions options = new RequestOptions();
             Glide.with(mContext)
                     .load(message.getFile())
                     .apply(options.centerCrop())
                     .placeholder(R.drawable.ic_file)
+                    .thumbnail(Glide.with(mContext).load(message.getFile()))
                     .into(((ViewHolder) holder).iv_file);
+        } else if (message.getFile().contains("jpg") ||
+                message.getFile().contains("png") ||
+                message.getFile().contains("mp4")) {
+            holder.rl_layer_file.setVisibility(View.VISIBLE);
+            holder.message.setVisibility(View.GONE);
+            ((ViewHolder) holder).ll_audio_layer.setVisibility(View.GONE);
+
+            RequestOptions options = new RequestOptions();
+            Glide.with(mContext)
+                    .load(message.getFile())
+                    .apply(options.centerCrop())
+                    .placeholder(R.drawable.ic_file)
+                    .thumbnail(Glide.with(mContext).load(message.getFile()))
+                    .into(((ViewHolder) holder).iv_file);
+
+        } else if (message.getFile().contains("mp3") || message.getFile().contains("pk")) {
+            holder.rl_layer_file.setVisibility(View.GONE);
+            holder.message.setVisibility(View.GONE);
+            ((ViewHolder) holder).ll_audio_layer.setVisibility(View.VISIBLE);
+
+
+        }
+    }
+
+    MediaPlayer mediaPlayer = new MediaPlayer();
+
+    public void clearMediaPlayer() {
+        if (mediaPlayer!=null){
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
         }
 
+    }
 
+    private void setAudioFile(Message message, ViewHolder holder, int position) {
+        try {
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                clearMediaPlayer();
+                holder.sheekbar.setProgress(0);
+            }
+            if (mediaPlayer == null) {
+                mediaPlayer = new MediaPlayer();
+            }
+
+            mediaPlayer.setDataSource("file://" + message.getStorageFile());
+
+            mediaPlayer.prepare();
+            mediaPlayer.setVolume(0.5f, 0.5f);
+            mediaPlayer.setLooping(false);
+            holder.sheekbar.setMax(mediaPlayer.getDuration());
+
+            mediaPlayer.start();
+            seekBar = holder.sheekbar;
+            new Thread().start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    SeekBar seekBar;
+
+    public void run() {
+
+        int currentPosition = mediaPlayer.getCurrentPosition();
+        int total = mediaPlayer.getDuration();
+
+
+        while (mediaPlayer != null && mediaPlayer.isPlaying() && currentPosition < total) {
+            try {
+                Thread.sleep(1000);
+                currentPosition = mediaPlayer.getCurrentPosition();
+            } catch (InterruptedException e) {
+                return;
+            } catch (Exception e) {
+                return;
+            }
+            Log.d(tag, "---run method start-");
+            if (seekBar != null) {
+                seekBar.setProgress(currentPosition);
+            }
+        }
     }
 
     private void downloadfile(ViewHolder holder, Message message, int position) {
@@ -273,40 +530,53 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
         })
                 .setOnCancelListener(new OnCancelListener() {
-            @Override
-            public void onCancel() {
-                holder.ll_download.setVisibility(View.VISIBLE);
-                holder.progressBar.setVisibility(View.GONE);
-            }
-        })
+                    @Override
+                    public void onCancel() {
+                        holder.ll_download.setVisibility(View.VISIBLE);
+                        holder.progressBar.setVisibility(View.GONE);
+                    }
+                })
                 .setOnProgressListener(new OnProgressListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onProgress(Progress progress) {
-                long progressPercent = progress.currentBytes * 100 / progress.totalBytes;
-                holder.progressBar.setProgress((int) progressPercent);
-                holder.progressBar.setMin((int) progressPercent);
-                holder.progressBar.setIndeterminate(false);
-                holder.ll_download.setVisibility(View.GONE);
-                holder.progressBar.setVisibility(View.VISIBLE);
-            }
-        })
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onProgress(Progress progress) {
+                        long progressPercent = progress.currentBytes * 100 / progress.totalBytes;
+                        holder.progressBar.setProgress((int) progressPercent);
+                        holder.progressBar.setIndeterminate(false);
+                        holder.ll_download.setVisibility(View.GONE);
+                        holder.progressBar.setVisibility(View.VISIBLE);
+                    }
+                })
                 .start(new OnDownloadListener() {
-            @Override
-            public void onDownloadComplete() {
-                String file = "file://" + dirPath + "/" + filename;
-                Log.d(tag, "---file name download--" + file);
-                holder.ll_download.setVisibility(View.GONE);
-                holder.progressBar.setVisibility(View.GONE);
-                ChatDatabase.getInstance(mContext).chatMessageDao().updateStorage(file, message.getId());
-            }
+                    @Override
+                    public void onDownloadComplete() {
+                        String file = dirPath + "/" + filename;
+                        Uri uri;
+                        File file_ = new File(Environment.getExternalStorageDirectory(),
+                                filename);
+                        //    uri = FileProvider.getUriForFile(mContext, mContext.getPackageName(), file_);
+//                        uri = Uri.fromFile(file_);
+                        Log.d(tag, "---file name download- 387-" + file);
+                        holder.ll_download.setVisibility(View.GONE);
+                        holder.progressBar.setVisibility(View.GONE);
+                        ChatDatabase.getInstance(mContext).chatMessageDao().updateStorage(file, message.getId());
+                        try {
+                            if (message.getFile().contains("pdf")) {
+                                showpdfFile(ChatDatabase.getInstance(mContext).chatMessageDao().getFile(message.getGroupId(), message.getId()), holder, position);
+                            } else {
 
-            @Override
-            public void onError(Error error) {
-                holder.ll_download.setVisibility(View.VISIBLE);
-                holder.progressBar.setVisibility(View.GONE);
-            }
-        });
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Error error) {
+                        holder.ll_download.setVisibility(View.VISIBLE);
+                        holder.progressBar.setVisibility(View.GONE);
+                    }
+                });
         holder.progressBar.setTag(downloadid);
         holder.progressBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -372,4 +642,60 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         void onContactClick(Message message);
     }
+
+    private class DownLoadImageTask extends AsyncTask<String, Void, String> {
+        TextView txt_size;
+        Message message;
+
+        DownLoadImageTask(TextView txt_size, Message message) {
+            this.txt_size = txt_size;
+            this.message = message;
+        }
+
+        private final DecimalFormat format = new DecimalFormat("#.##");
+        private static final long MiB = 1024 * 1024;
+        private static final long KiB = 1024;
+
+        protected String doInBackground(String... urls) {
+
+
+            int file_size = 0;
+            String size = null;
+            try {
+                URL myUrl = new URL(urls[0]);
+                URLConnection urlConnection = null;
+                urlConnection = myUrl.openConnection();
+                urlConnection.connect();
+
+                file_size = urlConnection.getContentLength();
+                file_size = file_size / 1024;
+
+                final double length = file_size;
+
+                if (length > MiB) {
+                    size = format.format(length / MiB) + " MiB";
+                }
+                if (length > KiB) {
+                    size = format.format(length / KiB) + " KiB";
+                }
+                if (length<KiB){
+                    size = format.format(length) + " B";
+                }
+
+                Log.i("sasa", "file_size = " + size);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return size;
+        }
+
+        protected void onPostExecute(String result) {
+
+            txt_size.setText(result);
+            message.setSize(result);
+        }
+    }
+
+
 }

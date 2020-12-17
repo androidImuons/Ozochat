@@ -8,6 +8,8 @@ import android.os.Environment;
 
 import androidx.core.content.ContextCompat;
 
+import com.jaiselrahman.filepicker.utils.FileUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -68,8 +70,6 @@ public class FileUtil {
     }
 
     /**
-     * 保存图片
-     *
      * @param bitName
      * @param mBitmap
      */

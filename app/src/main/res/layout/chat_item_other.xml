@@ -9,7 +9,7 @@
     android:paddingRight="70dp">
     <LinearLayout
         android:id="@+id/ll_layer"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:orientation="vertical"
         android:background="@drawable/bg_bubble_white"
         android:layout_height="wrap_content">
@@ -39,6 +39,8 @@
         <RelativeLayout
             android:id="@+id/rl_layer_file"
             android:layout_width="150dp"
+            android:padding="@dimen/dp5"
+            android:background="@drawable/bg_bubble_white"
             android:visibility="gone"
             android:layout_height="150dp">
 
@@ -56,15 +58,14 @@
                 android:layout_height="match_parent">
                 <ImageView
                     android:layout_width="@dimen/dp20"
-                    android:backgroundTint="@color/colorWhite"
-                    android:background="@drawable/ic_downarrow"
+                    android:background="@drawable/ic_download_svg"
                     android:layout_height="@dimen/dp20">
                 </ImageView>
                 <TextView
                     android:id="@+id/txt_file_size"
                     android:layout_width="wrap_content"
                     android:layout_marginLeft="@dimen/dp10"
-                    android:text="dfsfns"
+                    android:text=""
                     android:textColor="@color/colorBlack"
                     android:fontFamily="@font/urfa_regular"
                     android:layout_height="wrap_content">
@@ -83,6 +84,38 @@
 
             </ProgressBar>
         </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_audio_layer"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="1"
+            android:background="@drawable/bg_bubble_white"
+            android:layout_height="@dimen/dp50"
+            android:gravity="center_vertical">
+
+
+            <SeekBar
+                android:id="@+id/sheekbar"
+                android:layout_width="0dp"
+                android:layout_weight="0.8"
+                android:layout_height="@dimen/dp10"
+                android:progress="30">
+            </SeekBar>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/iv_audio_donload"
+                    android:layout_width="@dimen/dp30"
+                    android:layout_height="@dimen/dp30"
+                    android:background="@drawable/ic_download_svg"></ImageView>
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 
 
