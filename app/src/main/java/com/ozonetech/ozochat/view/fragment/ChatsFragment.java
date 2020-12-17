@@ -312,7 +312,12 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         } else {
             List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
             Log.d(tag, " on resume--314--" + prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size());
-            getrecentChat(0);
+            if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size()>0){
+                getrecentChat(0);
+            }else{
+                requestContactPermission();
+            }
+
         }
 
 

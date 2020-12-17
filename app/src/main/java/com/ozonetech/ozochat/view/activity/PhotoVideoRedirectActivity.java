@@ -136,6 +136,7 @@ public class PhotoVideoRedirectActivity extends AppCompatActivity {
             videoPlayerManager.stopAnyPlayback();
         }
         videoPlayerManager.playNewVideo(null, videoPlayerView, url);
+
     }
 
     VideoPlayerManager videoPlayerManager = new SingleVideoPlayerManager(new PlayerItemChangeListener() {

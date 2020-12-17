@@ -8,6 +8,8 @@ import android.os.Environment;
 
 import androidx.core.content.ContextCompat;
 
+import com.jaiselrahman.filepicker.utils.FileUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

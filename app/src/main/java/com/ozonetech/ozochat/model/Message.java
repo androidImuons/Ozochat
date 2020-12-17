@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Entity
 public class Message implements Serializable {
 
-//    @PrimaryKey(autoGenerate = true)
+    //    @PrimaryKey(autoGenerate = true)
 //    private int rendId;
     @PrimaryKey()
     @SerializedName("id")
@@ -118,7 +118,6 @@ public class Message implements Serializable {
     private boolean status;
 
 
-
     public boolean isIs_contact() {
         return is_contact;
     }
@@ -183,6 +182,15 @@ public class Message implements Serializable {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    String size=null;
+
+    public void setSize(String result) {
+        this.size = result;
+    }
+    public String getSize(){
+        return this.size;
     }
 
 //    public int getRendId() {

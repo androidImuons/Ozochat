@@ -61,15 +61,17 @@ public class MainActivity extends AppCompatActivity {
         dataBinding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
         dataBinding.executePendingBindings();
         dataBinding.setLifecycleOwner(this);
-Intent intent=new Intent(this,ContactDBService.class);
-startService(intent);
+        Intent intent = new Intent(this, ContactDBService.class);
+        startService(intent);
         setPopUpWindow();
         setActionBar();
         //setupUi();
         checkUpdate();
         init();
     }
+
     DialogAppUpdater dialogAppUpdater;
+
     private void checkUpdate() {
         new AppUpdateChecker(this, new AppUpdateChecker.AppUpdateAvailableListener() {
             @Override
@@ -78,23 +80,22 @@ startService(intent);
                 appUpdatemodal.observe(MainActivity.this, new Observer<AppVersionModel>() {
                     @Override
                     public void onChanged(AppVersionModel appVersionModel) {
-                        if (appVersionModel.isSuccess()){
-                            MainActivity.this.appVersionModel =appVersionModel;
+                        if (appVersionModel.isSuccess()) {
+                            MainActivity.this.appVersionModel = appVersionModel;
                             if (isFinishing()) return;
                             try {
                                 if (dialogAppUpdater != null && dialogAppUpdater.isShowing()) {
                                     dialogAppUpdater.dismiss();
                                 }
-                                Log.d(tag,"-----dialog open-"+appUpdatemodal.getValue().isSuccess());
+                                Log.d(tag, "-----dialog open-" + appUpdatemodal.getValue().isSuccess());
                                 dialogAppUpdater = new DialogAppUpdater(MainActivity.this, appVersionModel);
                                 dialogAppUpdater.show();
                             } catch (Exception e) {
-                                Log.d(tag,"--exception-"+e.getMessage());
+                                Log.d(tag, "--exception-" + e.getMessage());
                             }
                         }
                     }
                 });
-
 
 
             }
@@ -102,6 +103,7 @@ startService(intent);
     }
 
     private PopupWindow mypopupWindow;
+
     private void setActionBar() {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -129,6 +131,7 @@ startService(intent);
         });
 
     }
+
     private void setPopUpWindow() {
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.menu_item_view, null);
@@ -142,7 +145,7 @@ startService(intent);
 //                startActivity(new Intent(MainActivity.this, ProfileInfoNew.class)
 //                                .putExtra("userData" , new Gson().toJson(AppCommon.getInstance(getApplicationContext()).getUserObject())));
 
-                startActivity(new Intent(MainActivity.this,ProfileInfoActivity.class));
+                startActivity(new Intent(MainActivity.this, ProfileInfoActivity.class));
             }
         });
 
@@ -159,6 +162,7 @@ startService(intent);
     }
 
     private void init() {
+        chatsFragment = new ChatsFragment();
         // setSupportActionBar(dataBinding.toolbar);
         setupViewPager(dataBinding.viewpager);
         dataBinding.tabs.setupWithViewPager(dataBinding.viewpager);
@@ -210,7 +214,7 @@ startService(intent);
                 if (dialogAppUpdater != null && dialogAppUpdater.isShowing()) {
                     dialogAppUpdater.dismiss();
                 }
-                Log.d(tag,"--reshoww--");
+                Log.d(tag, "--reshoww--");
                 dialogAppUpdater = new DialogAppUpdater(MainActivity.this, appVersionModel);
                 dialogAppUpdater.show();
             } catch (Exception e) {
@@ -270,11 +274,16 @@ startService(intent);
         dataBinding.tabs.getTabAt(0).setIcon(tabIcons[0]);
     }
 
+    ChatsFragment chatsFragment;
 
     private void setupViewPager(ViewPager viewPager) {
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new CameraFragment(), "");
-        adapter.addFragment(new ChatsFragment(), "CHATS");
+        if (!chatsFragment.isAdded()) {
+            adapter.addFragment(chatsFragment, "CHATS");
+        }
+
         adapter.addFragment(new UserStatusFragment(), "STATUS");
         adapter.addFragment(new CallsFragment(), "CALLS");
         viewPager.setAdapter(adapter);

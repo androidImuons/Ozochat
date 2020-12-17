@@ -232,6 +232,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onClick(View view) {
                 getMessage();
+                mAdapter.clearMediaPlayer();
                 finish();
             }
         });
@@ -538,10 +539,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         List<Message> itemsFromDB = chatDatabase.chatMessageDao().getItemById(item.getId());
         // chatDatabase.chatMessageDao().insert(item);
 
-        if (itemsFromDB.isEmpty()){
+        if (itemsFromDB.isEmpty()) {
             chatDatabase.chatMessageDao().insert(item);
-        } else{
-            chatDatabase.chatMessageDao().updated_time(item.getCreated(),item.getId());
+        } else {
+            chatDatabase.chatMessageDao().updated_time(item.getCreated(), item.getId());
         }
 
         return item;
@@ -593,6 +594,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         Intent intent = new Intent(UserChatActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        mAdapter.clearMediaPlayer();
         finish();
     }
 
@@ -761,83 +763,55 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             Uri selectedMediaUri = data.getData();
-//
-//            Log.d(tag, "-selectedMediaUri --" + selectedMediaUri);
-//            if (requestCode == IMAGE_PICKER_SELECT) {
-//                // Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
-//                Contacts contactsViewModel = new Contacts();
-//                contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
-//                ArrayList<String> list = new ArrayList<>();
-//                list.add(getRealPathFromURI(selectedMediaUri));
-//                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
-//
-//
-//            }
-//            else if (requestCode == VIDEO_PICKER_SELECT) {
-//                //  Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
-//                Contacts contactsViewModel = new Contacts();
-//                contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
-//                ArrayList<String> list = new ArrayList<>();
-//                list.add(selectedMediaUri.getPath());
-//                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
-//
-//            }
-//            else if (requestCode == AUDIO_PICKER_SELECT) {
-//                Toast.makeText(UserChatActivity.this, "Coming Soon ! ", Toast.LENGTH_LONG).show();
-//            }
-//            else if (requestCode == CAMERA_PIC_REQUEST) {
-//                Bitmap image = (Bitmap) data.getExtras().get("data");
-//
-//                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//                image.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
-//                String url = MediaStore.Images.Media.insertImage(getContentResolver(), image, "attachment", null);
-//                selectedMediaUri = Uri.parse(url);
-//                Contacts contactsViewModel = new Contacts();
-//                contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
-//                ArrayList<String> list = new ArrayList<>();
-//                list.add(selectedMediaUri.toString());
-//                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
-//
-//                Log.d(tag, "-selectedMediaUri --" + selectedMediaUri.toString());
-//                // dataBinding.ivPic.setImageBitmap(image);
-//            }
-//            else if (requestCode == REQUEST_RECORDING) {
-//                Uri savedUri = data.getData();
-//                Toast.makeText(UserChatActivity.this,
-//                        "Saved: " + savedUri.getPath(), Toast.LENGTH_LONG).show();
-//            }
-//            else if(requestCode==FILE_PICKER_SELECT){
-//                Uri savedUri = data.getData();
-//                Log.d(tag,"----file selected->>-"+savedUri.getPath());
-//
-//
-//                Contacts contactsViewModel = new Contacts();
-//                contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
-//                ArrayList<String> list = new ArrayList<>();
-//                list.add(savedUri.toString());
-//                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), list);//"content://media/external/images/media/55980"
-//
-//            }
+
             if (popupWindow != null) {
                 popupWindow.dismiss();
             }
             Contacts contactsViewModel = new Contacts();
             contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
-         files = data.getParcelableArrayListExtra(FilePickerActivity.MEDIA_FILES);
+            files = data.getParcelableArrayListExtra(FilePickerActivity.MEDIA_FILES);
             //Do something with files
+            contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
+
+//            for (int i=0;i<files.size();i++){
+//                Log.d(tag, "----dummay data--");
+//                Date date = new Date();
+//                long unixTime = date.getTime() / 1000L;
+//                Message message = new Message();
+//                int index = 0;
+//                List<Message> messageArrayList = chatDatabase.chatMessageDao().getAll(group_id);
+//                if (messageArrayList.size() != 0) {
+//                    index = messageArrayList.get(messageArrayList.size() - 1).getId();
+//                }
+//                Log.d(tag, "unsaved message get id" + index);
+//                message.setId(index + 1);
+//                message.setUserId(admin_id);
+//                message.setSender_id(prefManager.getUserId());
+//                message.setGroupId(group_id);
+//                message.setMessage(null);
+//                message.setCreated("");
+//                message.setSender_mobile(prefManager.getUserDetails().get(prefManager.KEY_USER_MOBILE));
+//                message.setSender_name(prefManager.getUserDetails().get(prefManager.KEY_USER_NAME));
+//                message.setFile(files.get(i).getPath());
+//                message.setStorageFile(files.get(i).getPath());
+//                message.setType(files.get(i).getMimeType());
+//                message.setStatus(false);
+//               // this.messageArrayList.add(message);
+//            }
+            //showData();
 
 
-            switch (requestCode) {
-                case IMAGE_PICKER_SELECT:
-                    contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
-                    break;
-                case FILE_PICKER_SELECT:
-                    contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
-                    break;
-                case AUDIO_PICKER_SELECT:
-                    contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
-                    break;
-            }
+//            switch (requestCode) {
+//                case IMAGE_PICKER_SELECT:
+//                    contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
+//                    break;
+//                case FILE_PICKER_SELECT:
+//                    contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
+//                    break;
+//                case AUDIO_PICKER_SELECT:
+//                    contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
+//                    break;
+//            }
 
         }
     }
@@ -873,10 +847,12 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         if (flag) {
             Log.d(tag, "----- connect socket- yes-");
             if (start_flag.equals("group")) {
+                getAllLocalData();
                 getMessage();
             } else {
                 Intent intent = getIntent();
                 if (intent.hasExtra("admin_id")) {
+                    getAllLocalData();
                     getMessage();
                 } else {
                     checkGroup();
@@ -937,23 +913,23 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onChanged(UploadFilesResponse uploadFilesResponse) {
                 if (uploadFilesResponse.getSuccess()) {
-                   StoreImage(uploadFilesResponse.getDataList());
+                    StoreImage(uploadFilesResponse.getDataList());
 
                 } else {
-Log.d(tag,"---image upload fail--"+uploadFilesResponse.getMessage());
+                    Log.d(tag, "---image upload fail--" + uploadFilesResponse.getMessage());
                 }
             }
         });
     }
 
     private void StoreImage(List<DataObject> dataList) {
-        for (int i=0;i<dataList.size();i++){
+        for (int i = 0; i < dataList.size(); i++) {
             Date date = new Date();
             long unixTime = date.getTime() / 1000L;
-         Log.d(tag,"-947--"+   files.get(i).getThumbnail());
-            Log.d(tag,"-getmimi--"+   files.get(i).getMimeType());
-            Log.d(tag,"-getmimi--"+   files.get(i).getMediaType());
-            Log.d(tag,"-thb--"+   files.get(i).getName());
+            Log.d(tag, "-947--" + files.get(i).getThumbnail());
+            Log.d(tag, "-getmimi--" + files.get(i).getMimeType());
+            Log.d(tag, "-getmimi--" + files.get(i).getMediaType());
+            Log.d(tag, "-thb--" + files.get(i).getName());
             Message message = new Message();
 
             message.setId(dataList.get(i).getMsg_id());
