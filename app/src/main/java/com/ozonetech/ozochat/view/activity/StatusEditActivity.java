@@ -53,7 +53,6 @@ public class StatusEditActivity extends AppCompatActivity implements UserStatusA
     int selectedPosition = 0;
     ArrayList<String> captionArraylist;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

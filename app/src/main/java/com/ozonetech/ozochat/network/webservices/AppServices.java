@@ -8,6 +8,7 @@ import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
+import com.ozonetech.ozochat.model.StatusResponseModel;
 import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
 import com.ozonetech.ozochat.utils.AppVersionModel;
@@ -94,5 +95,8 @@ public interface AppServices {
     @POST("getVersion")
     Call<AppVersionModel> updateApp(@FieldMap Map<String, String> groupMap);
 
+    @FormUrlEncoded
+    @POST("getStatus")
+    Call<StatusResponseModel> getUserStatus(@FieldMap Map<String,String> statusMap);
 
 }
