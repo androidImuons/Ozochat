@@ -27,6 +27,7 @@ import com.ozonetech.ozochat.listeners.StatusListener
 import com.ozonetech.ozochat.model.CreateGRoupREsponse
 import com.ozonetech.ozochat.model.GroupCreateRecord
 import com.ozonetech.ozochat.model.StatusResponseModel
+import com.ozonetech.ozochat.model.UserStatusResponseModel
 import com.ozonetech.ozochat.utils.MyPreferenceManager
 import com.ozonetech.ozochat.view.activity.StatusEditActivity
 import com.ozonetech.ozochat.view.adapter.UserStatusAdapter
@@ -167,20 +168,21 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
             override fun onChanged(t: StatusResponseModel?) {
                 hideProgressDialog()
                 try {
-
                     if(t?.success == true){
                         Log.d("UserStatusFrag", "--Response : Code" + t.message)
                     }else{
                         Log.d("UserStatusFrag", "--Response : Code" + (t?.message ?: ""))
                     }
-
                 } catch (e:Exception) {}
                 finally
                 {
                     hideProgressDialog()
                 }
             }
-
         })
+    }
+
+    override fun onSetUserStatusSuccess(userStatusResponse: LiveData<UserStatusResponseModel>?) {
+        TODO("Not yet implemented")
     }
 }

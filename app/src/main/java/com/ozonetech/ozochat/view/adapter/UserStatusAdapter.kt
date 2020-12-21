@@ -32,6 +32,10 @@ class UserStatusAdapter(private val context: Context) : RecyclerView.Adapter<Rec
         notifyDataSetChanged()
     }
 
+    fun getAllUri() : List<Uri>{
+        return list;
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.image_row_layout, parent, false)
@@ -103,6 +107,7 @@ class UserStatusAdapter(private val context: Context) : RecyclerView.Adapter<Rec
 
     interface StatusAdapterListerner {
         fun onStatusViewClicked(position: Int)
+
     }
 
 }

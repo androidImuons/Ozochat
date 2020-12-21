@@ -186,7 +186,5 @@ public class Contacts extends ViewModel implements Serializable {
             uploadFilsListner.onSuccessResponse(uploadFilesResponseLiveData);
         }
 
-
-
     }
 }

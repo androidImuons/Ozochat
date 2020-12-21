@@ -10,12 +10,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.StatusResponseModel;
+import com.ozonetech.ozochat.model.User;
+import com.ozonetech.ozochat.model.UserStatusResponseModel;
 import com.ozonetech.ozochat.network.webservices.AppServices;
 import com.ozonetech.ozochat.network.webservices.ServiceGenerator;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 
 import java.util.Map;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,6 +27,9 @@ public class StatusRepository {
     private static String TAG = StatusRepository.class.getSimpleName();
     private MutableLiveData<StatusResponseModel> statusGetResponse;
     StatusResponseModel statusResponseModel;
+
+    private MutableLiveData<UserStatusResponseModel> userStatusResponse;
+    UserStatusResponseModel userStatusResponseModel;
 
     public LiveData<StatusResponseModel> getUserStatus(Context context, Map<String, String> statusMap) {
 
@@ -56,4 +62,33 @@ public class StatusRepository {
         return statusGetResponse;
     }
 
+    public LiveData<UserStatusResponseModel> setUserStatus(Context context, RequestBody requestBody) {
+        userStatusResponse=new MutableLiveData<>();
+        AppServices apiService = ServiceGenerator.createService(AppServices.class);
+        apiService.uploadUserStatus("application/json",requestBody).enqueue(new Callback<UserStatusResponseModel>() {
+            @Override
+            public void onResponse(Call<UserStatusResponseModel> call, Response<UserStatusResponseModel> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.isSuccessful()) {
+                    userStatusResponseModel = response.body();
+                    userStatusResponse.setValue(userStatusResponseModel);
+                    Log.d(TAG, "-- 200---" + new Gson().toJson(response.body()));
+                } else {
+                    Log.d(TAG, "-- 200---" + new Gson().toJson(response.body()));
+                    userStatusResponseModel = response.body();
+                    userStatusResponse.setValue(userStatusResponseModel);
+                    Log.d(TAG, "-- 200---" + new Gson().toJson(response.body()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserStatusResponseModel> call, Throwable t) {
+                Log.d(TAG, "--------------" + t.getMessage());
+            }
+        });
+        return userStatusResponse;
+
+    }
 }
