@@ -26,9 +26,12 @@ public class StatusResponseModel extends ViewModel {
     @SerializedName("message")
     @Expose
     private String message;
-    @SerializedName("data")
+    @SerializedName("imgData")
     @Expose
-    private List<StatusModel> data = null;
+    private List<StatusModel> imgData = null;
+    @SerializedName("txtData")
+    @Expose
+    private List<TextStatusModel> txtData = null;
 
     public Boolean getSuccess() {
         return success;
@@ -46,13 +49,22 @@ public class StatusResponseModel extends ViewModel {
         this.message = message;
     }
 
-    public List<StatusModel> getData() {
-        return data;
+    public List<StatusModel> getImgData() {
+        return imgData;
     }
 
-    public void setData(List<StatusModel> data) {
-        this.data = data;
+    public void setImgData(List<StatusModel> imgData) {
+        this.imgData = imgData;
     }
+
+    public List<TextStatusModel> getTxtData() {
+        return txtData;
+    }
+
+    public void setTxtData(List<TextStatusModel> txtData) {
+        this.txtData = txtData;
+    }
+
 
     public void getUserStatus(Context context, StatusListener statusListener, Map<String, String> statusMap) {
 
