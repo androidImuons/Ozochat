@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -694,7 +695,7 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
                 intent.putExtra(FilePickerActivity.CONFIGS, new Configurations.Builder()
                         .setCheckPermission(true)
                         .setShowImages(true)
-                        .enableImageCapture(true)
+                        .enableImageCapture(false)
                         .setShowVideos(true)
                         .setMaxSelection(10)
                         .setSkipZeroSizeFiles(true)
@@ -763,6 +764,19 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         });
 
     }
+    public String getPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getApplicationContext().getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        Log.d(tag,"-----getpath from uri--"+res);
+        return res;
+    }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -775,7 +789,27 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             }
             Contacts contactsViewModel = new Contacts();
             contactsViewModel.uploadFilsListner = (UploadFilsListner) UserChatActivity.this;
+            if (requestCode==CAMERA_PIC_REQUEST){
+                files=new ArrayList<>();
+                MediaFile mediaFile=new MediaFile();
+
+                Bitmap bitmap = null;
+
+                bitmap = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
+
+                Log.d(tag,"----camera image url 789--"+Uri.parse(url));
+                mediaFile.setUri(Uri.parse(url));
+                mediaFile.setPath(getPathFromURI(Uri.parse(url)));
+                files.add(mediaFile);
+                contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
+
+                return;
+            }
             files = data.getParcelableArrayListExtra(FilePickerActivity.MEDIA_FILES);
+
             //Do something with files
             contactsViewModel.uploadfiles(UserChatActivity.this, contactsViewModel.contactsListener = UserChatActivity.this, prefManager.getUserId(), group_id, String.valueOf(admin_id), files);
 

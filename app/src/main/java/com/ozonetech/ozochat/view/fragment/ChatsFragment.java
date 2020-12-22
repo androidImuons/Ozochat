@@ -161,7 +161,6 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
 
                 boolean flag = true;
                 for (int j = 0; j < myContactsArrayList.size(); j++) {
-
                     String myContactMobileNo = myContactsArrayList.get(j).getPhone();
                     if (myContactMobileNo.equalsIgnoreCase(contactMobileNo)) {
                         String myContactName = myContactsArrayList.get(j).getName();
@@ -173,17 +172,15 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                     }
                 }
                 if (!flag) {
-                    chatRoomList.get(i).setUsername(contactMobileNo);
+                   // chatRoomList.get(i).setUsername(contactMobileNo);
+                    chatRoomList.get(i).setUsername(chatRoomList.get(i).getUsername());
                 }
 
             } else if (chatRoomList.get(i).getOneToOne() == 0) {
                 chatRoomList.get(i).setUsername(chatRoomList.get(i).getGroupName());
             }
         }
-//        mAdapter = new ChatRoomsAdapter(getActivity(), chatRoomList,ChatsFragment.this);
-//
-//        dataBinding.recyclerView.setLayoutManager(linearLayout);
-//        dataBinding.recyclerView.setAdapter(mAdapter);
+
         updateDataBase(chatRoomList);
 
 /*
@@ -312,9 +309,9 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
         } else {
             List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
             Log.d(tag, " on resume--314--" + prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size());
-            if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size()>0){
+            if (prefManager.getArrayListContact(prefManager.KEY_CONTACTS).size() > 0) {
                 getrecentChat(0);
-            }else{
+            } else {
                 requestContactPermission();
             }
 
@@ -389,7 +386,7 @@ public class ChatsFragment extends BaseFragment implements UserRecentChatListene
                 chatRoom.setGroupId(jsonObject.getString("group_id"));
                 chatRoom.setOneToOne(jsonObject.getInt("oneToOne"));
                 chatRoom.setGroupName(jsonObject.getString("group_name"));
-                chatRoom.setUsername(jsonObject.getString("usermobile"));
+                chatRoom.setUsername(jsonObject.getString("username"));
                 chatRoom.setLastMessage(jsonObject.getString("message"));
                 if (chatRoom.getOneToOne() == 0) {
                     chatRoom.setProfilePicture(jsonObject.getString("group_image"));

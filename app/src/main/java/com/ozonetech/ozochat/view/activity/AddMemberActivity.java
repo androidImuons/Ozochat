@@ -41,11 +41,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ozonetech.ozochat.R;
+import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.databinding.ActivityAddMemberBinding;
 import com.ozonetech.ozochat.listeners.ContactsListener;
 import com.ozonetech.ozochat.listeners.CreateGroupInterface;
 import com.ozonetech.ozochat.model.AddMemberResponseModel;
 import com.ozonetech.ozochat.model.CommonResponse;
+import com.ozonetech.ozochat.model.ContactModel;
 import com.ozonetech.ozochat.model.CreateGRoupREsponse;
 import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.MobileObject;
@@ -64,6 +66,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static com.ozonetech.ozochat.MyApplication.chatDatabase;
 
 public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.ContactsAdapterListener, SelectedGrpMemberAdpter.SelectedAdpterListener, CreateGroupInterface, ContactsListener {      //
 
@@ -85,6 +89,7 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
     Cursor phones;
     ArrayList<Contacts> selectUsers;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private String tag="AddMemberActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,8 +119,26 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS) == null) {
+            Log.d(tag, " --310--" + myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS));
+            requestContactPermission();
+        } else {
+            List<ContactModel> validContactList = ChatDatabase.getInstance(getApplicationContext()).ValidContact().getAllContact();
+            Log.d(tag, " on resume--314--" + myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS).size());
+            if (myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS).size() > 0) {
+                gotoAddMembertoGroup(myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS));
+            } else {
+                requestContactPermission();
+            }
+
+        }
+    }
+
     private void init() {
-        requestContactPermission();
+       // requestContactPermission();
         selectUsers = new ArrayList<Contacts>();
         Intent intent = getIntent();
         Bundle args = intent.getBundleExtra("BUNDLE");
@@ -579,10 +602,26 @@ public class AddMemberActivity extends BaseActivity implements AddMemberAdapter.
             //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-            LoadContact loadContact = new LoadContact();
-            loadContact.execute();
+//            phones = getApplicationContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+//                    null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+//            LoadContact loadContact = new LoadContact();
+//            loadContact.execute();
+
+            List<ContactModel> validContactList = chatDatabase.ValidContact().getAllContact();
+            ArrayList<Contacts> list = new ArrayList<>();
+            for (int i = 0; i < validContactList.size(); i++) {
+                ContactModel contactModel = validContactList.get(i);
+                Contacts contacts = new Contacts();
+                contacts.setName(contactModel.getName());
+                contacts.setPhone(contactModel.getPhone());
+                contacts.setProfilePicture(contactModel.getProfilePicture());
+                contacts.setUid(contactModel.getUid());
+                contacts.setStatus("Hii, I am using Ozochat");
+                list.add(contacts);
+            }
+            Log.d(tag, "-show -db valid contatct--" + validContactList.size());
+            myPreferenceManager.saveArrayListContact(list, myPreferenceManager.KEY_CONTACTS);
+            gotoAddMembertoGroup(myPreferenceManager.getArrayListContact(myPreferenceManager.KEY_CONTACTS));
         }
     }
 

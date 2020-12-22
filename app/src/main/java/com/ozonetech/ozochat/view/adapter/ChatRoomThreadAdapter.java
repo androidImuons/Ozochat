@@ -1,9 +1,11 @@
 package com.ozonetech.ozochat.view.adapter;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.pdf.PdfRenderer;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +39,7 @@ import com.downloader.OnProgressListener;
 import com.downloader.OnStartOrResumeListener;
 import com.downloader.PRDownloader;
 import com.downloader.Progress;
+import com.github.barteksc.pdfviewer.PDFView;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.model.Message;
@@ -55,6 +59,7 @@ import com.tonyodev.fetch2core.DownloadBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -97,6 +102,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         LinearLayout ll_audio_layer;
         SeekBar sheekbar;
         ImageView iv_audio_donload;
+        PDFView pdfView;
 
         public ViewHolder(View view) {
             super(view);
@@ -111,6 +117,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             ll_audio_layer = (LinearLayout) itemView.findViewById(R.id.ll_audio_layer);
             sheekbar = (SeekBar) itemView.findViewById(R.id.sheekbar);
             iv_audio_donload = (ImageView) itemView.findViewById(R.id.iv_audio_donload);
+            pdfView=(PDFView)itemView.findViewById(R.id.pdfView);
 
         }
     }
@@ -202,7 +209,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 setName(((ViewHolder) holder).txt_sender_name, message);
             } else {
                 message.setIs_contact(false);
-                ((ViewHolder) holder).txt_sender_name.setText(message.getSender_mobile() + "         " + message.getSender_name());
+                ((ViewHolder) holder).txt_sender_name.setText(message.getSender_name());
             }
             ((ViewHolder) holder).txt_sender_name.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -297,6 +304,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 e.printStackTrace();
             }
         } else if (message.getFile().contains("jpg")
+                ||message.getFile().contains("jpeg")
                 || message.getFile().contains("png")
                 || message.getFile().contains("mp4")) {
             holder.ll_download.setVisibility(View.GONE);
@@ -350,33 +358,74 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         }
     }
+    // for try
+    private byte[] getFileDataFromDrawable(Context context, String filePath) {
 
+        Log.d("bitmap image", "--------------" + filePath);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Log.d("bitmap 1", "--------------");
+
+        Log.d("bitmap 2", "--------------");
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        if (byteArrayOutputStream == null) {
+            Log.e("byte null", "byteArrayOutputStream nill ************************");
+        }
+
+
+        byte[] b = byteArrayOutputStream.toByteArray();
+        String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+        Log.d("encode image ", "--------------" + imageEncoded);
+        return byteArrayOutputStream.toByteArray();
+    }
     private void showpdfFile(Message message, ViewHolder holder, int position) throws IOException {
         Bitmap bitmap = null;
         ContentResolver contentResolver = mContext.getContentResolver();
-        ParcelFileDescriptor fileDescriptor = contentResolver.openFileDescriptor(Uri.parse("/storage/emulated/0/storage/emulated/0/Download/OZOCHAT/8277.pdf"), "r");
-        if (fileDescriptor != null) {
-            PdfRenderer pdfRenderer = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                pdfRenderer = new PdfRenderer(fileDescriptor);
-                if (pdfRenderer != null) {
-                    if (pdfRenderer.getPageCount() > 0) {
-                        PdfRenderer.Page page = pdfRenderer.openPage(0);
-                        // Set the width and height based on the desired preview size
-                        // and the aspect ratio of the pdf page
-                        int bitmapWidth = 250;
-                        int bitmapHeight = 250;
-                        // Create a white bitmap to make sure that PDFs without
-                        // a background color are rendered on a white background
-                        int[] colors = new int[]{mContext.getResources().getColor(R.color.red), mContext.getResources().getColor(R.color.colorBlue), mContext.getResources().getColor(R.color.green)};
-                        bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
-                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                        page.close();
-                        holder.iv_file.setImageBitmap(bitmap);
-                    }
+        holder.iv_file.setVisibility(View.GONE);
+        holder.pdfView.setVisibility(View.VISIBLE);
+        holder.pdfView.fromFile(new File(message.getStorageFile())).pages(1).load();
+
+        holder.pdfView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File file = new File(message.getStorageFile());
+                Intent target = new Intent(Intent.ACTION_VIEW);
+                target.setDataAndType(Uri.fromFile(file),"application/pdf");
+                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                Intent intent = Intent.createChooser(target, "Open File");
+                try {
+                    mContext.startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    // Instruct the user to install a PDF reader here, or something
                 }
             }
-        }
+        });
+//
+//        ParcelFileDescriptor fileDescriptor = contentResolver.openFileDescriptor(Uri.parse(message.getStorageFile()), "r");
+//        if (fileDescriptor != null) {
+//            PdfRenderer pdfRenderer = null;
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+//                pdfRenderer = new PdfRenderer(fileDescriptor);
+//                if (pdfRenderer != null) {
+//                    if (pdfRenderer.getPageCount() > 0) {
+//                        PdfRenderer.Page page = pdfRenderer.openPage(0);
+//                        // Set the width and height based on the desired preview size
+//                        // and the aspect ratio of the pdf page
+//                        int bitmapWidth = 250;
+//                        int bitmapHeight = 250;
+//                        // Create a white bitmap to make sure that PDFs without
+//                        // a background color are rendered on a white background
+//                        int[] colors = new int[]{mContext.getResources().getColor(R.color.red), mContext.getResources().getColor(R.color.colorBlue), mContext.getResources().getColor(R.color.green)};
+//                        bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+//                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+//                        page.close();
+//                        holder.iv_file.setImageBitmap(bitmap);
+//                    }
+//                }
+//            }
+//        }
     }
 
     private void showFile(ViewHolder holder, Message message, int position) throws IOException {
@@ -424,8 +473,10 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     .placeholder(R.drawable.ic_file)
                     .thumbnail(Glide.with(mContext).load(message.getFile()))
                     .into(((ViewHolder) holder).iv_file);
-        } else if (message.getFile().contains("jpg") ||
-                message.getFile().contains("png") ||
+        }
+        else if (message.getFile().contains("jpg")
+                  ||message.getFile().contains("jpeg")
+               || message.getFile().contains("png") ||
                 message.getFile().contains("mp4")) {
             holder.rl_layer_file.setVisibility(View.VISIBLE);
             holder.message.setVisibility(View.GONE);
@@ -600,7 +651,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 message.setIs_contact(true);
                 return;
             } else {
-                holder.setText(message.getSender_mobile() + "         " + message.getSender_name());
+                holder.setText(message.getSender_name() + "         " + message.getSender_name());
                 flag = false;
             }
         }

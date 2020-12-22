@@ -62,10 +62,14 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
         binding.setLifecycleOwner(this)
         myPreferenceManager = MyPreferenceManager(activity)
 
-        renderView()
+
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        renderView()
+    }
     private fun renderView() {
         if (myPreferenceManager.userDetails[MyPreferenceManager.KEY_PROFILE_PIC] != null) {
             Log.d("image url", "--details-" + myPreferenceManager.userDetails[MyPreferenceManager.KEY_PROFILE_PIC])

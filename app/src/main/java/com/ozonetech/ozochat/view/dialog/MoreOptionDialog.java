@@ -136,6 +136,9 @@ public class MoreOptionDialog extends AppBaseFragment implements ContactsListene
         if (getIsContact()) {
             txt_add_to_exist_contact.setVisibility(View.GONE);
             txt_add_to_contact.setVisibility(View.GONE);
+        }else{
+            txt_add_to_exist_contact.setVisibility(View.GONE);
+            txt_add_to_contact.setVisibility(View.GONE);
         }
         onClick();
     }
