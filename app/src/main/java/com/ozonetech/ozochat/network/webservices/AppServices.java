@@ -93,6 +93,4 @@ public interface AppServices {
     @FormUrlEncoded
     @POST("getVersion")
     Call<AppVersionModel> updateApp(@FieldMap Map<String, String> groupMap);
-
-
 }
