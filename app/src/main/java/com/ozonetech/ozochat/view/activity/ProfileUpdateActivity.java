@@ -68,7 +68,7 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
     ProfileUpdateViewModel viewModel;
     private MyPreferenceManager myPreferenceManager;
     private String filter_image;
-    private String tag="ProfileUpdateActivity";
+    private String tag = "ProfileUpdateActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,10 +177,10 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
         galleryIntent.setType("image/*");
 //        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-       // startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"), SELECT_FILE);
+        // startActivityForResult(Intent.createChooser(galleryIntent, "Select Picture"), SELECT_FILE);
 
 
-        Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, SELECT_FILE);
     }
 
@@ -209,25 +209,23 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE) {
                 outPutfileUri = data.getData();
-                Log.d(tag,"---"+outPutfileUri);
+                Log.d(tag, "---" + outPutfileUri);
                 Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), outPutfileUri);
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                     String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
-                    filter_image=url;
+                    filter_image = url;
                     outPutfileUri = Uri.parse(url);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
-
-
                 Uri selectedImage = data.getData();
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
                 cursor.moveToFirst();
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 String picturePath = cursor.getString(columnIndex);
@@ -239,7 +237,7 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                 binding.image.setImageURI(outPutfileUri);
                 updateProfile();
                 try {
-                   // filterImage();
+                    // filterImage();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -250,29 +248,29 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                 String url = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "attachment", null);
-              filter_image=url;
+                filter_image = url;
                 outPutfileUri = Uri.parse(url);
                 isAttachment = "1";
                 binding.image.setImageURI(outPutfileUri);
                 updateProfile();
                 try {
-                //    filterImage();
+                    //    filterImage();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else if (requestCode==ACTION_REQUEST_EDITIMAGE){
+            } else if (requestCode == ACTION_REQUEST_EDITIMAGE) {
                 String newFilePath = data.getStringExtra(ImageEditorIntentBuilder.OUTPUT_PATH);
                 boolean isImageEdit = data.getBooleanExtra(EditImageActivity.IS_IMAGE_EDITED, false);
                 if (isImageEdit) {
-                   // Toast.makeText(this, getString(R.string.save_path, newFilePath), Toast.LENGTH_LONG).show();
+                    // Toast.makeText(this, getString(R.string.save_path, newFilePath), Toast.LENGTH_LONG).show();
                 } else {
                     newFilePath = data.getStringExtra(ImageEditorIntentBuilder.SOURCE_PATH);
                 }
 
-                outPutfileUri= Uri.fromFile(outputFile);
+                outPutfileUri = Uri.fromFile(outputFile);
 
-                filter_image=newFilePath;
-                Log.d("edit","---"+outPutfileUri.getPath());
+                filter_image = newFilePath;
+                Log.d("edit", "---" + outPutfileUri.getPath());
                 binding.image.setImageURI(outPutfileUri);
 
                 RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
@@ -286,11 +284,12 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
 
 
     public static final int ACTION_REQUEST_EDITIMAGE = 9;
-    File outputFile ;
+    File outputFile;
+
     private void filterImage() throws Exception {
-        Log.d("filterimage","-----image filter--"+ filter_image);
-        outputFile= FileUtil.genEditFile();
-        Intent intent = new ImageEditorIntentBuilder(this,filter_image,outputFile.getAbsolutePath())
+        Log.d("filterimage", "-----image filter--" + filter_image);
+        outputFile = FileUtil.genEditFile();
+        Intent intent = new ImageEditorIntentBuilder(this, filter_image, outputFile.getAbsolutePath())
                 .withAddText()
                 .withFilterFeature()
                 .withRotateFeature()
@@ -307,7 +306,6 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
     }
 
 
-
     private void updateProfile() {
         if (AppCommon.getInstance(this).isConnectingToInternet(this)) {
             final Dialog dialog = ViewUtils.getProgressBar(this);
@@ -319,8 +317,8 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
             RequestBody requestFile = null;
             if (isAttachment.equals("1")) {
                 File file = FileUtils.getFile(this, outPutfileUri);
-               imageUrl = prepareFilePart("image", outPutfileUri);
-              //  imageUrl=preparefile("image",outPutfileUri.toString());
+                imageUrl = prepareFilePart("image", outPutfileUri);
+                //  imageUrl=preparefile("image",outPutfileUri.toString());
             }
             Map<String, RequestBody> map = new HashMap<>();
             map.put("uid", uid);
@@ -338,8 +336,8 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                         if (authResponse.getSuccess() == true) {
                             showSnackbar(binding.rrLayer, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
                             myPreferenceManager.setProfilePic(authResponse.getDataObject().getImage_url());
-                            binding.image.setImageURI(authResponse.getDataObject().getImage_url());
-
+                            //  binding.image.setImageURI(authResponse.getDataObject().getImage_url());
+                            binding.image.setImageURI(myPreferenceManager.getUserDetails().get(myPreferenceManager.KEY_PROFILE_PIC));
                             RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
                             roundingParams.setRoundAsCircle(true);
                             binding.image.getHierarchy().setRoundingParams(roundingParams);
@@ -377,39 +375,40 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
 
-    private MultipartBody.Part preparefile(String param,String fileUri) {
+    private MultipartBody.Part preparefile(String param, String fileUri) {
 
         File file = new File(fileUri);
         MultipartBody.Part body = null;
         long length = file.length();
         length = length / 1024;
-        Log.d("file size","----"+length);
-        Log.d("file size","----"+file.getAbsolutePath());
+        Log.d("file size", "----" + length);
+        Log.d("file size", "----" + file.getAbsolutePath());
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         body = MultipartBody.Part.createFormData(param, file.getName().replace(" ", "_"), requestFile);
         return body;
     }
 
-    public void updatename(View view){
+    public void updatename(View view) {
         Bundle bundle = new Bundle();
         bundle.putString("name", String.valueOf(binding.txtName.getText().toString()));
-        bundle.putString("param","username");
+        bundle.putString("param", "username");
         EditDialog instance = EditDialog.getInstance(bundle);
         instance.show(getSupportFragmentManager(), instance.getClass().getSimpleName());
-        instance.sendCallBack =(EditDialog.SendCallBack) ProfileUpdateActivity.this;
+        instance.sendCallBack = (EditDialog.SendCallBack) ProfileUpdateActivity.this;
     }
-    public void updatestatus(View view){
+
+    public void updatestatus(View view) {
         Bundle bundle = new Bundle();
         bundle.putString("name", String.valueOf(binding.txtAboutUs.getText().toString()));
-        bundle.putString("param","user_status");
+        bundle.putString("param", "user_status");
         EditDialog instance = EditDialog.getInstance(bundle);
         instance.show(getSupportFragmentManager(), instance.getClass().getSimpleName());
-        instance.sendCallBack =(EditDialog.SendCallBack) ProfileUpdateActivity.this;
+        instance.sendCallBack = (EditDialog.SendCallBack) ProfileUpdateActivity.this;
     }
 
     @Override
     public void sendMessage(String msg, String pos) {
-            updateNameAboutUs(msg,pos);
+        updateNameAboutUs(msg, pos);
     }
 
     @Override
@@ -440,10 +439,10 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                     if (authResponse != null) {
                         showSnackbar(binding.rrLayer, authResponse.getMessage(), Snackbar.LENGTH_SHORT);
 
-                        if(pos.equals("user_status")){
+                        if (pos.equals("user_status")) {
                             myPreferenceManager.setAboutus(msg);
-                         binding.txtAboutUs.setText(msg);
-                        }else{
+                            binding.txtAboutUs.setText(msg);
+                        } else {
                             myPreferenceManager.setUserName(msg);
                             binding.txtName.setText(msg);
                         }

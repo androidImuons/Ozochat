@@ -232,7 +232,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
             @Override
             public void onClick(View view) {
                 getMessage();
-                mAdapter.clearMediaPlayer();
+                if (mAdapter!=null){
+                    mAdapter.clearMediaPlayer();
+                }
+
                 finish();
             }
         });
@@ -594,7 +597,10 @@ public class UserChatActivity extends BaseActivity implements CommonResponseInte
         Intent intent = new Intent(UserChatActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        mAdapter.clearMediaPlayer();
+        if (mAdapter!=null){
+            mAdapter.clearMediaPlayer();
+        }
+
         finish();
     }
 

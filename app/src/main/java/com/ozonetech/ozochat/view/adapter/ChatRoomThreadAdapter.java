@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.pdf.PdfDocument;
 import android.graphics.pdf.PdfRenderer;
 import android.media.MediaPlayer;
+import android.media.MediaScannerConnection;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -55,6 +56,18 @@ import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.utils.ThubnailUtils;
 import com.ozonetech.ozochat.view.activity.PhotoVideoRedirectActivity;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
+import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2.Fetch;
+import com.tonyodev.fetch2.FetchConfiguration;
+import com.tonyodev.fetch2.FetchListener;
+import com.tonyodev.fetch2.NetworkType;
+import com.tonyodev.fetch2.Priority;
+import com.tonyodev.fetch2.Request;
+import com.tonyodev.fetch2core.DownloadBlock;
+import com.tonyodev.fetch2core.Extras;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +82,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import iamutkarshtiwari.github.io.ananas.editimage.utils.Utils;
 
@@ -87,6 +101,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private ArrayList<Message> messageArrayList;
     private String tag = "ChatRoomThreadAdapter";
     private ImageView last_ivAudio;
+    private Fetch fetch;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView message;
@@ -130,6 +145,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         today = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)); //2020-11-04T10:25:31.000Z
         prefManager = new MyPreferenceManager(mContext.getApplicationContext());
         dirPath = FileUtil.getRootDirPath(mContext);
+
     }
 
     @Override
@@ -177,6 +193,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             Log.d(tag, "----message avail" + message.getMessage());
         } else if (message.getFile() != null) {
 
+            download(message,(ViewHolder)holder);
             try {
                 if (message.getStorageFile() != null) {
                     showLocalDbFile(((ViewHolder) holder), message, position);
@@ -245,7 +262,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             public void onStopTrackingTouch(SeekBar seekBar) {
 
                 if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                   // mediaPlayer.seekTo(holder.sheekbar.getProgress());
+                    // mediaPlayer.seekTo(holder.sheekbar.getProgress());
                 }
             }
         });
@@ -314,8 +331,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     .into(((ViewHolder) holder).iv_file);
 
             Log.d(tag, "--storage path 231--" + message.getStorageFile());
-        }
-        else if (message.getFile().contains("mp3") ||
+        } else if (message.getFile().contains("mp3") ||
                 message.getFile().contains("pk")) {
             holder.ll_download.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);
@@ -329,11 +345,11 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             holder.iv_audio_donload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (last_ivAudio!=null){
+                    if (last_ivAudio != null) {
                         last_ivAudio.setBackground(mContext.getDrawable(R.drawable.ic_stop));
-                        last_ivAudio=holder.iv_audio_donload;
-                    }else{
-                        last_ivAudio=holder.iv_audio_donload;
+                        last_ivAudio = holder.iv_audio_donload;
+                    } else {
+                        last_ivAudio = holder.iv_audio_donload;
                     }
 
                     if ((Integer) view.getTag() == 0) {
@@ -343,7 +359,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     } else {
                         holder.iv_audio_donload.setTag(0);
                         holder.iv_audio_donload.setBackground(mContext.getDrawable(R.drawable.ic_stop));
-                        if (mediaPlayer!=null&&mediaPlayer.isPlaying()) {
+                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                             mediaPlayer.pause();
                         }
                     }
@@ -356,7 +372,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private void showpdfFile(Message message, ViewHolder holder, int position) throws IOException {
         Bitmap bitmap = null;
         ContentResolver contentResolver = mContext.getContentResolver();
-        ParcelFileDescriptor fileDescriptor = contentResolver.openFileDescriptor(Uri.parse(message.getStorageFile()), "r");
+        ParcelFileDescriptor fileDescriptor = contentResolver.openFileDescriptor(Uri.parse("/storage/emulated/0/storage/emulated/0/Download/OZOCHAT/8277.pdf"), "r");
         if (fileDescriptor != null) {
             PdfRenderer pdfRenderer = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -380,7 +396,6 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             }
         }
     }
-
 
     private void showFile(ViewHolder holder, Message message, int position) throws IOException {
 
@@ -454,7 +469,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     MediaPlayer mediaPlayer = new MediaPlayer();
 
     public void clearMediaPlayer() {
-        if (mediaPlayer!=null){
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
@@ -514,7 +529,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private void downloadfile(ViewHolder holder, Message message, int position) {
         holder.rl_layer_file.setTag(holder);
         String filename = message.getId().toString() + message.getFile().substring(message.getFile().lastIndexOf("."));
-        ;
+
         Log.d(tag, "----file generate---" + filename);
         int downloadid = PRDownloader.download(message.getFile(), dirPath, filename).build().setOnStartOrResumeListener(new OnStartOrResumeListener() {
             @Override
@@ -678,7 +693,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 if (length > KiB) {
                     size = format.format(length / KiB) + " KiB";
                 }
-                if (length<KiB){
+                if (length < KiB) {
                     size = format.format(length) + " B";
                 }
 
@@ -697,5 +712,109 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         }
     }
 
+
+    private void download(Message message, ViewHolder viewHolder) {
+        FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(mContext)
+                .setDownloadConcurrentLimit(3)
+                .build();
+         fetch = Fetch.Impl.getInstance(fetchConfiguration);
+         // filename = message.getId().toString() + message.getFile().substring(message.getFile().lastIndexOf("."));
+       String filename="1608179.jpg";
+        String url = "https://ozochatapireplica.ozonetech.biz/uploads/1607670016077.pdf";
+        String file = dirPath +"/"+ filename;
+        final Request request = new Request(url, file);
+        request.setPriority(Priority.HIGH);
+        request.setNetworkType(NetworkType.ALL);
+
+      //  request.addHeader("clientKey", "SD78DF93_3947&MVNGHE1WONG");
+
+        fetch.enqueue(request, updatedRequest -> {
+            //Request was successfully enqueued for download.
+            Log.d(tag,"----fatch--");
+            fetch.addListener(fetchListener);
+        }, error -> {
+            //An error occurred enqueuing the request.
+        });
+
+
+//Remove listener when done.
+
+
+    }
+    FetchListener fetchListener = new FetchListener() {
+        @Override
+        public void onAdded(@NotNull Download download) {
+
+        }
+
+        @Override
+        public void onQueued(@NotNull Download download, boolean b) {
+
+        }
+
+        @Override
+        public void onWaitingNetwork(@NotNull Download download) {
+
+        }
+
+        @Override
+        public void onCompleted(@NotNull Download download) {
+            download.getFileUri();
+            Log.d(tag,"---761--"+download.getFileUri());
+            Log.d(tag,"---762--"+download.getFile());
+            Uri uri=Uri.fromFile(new File(download.getFile()));
+            Log.d(tag,"---764--"+uri.toString());
+            Uri uri1=Uri.parse(download.getFileUri().toString());
+            Log.d(tag,"---766--"+uri1.toString());
+            File file=new File(download.getFile());
+            Log.d(tag,"---768--"+file.getAbsolutePath());
+            fetch.removeListener(fetchListener);;
+        }
+
+        @Override
+        public void onError(@NotNull Download download, @NotNull com.tonyodev.fetch2.Error error, @Nullable Throwable throwable) {
+
+        }
+
+        @Override
+        public void onDownloadBlockUpdated(@NotNull Download download, @NotNull DownloadBlock downloadBlock, int i) {
+
+        }
+
+        @Override
+        public void onStarted(@NotNull Download download, @NotNull List<? extends DownloadBlock> list, int i) {
+
+        }
+
+        @Override
+        public void onProgress(@NotNull Download download, long l, long l1) {
+
+        }
+
+        @Override
+        public void onPaused(@NotNull Download download) {
+
+        }
+
+        @Override
+        public void onResumed(@NotNull Download download) {
+
+        }
+
+        @Override
+        public void onCancelled(@NotNull Download download) {
+
+        }
+
+        @Override
+        public void onRemoved(@NotNull Download download) {
+
+        }
+
+        @Override
+        public void onDeleted(@NotNull Download download) {
+
+        }
+    };
 
 }
