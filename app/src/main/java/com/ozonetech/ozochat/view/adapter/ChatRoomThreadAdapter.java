@@ -3,21 +3,14 @@ package com.ozonetech.ozochat.view.adapter;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.pdf.PdfDocument;
 import android.graphics.pdf.PdfRenderer;
 import android.media.MediaPlayer;
-import android.media.MediaScannerConnection;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
-import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +23,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.content.FileProvider;
-import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -44,16 +35,12 @@ import com.downloader.OnPauseListener;
 import com.downloader.OnProgressListener;
 import com.downloader.OnStartOrResumeListener;
 import com.downloader.PRDownloader;
-import com.downloader.PRDownloaderConfig;
 import com.downloader.Progress;
-import com.jaiselrahman.filepicker.utils.FileUtils;
-import com.ozonetech.ozochat.MyApplication;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.database.ChatDatabase;
 import com.ozonetech.ozochat.model.Message;
 import com.ozonetech.ozochat.utils.FileUtil;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
-import com.ozonetech.ozochat.utils.ThubnailUtils;
 import com.ozonetech.ozochat.view.activity.PhotoVideoRedirectActivity;
 import com.ozonetech.ozochat.view.activity.UserChatActivity;
 import com.tonyodev.fetch2.Download;
@@ -64,16 +51,13 @@ import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2.Priority;
 import com.tonyodev.fetch2.Request;
 import com.tonyodev.fetch2core.DownloadBlock;
-import com.tonyodev.fetch2core.Extras;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
@@ -83,8 +67,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import iamutkarshtiwari.github.io.ananas.editimage.utils.Utils;
 
 public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -731,7 +713,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         fetch.enqueue(request, updatedRequest -> {
             //Request was successfully enqueued for download.
             Log.d(tag,"----fatch--");
-            fetch.addListener(fetchListener);
+            //fetch.addListener(fetchListener);
         }, error -> {
             //An error occurred enqueuing the request.
         });
