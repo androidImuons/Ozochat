@@ -8,8 +8,10 @@ import com.ozonetech.ozochat.model.LeftResponseModel;
 import com.ozonetech.ozochat.model.LoginResponse;
 import com.ozonetech.ozochat.model.NumberListObject;
 import com.ozonetech.ozochat.model.OTPResponse;
+import com.ozonetech.ozochat.model.StatusResponseModel;
 import com.ozonetech.ozochat.model.UploadFilesResponse;
 import com.ozonetech.ozochat.model.UploadResponse;
+import com.ozonetech.ozochat.model.UserStatusResponseModel;
 import com.ozonetech.ozochat.utils.AppVersionModel;
 import com.ozonetech.ozochat.viewmodel.GroupDetailModel;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
@@ -27,6 +29,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -93,4 +96,12 @@ public interface AppServices {
     @FormUrlEncoded
     @POST("getVersion")
     Call<AppVersionModel> updateApp(@FieldMap Map<String, String> groupMap);
+
+    @POST("setStatus")
+    Call<UserStatusResponseModel> uploadUserStatus(@Header("Accept") String accept,@Body RequestBody userStatusBody);
+
+    @FormUrlEncoded
+    @POST("getStatus")
+    Call<StatusResponseModel> getUserStatus(@FieldMap Map<String,String> statusMap);
+
 }

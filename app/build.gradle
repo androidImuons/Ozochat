@@ -62,7 +62,7 @@ dependencies {
     implementation 'com.github.mejdi14:Flat-Dialog-Android:1.0.5'
 
     //material design
-  //  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    //  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.2.0'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
     implementation "androidx.cardview:cardview:1.0.0"
@@ -70,7 +70,7 @@ dependencies {
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     annotationProcessor 'android.arch.lifecycle:compiler:2.2.0'
-   // implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Retrofit and Okhttp
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
@@ -103,7 +103,7 @@ dependencies {
     implementation 'com.github.nkzawa:socket.io-client:0.6.0'
 
     implementation "org.java-websocket:Java-WebSocket:1.3.0"
-   implementation 'com.github.nkzawa:socket.io-client:0.3.0'
+    implementation 'com.github.nkzawa:socket.io-client:0.3.0'
 
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
@@ -119,7 +119,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.2.0'
     implementation 'com.github.iamutkarshtiwari:Ananas:1.2.4'
 
-        implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support:multidex:1.0.3'
 
     implementation 'com.google.android.play:core:1.5.0'
 
@@ -129,11 +129,7 @@ dependencies {
 
     implementation 'com.mindorks.android:prdownloader:0.6.0'
 
-    implementation  'com.fxn769:pix:1.5.4'
+    implementation 'com.fxn769:pix:1.5.4'
 
-    implementation 'gun0912.ted:tedbottompicker:2.0.1'
-
-    implementation 'ja.burhanrashid52:photoeditor:1.1.0'
-
-    implementation "androidx.tonyodev.fetch2:xfetch2:3.1.5"
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
 }

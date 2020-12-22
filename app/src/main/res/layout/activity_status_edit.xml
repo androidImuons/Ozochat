@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <RelativeLayout
+        android:id="@+id/rl_StatusEdit"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorBlack"
@@ -18,14 +19,15 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/include_toolbar">
 
+<!--
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewSelector"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/dp100"
                 android:layout_marginBottom="@dimen/dp150"/>
+-->
 
-<!--
             <ImageView
                 android:contentDescription="@string/app_name"
                 android:id="@+id/currentStreamImage"
@@ -35,8 +37,6 @@
                 android:scaleType="centerCrop"
                 android:layout_marginTop="@dimen/dp100"
                 android:layout_marginBottom="@dimen/dp150"/>
--->
-
 
             <LinearLayout
                 android:orientation="vertical"
@@ -63,6 +63,12 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_et_caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/dp50"
+                        android:visibility="gone"
+                        android:layout_weight="1"/>
                     <EditText
                         android:id="@+id/caption"
                         android:hint="@string/enter_caption_here"
@@ -72,10 +78,11 @@
                         android:layout_width="0dp"
                         android:layout_gravity="center"
                         android:layout_height="wrap_content"
+                        android:visibility="visible"
                         android:layout_weight="1"/>
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab"
+                        android:id="@+id/fabSend"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"

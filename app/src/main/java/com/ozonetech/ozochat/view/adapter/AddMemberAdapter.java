@@ -200,4 +200,5 @@ public class AddMemberAdapter extends RecyclerView.Adapter<AddMemberAdapter.MyVi
         void onRemoveMemeber(Contacts contacts);
     }
 
+
 }
