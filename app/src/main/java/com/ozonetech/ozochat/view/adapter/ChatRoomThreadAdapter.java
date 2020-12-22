@@ -193,7 +193,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             Log.d(tag, "----message avail" + message.getMessage());
         } else if (message.getFile() != null) {
 
-            download(message,(ViewHolder)holder);
+
             try {
                 if (message.getStorageFile() != null) {
                     showLocalDbFile(((ViewHolder) holder), message, position);
