@@ -48,6 +48,12 @@
             android:layout_height="match_parent"
             android:visibility="visible"></ImageView>
 
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/pdfView"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="match_parent"/>
+
         <LinearLayout
             android:id="@+id/ll_download"
             android:layout_width="match_parent"
