@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ll_status_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_list_row"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_margin="2dp"
+    android:orientation="horizontal">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="@dimen/dp50"
+        android:layout_height="@dimen/dp50"
+        android:layout_margin="@dimen/dp10"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile_pic"
+        app:civ_border_color="#7e3c62"
+        app:civ_border_width="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/dp5"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTotalViews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp2"
+            android:fontFamily="@font/urfa_medium"
+            android:text="60 views"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/sp12" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dp2"
+            android:fontFamily="@font/urfa_regular"
+            android:text="Yesterday 11:00 am"
+            android:textColor="@color/colorHint"
+            android:textSize="@dimen/sp12" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

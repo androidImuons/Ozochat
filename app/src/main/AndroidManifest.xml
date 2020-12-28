@@ -36,7 +36,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.activity.StatusEditActivity"></activity>
+        <activity android:name=".view.activity.MyStatusActivity"></activity>
+        <activity android:name=".view.activity.StoriesActivity" />
+        <activity android:name=".view.activity.StatusEditActivity" />
 
         <service
             android:name=".network.DbService"
@@ -98,8 +100,10 @@
         <activity android:name=".view.activity.WelcomeScreen" />
         <activity android:name=".view.activity.SettingActivity" />
         <activity android:name=".view.activity.ProfileUpdateActivity" />
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+
         <receiver
             android:name=".network.ConnectivityReceiver"
             android:enabled="true">
@@ -121,9 +125,6 @@
         <service
             android:name=".network.ContactDBService"
             android:exported="false" />
-
-
-
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

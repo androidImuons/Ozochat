@@ -3,7 +3,9 @@ package com.ozonetech.ozochat.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class StatusModel {
+import java.io.Serializable;
+
+public class StatusModel implements Serializable {
 
     @SerializedName("sender_id")
     @Expose

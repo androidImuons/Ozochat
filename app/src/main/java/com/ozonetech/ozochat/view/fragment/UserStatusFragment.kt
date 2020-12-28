@@ -1,5 +1,4 @@
 package com.ozonetech.ozochat.view.fragment
-
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -20,36 +19,35 @@ import com.bumptech.glide.request.RequestOptions
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.fxn.utility.PermUtil
-import com.google.android.material.snackbar.Snackbar
 import com.ozonetech.ozochat.R
 import com.ozonetech.ozochat.databinding.FragmentUserStatusBinding
 import com.ozonetech.ozochat.listeners.StatusListener
-import com.ozonetech.ozochat.model.CreateGRoupREsponse
-import com.ozonetech.ozochat.model.GroupCreateRecord
+import com.ozonetech.ozochat.model.StatusModel
 import com.ozonetech.ozochat.model.StatusResponseModel
 import com.ozonetech.ozochat.model.UserStatusResponseModel
 import com.ozonetech.ozochat.utils.MyPreferenceManager
+import com.ozonetech.ozochat.view.activity.MyStatusActivity
 import com.ozonetech.ozochat.view.activity.StatusEditActivity
+import com.ozonetech.ozochat.view.activity.StoriesActivity
 import com.ozonetech.ozochat.view.adapter.UserStatusAdapter
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
+class UserStatusFragment : BaseFragment(), StatusListener {
 
-class UserStatusFragment : BaseFragment() ,StatusListener{
-
-    private lateinit var binding : FragmentUserStatusBinding
-    private lateinit var myPreferenceManager : MyPreferenceManager
+    private lateinit var binding: FragmentUserStatusBinding
+    private lateinit var myPreferenceManager: MyPreferenceManager
     private val requestCodePicker = 100
     private lateinit var myAdapter: UserStatusAdapter
     private lateinit var options: Options
     private var returnValue = ArrayList<String>()
     private var returnValueUri = ArrayList<Uri>()
     private lateinit var statusResponseModel: StatusResponseModel
+    var imgStatusArraylist = ArrayList<StatusModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +55,6 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user_status, container, false)
         statusResponseModel = ViewModelProviders.of(this@UserStatusFragment).get(StatusResponseModel::class.java)
         // dataBinding.llNewContact.setVisibility(View.VISIBLE);
-
         val view: View = binding.getRoot()
         binding.setLifecycleOwner(this)
         myPreferenceManager = MyPreferenceManager(activity)
@@ -80,6 +77,8 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
                     .into(binding.thumbnail)
         }
 
+        binding.ivMore.visibility = View.GONE
+        binding.tvContactStatus.text = "Tap to add status update";
         binding.rvRecentUpdates.layoutManager = LinearLayoutManager(activity)
         myAdapter = UserStatusAdapter(requireContext())
         options = Options.init()
@@ -93,8 +92,24 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
         binding.rvRecentUpdates.adapter = myAdapter
 
         binding.llMyStatus.setOnClickListener {
-            options.preSelectedUrls = returnValue
-            Pix.start(this@UserStatusFragment, options)
+
+            if (binding.tvContactStatus.text.equals("Tap to add status update")) {
+                options.preSelectedUrls = returnValue
+                Pix.start(this@UserStatusFragment, options)
+                binding.ivMore.visibility = View.GONE
+
+            } else {
+                binding.ivMore.visibility = View.VISIBLE
+                val intent = Intent(activity, StoriesActivity::class.java)
+                intent.putExtra("imgStatusArraylist", imgStatusArraylist);
+                startActivity(intent)
+            }
+        }
+
+        binding.ivMore.setOnClickListener {
+            val intent = Intent(activity, MyStatusActivity::class.java)
+            intent.putExtra("imgStatusArraylist", imgStatusArraylist);
+            startActivity(intent)
         }
 
         getUserStatus()
@@ -102,7 +117,7 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
     }
 
     private fun getUserStatus() {
-        val statusMap : MutableMap<String, String> = HashMap()
+        val statusMap: MutableMap<String, String> = HashMap()
         myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID)?.let { statusMap.put("sender_id", it) }
         showProgressDialog("Please wait...")
         statusResponseModel.getUserStatus(activity, also { statusResponseModel.statusListener = it }, statusMap)
@@ -121,12 +136,7 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
                     }
 
                     gotoImgEditor(returnValueUri)
-                    /* val bundle = Bundle()
-                    bundle.putSerializable("KEY_ARRAYLIST", returnValue)
-                    val mapFragment = AddImageWithCaptionFragment()
-                    mapFragment.arguments = bundle*/
 
-                    //  myAdapter.addImage(returnValue)
                 }
             }
         }
@@ -168,23 +178,34 @@ class UserStatusFragment : BaseFragment() ,StatusListener{
     }
 
     override fun onGetUserStatusSuccess(statusGetResponse: LiveData<StatusResponseModel>?) {
-        statusGetResponse?.observe(viewLifecycleOwner,object:Observer<StatusResponseModel>{
+        statusGetResponse?.observe(viewLifecycleOwner, object : Observer<StatusResponseModel> {
             override fun onChanged(t: StatusResponseModel?) {
                 hideProgressDialog()
                 try {
-                    if(t?.success == true){
+                    if (t?.success == true) {
+
+                        if (t?.imgData.size != 0) {
+
+                            imgStatusArraylist = t?.imgData as ArrayList<StatusModel>
+
+                            if (binding.tvContactStatus.text.equals("Tap to add status update")) {
+                                binding.tvContactStatus.text = "Today"
+                            }
+                        }
+
                         Log.d("UserStatusFrag", "--Response : Code" + t.message)
-                    }else{
+                    } else {
                         Log.d("UserStatusFrag", "--Response : Code" + (t?.message ?: ""))
                     }
-                } catch (e:Exception) {}
-                finally
-                {
+                } catch (e: Exception) {
+                } finally {
                     hideProgressDialog()
                 }
             }
         })
     }
+
+
 
     override fun onSetUserStatusSuccess(userStatusResponse: LiveData<UserStatusResponseModel>?) {
         TODO("Not yet implemented")

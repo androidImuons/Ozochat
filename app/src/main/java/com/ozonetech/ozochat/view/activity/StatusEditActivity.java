@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 import com.jaiselrahman.filepicker.model.MediaFile;
 import com.ozonetech.ozochat.R;
 import com.ozonetech.ozochat.databinding.ActivityStatusEditBinding;
@@ -41,6 +43,7 @@ import com.ozonetech.ozochat.databinding.StatusToolbarBinding;
 import com.ozonetech.ozochat.listeners.StatusListener;
 import com.ozonetech.ozochat.model.StatusResponseModel;
 import com.ozonetech.ozochat.model.UserStatusResponseModel;
+import com.ozonetech.ozochat.network.FileUtils;
 import com.ozonetech.ozochat.utils.MyPreferenceManager;
 import com.ozonetech.ozochat.view.adapter.StatusCaptionAdapter;
 import com.ozonetech.ozochat.view.adapter.UserStatusAdapter;
@@ -53,6 +56,8 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -153,42 +158,67 @@ public class StatusEditActivity extends BaseActivity implements UserStatusAdapte
             @Override
             public void onClick(View v) {
 
-                MultipartBody.Builder builder = new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM);
-
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                if(adapter.getAllUri().size()!=0){
-                    for(Uri uri : adapter.getAllUri()) {
-                        Cursor cursor = StatusEditActivity.this.getContentResolver().query(uri,
-                                filePathColumn, null, null, null);
-                        if (cursor != null) {
-                            cursor.moveToFirst();
-
-                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                            String picturePath = cursor.getString(columnIndex);
-                            File imageFile = new File(picturePath);
-
-                            builder.addFormDataPart("files", imageFile.getName(),
-                                    RequestBody.create(MediaType.parse(StatusEditActivity.this.getContentResolver().getType(uri)), imageFile));
-                        }
+                if (adapter.getAllUri().size() != 0) {
+                    MultipartBody.Builder builder = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM);
+                    ArrayList<String> filePaths = new ArrayList<>();
+                    for (int i = 0; i < adapter.getAllUri().size(); i++) {
+                        //File file = FileUtils.getFile(StatusEditActivity.this, adapter.getAllUri().get(i));
+                        filePaths.add(getRealPathFromDocumentUri(StatusEditActivity.this, adapter.getAllUri().get(i)));
                     }
+                    for (int i = 0; i < filePaths.size(); i++) {
+                        File file = new File(filePaths.get(i));
+                        builder.addFormDataPart("files[]", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+                    }
+
+                    builder.addFormDataPart("sender_id", myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID))
+                            .addFormDataPart("text", "Good Morning")
+                            .addFormDataPart("bg_color", "green")
+                            .addFormDataPart("caption", "[]");
+
+                    RequestBody requestBody = builder.build();
+                    Log.d("StatusEditActivity", "-- 200---" + requestBody.toString());
+
+                    gotoSetUserStatus(requestBody);
+
+                } else {
+                    showSnackbar(binding.rlStatusEdit, "Please select the file to update status", Snackbar.LENGTH_SHORT);
                 }
-
-
-                builder.addFormDataPart("sender_id", myPreferenceManager.getUserDetails().get(MyPreferenceManager.KEY_USER_ID))
-                        .addFormDataPart("text", "")
-                        .addFormDataPart("bg_color", "")
-                        .addFormDataPart("caption", "[]");
-
-                RequestBody requestBody = builder.build();
-               gotoSetUserStatus(requestBody);
             }
         });
     }
 
+    public static String getRealPathFromDocumentUri(Context context, Uri uri) {
+        String filePath = "";
+
+        Pattern p = Pattern.compile("(\\d+)$");
+        Matcher m = p.matcher(uri.toString());
+        if (!m.find()) {
+            Log.e(StatusEditActivity.class.getSimpleName(), "ID for requested image not found: " + uri.toString());
+            return filePath;
+        }
+        String imgId = m.group();
+
+        String[] column = {MediaStore.Images.Media.DATA};
+        String sel = MediaStore.Images.Media._ID + "=?";
+
+        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, new String[]{imgId}, null);
+
+        int columnIndex = cursor.getColumnIndex(column[0]);
+
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+        cursor.close();
+
+        return filePath;
+    }
+
+
     private void gotoSetUserStatus(RequestBody requestBody) {
         showProgressDialog("Please wait...");
-        userStatusResponseModel.setUserStatus(StatusEditActivity.this,requestBody,userStatusResponseModel.statusListener=this);
+        userStatusResponseModel.setUserStatus(StatusEditActivity.this, requestBody, userStatusResponseModel.statusListener = this);
     }
 
     public void onSelectImageClick(View view) {
@@ -307,9 +337,10 @@ public class StatusEditActivity extends BaseActivity implements UserStatusAdapte
                 hideProgressDialog();
                 try {
 
-                    if(userStatusResponseModel.getSuccess()){
+                    if (userStatusResponseModel.getSuccess()) {
                         showSnackbar(binding.rlStatusEdit, userStatusResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
-                    }else{
+                        finish();
+                    } else {
                         showSnackbar(binding.rlStatusEdit, userStatusResponseModel.getMessage(), Snackbar.LENGTH_SHORT);
                     }
 
