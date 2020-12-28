@@ -13,10 +13,11 @@ import com.ozonetech.ozochat.repository.RecentChatList;
 import com.ozonetech.ozochat.repository.StatusRepository;
 import com.ozonetech.ozochat.viewmodel.UserChatListModel;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class StatusResponseModel extends ViewModel {
+public class StatusResponseModel extends ViewModel implements Serializable {
     public LiveData<StatusResponseModel> statusGetResponse;
     public StatusListener statusListener;
 
