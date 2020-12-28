@@ -70,8 +70,7 @@ public class RunTimePermission extends Activity
         arrayListPermission = new ArrayList<PermissionBean>();
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (int i = 0; i < permissions.length; i++)
             {
                 PermissionBean permissionBean = new PermissionBean();
@@ -85,10 +84,7 @@ public class RunTimePermission extends Activity
                     permissionBean.permission = permissions[i];
                     arrayListPermission.add(permissionBean);
                 }
-
-
             }
-
             if (arrayListPermission.size() <= 0)
             {
                 runTimePermissionListener.permissionGranted();
@@ -100,9 +96,7 @@ public class RunTimePermission extends Activity
                 arrayPermissions[i] = arrayListPermission.get(i).permission;
             }
             activity.requestPermissions(arrayPermissions, 10);
-        }
-        else
-        {
+        } else {
             if (runTimePermissionListener != null)
             {
                 runTimePermissionListener.permissionGranted();

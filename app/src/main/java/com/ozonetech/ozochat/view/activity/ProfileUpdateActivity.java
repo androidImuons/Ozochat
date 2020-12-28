@@ -221,8 +221,6 @@ public class ProfileUpdateActivity extends BaseActivity implements EditDialog.Se
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
                 Uri selectedImage = data.getData();
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
