@@ -77,7 +77,7 @@ public class ServiceGenerator {
                 }
             });
         }
-        Log.d("toke","Bearer "+authToken);
+        Log.d("token","Bearer "+authToken);
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
@@ -94,7 +94,6 @@ public class ServiceGenerator {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
             httpClient.addInterceptor(logging);
             Retrofit retrofit = builder.client(httpClient.build()).build();
-
             apiService = retrofit.create(AppServices.class);
             return apiService;
         } else {

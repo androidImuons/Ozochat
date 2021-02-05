@@ -341,15 +341,9 @@ public class ProfileInfoNew extends AppCompatActivity {
                             showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                         }
                     });
-
-
                 }
-
-
             }
         }
-
-
     }
 
     public void updateNameAboutUs() {
@@ -401,8 +395,6 @@ public class ProfileInfoNew extends AppCompatActivity {
                     showSnackbar(ll_login, getResources().getString(R.string.ServerError), Snackbar.LENGTH_SHORT);
                 }
             });
-
-
         }
     }
 
@@ -422,7 +414,6 @@ public class ProfileInfoNew extends AppCompatActivity {
         // MultipartBody.Part is used to send also the actual file name
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
-
     public void showSnackbar(View view, String message, int duration) {
         Snackbar snackbar = Snackbar.make(view, message, duration);
         snackbar.setActionTextColor(Color.WHITE);

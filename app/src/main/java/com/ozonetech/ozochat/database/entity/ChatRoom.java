@@ -22,7 +22,6 @@ public class ChatRoom implements Serializable {
    // @PrimaryKey(autoGenerate = true)
 
     private int id;
-
     @ColumnInfo(name = "user_contact_no")
     @SerializedName("user_contact_no")
     @Expose

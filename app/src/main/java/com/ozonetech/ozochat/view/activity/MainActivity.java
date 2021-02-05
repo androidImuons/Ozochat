@@ -104,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
     private PopupWindow mypopupWindow;
 
-    private void setActionBar() {
+    private void setActionBar()
+    {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
